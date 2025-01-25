@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prolog - ECOGUARDIANS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Cinzel', serif;
+            background-color: #000;
+        }
+
+        .scene-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: background-image 1s ease-in-out;
+        }
+
+        .narrative {
+            position: fixed;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 800px;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            z-index: 2;
+        }
+
+        .text-content {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #fff;
+            white-space: pre-line;
+        }
+
+        .button {
+            display: block;
+            margin: 20px auto 0;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(135deg, #4158D0, #C850C0);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .click-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.6);
+            animation: pulse 2s infinite;
+            z-index: 2;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease; /* Durasi transisi lebih cepat */
+            z-index: 3;
+        }
+        
+
+        .overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="scene-container" id="scene-container"></div>
+    <div class="narrative" id="narrative"></div>
+    <div class="click-hint">Klik untuk melanjutkan...</div>
+    <div class="overlay" id="overlay"></div>
+
+    <script>
+        const scenes = [
+            {
+                background: 'url("./assets/img/prolog1Bg.png")',
+                pages: [
+                    `Tahun 2099, kota Seijul menghadapi krisis ekologi yang belum pernah terjadi sebelumnya...\n\nKota Seijul dijuluki sebagai kota industri terbesar di Bumi karena sebagai pusat produksi kertas.`,
+                    `Hal ini menyebabkan kota Seijul menghasilkan limbah air dan juga polusi dari uap yang dihasilkan dari aktivitas industri.\n\nKarena terlalu berfokus pada industri, penduduk kota Seijul mengabaikan lingkungan disekitarnya.`,
+                    `Sampai pada akhirnya....\n\nBencana tiba... Polusi yang menutupi kota, sungai tercemar oleh limbah air, ekosistem lingkungan di Kota Seijul menjadi rusak.`
+                ]
+            },
+            {
+                background: 'url("./assets/img/prolog2Bg.png")',
+                pages: [
+                    `Sebagai engineer handal di kota Seijul, anda mencoba menciptakan alat untuk menyelamatkan kota seijul dari kehancuran lingkungan.\n\nPara Penduduk kota seijul telah berhasil di evakuasi dan sementara mengungsi di shelter.`,
+                    `Tetapi shelter tidak bisa menampung terlalu lama karena bahan persediaannya tidak tercukupi.\n\nAnda hanya memiliki waktu selama 3 hari untuk menciptakan alat tersebut.`,
+                    `Setiap keputusan anda akan mempengaruhi nasib jutaan penduduk dan ekosistem yang tersisa.`
+                ]
+            }
+        ];
+    
+        let currentScene = 0;
+        let currentPage = 0;
+        let isTransitioning = false;
+        let isTyping = false;
+    
+        // Tambahkan fungsi preload gambar
+        function preloadImages() {
+            return Promise.all(scenes.map(scene => {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.src = scene.background.replace('url("', '').replace('")', '');
+                    img.onload = resolve;
+                    img.onerror = reject;
+                });
+            }));
+        }
+    
+        async function typeWriter(element, text, speed = 30) {
+            isTyping = true;
+            element.innerHTML = '';
+            for (const char of text) {
+                if (!isTyping) {
+                    element.innerHTML = text;
+                    break;
+                }
+                element.innerHTML += char;
+                await new Promise(resolve => setTimeout(resolve, speed));
+            }
+            isTyping = false;
+        }
+    
+        async function showScene(index) {
+            if (isTransitioning) return;
+        
+            isTransitioning = true;
+        
+            const scene = scenes[index];
+            const container = document.getElementById('scene-container');
+            const narrative = document.getElementById('narrative');
+            const overlay = document.getElementById('overlay');
+        
+            overlay.classList.add('active');
+        
+            // Tunggu transisi yang lebih singkat
+            await new Promise(resolve => setTimeout(resolve, 200));
+        
+            container.style.backgroundImage = scene.background;
+            currentPage = 0;
+        
+            narrative.innerHTML = '<div class="text-content"></div>';
+            const textContent = narrative.querySelector('.text-content');
+        
+            // Tunggu sebentar agar background sudah muncul
+            await new Promise(resolve => setTimeout(resolve, 100));
+        
+            overlay.classList.remove('active');
+            await typeWriter(textContent, scene.pages[currentPage], 30);
+        
+            isTransitioning = false;
+        }
+        
+    
+        function showNextPage() {
+            const scene = scenes[currentScene];
+            const narrative = document.getElementById('narrative');
+            const textContent = narrative.querySelector('.text-content');
+    
+            if (isTyping) {
+                isTyping = false;
+                return;
+            }
+    
+            if (currentPage < scene.pages.length - 1) {
+                currentPage++;
+                textContent.innerHTML = '';
+                typeWriter(textContent, scene.pages[currentPage], 30);
+            } else if (currentScene < scenes.length - 1) {
+                nextScene();
+            } else {
+                // Cek apakah tombol sudah ada
+                if (!document.querySelector('.button')) {
+                    const button = document.createElement('button');
+                    button.className = 'button';
+                    button.textContent = 'MULAI SURVIVE';
+                    button.onclick = startGame;
+                    narrative.appendChild(button);
+                }
+            }
+        }
+    
+        function nextScene() {
+            if (currentScene < scenes.length - 1) {
+                currentScene++;
+                showScene(currentScene);
+            }
+        }
+    
+        function startGame() {
+            const overlay = document.getElementById('overlay');
+            overlay.classList.add('active');
+            setTimeout(() => {
+                window.location.href = 'game.html';
+            }, 1000);
+        }
+    
+        document.addEventListener('DOMContentLoaded', async () => {
+            const overlay = document.getElementById('overlay');
+            overlay.classList.add('active');
+            
+            // Preload gambar terlebih dahulu
+            try {
+                await preloadImages();
+                document.body.addEventListener('click', showNextPage);
+                overlay.classList.remove('active');
+                showScene(currentScene);
+            } catch (error) {
+                console.error('Error loading images:', error);
+            }
+        });
+    </script>
+</body>
+</html>
