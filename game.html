@@ -3,9 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>ECOGUARDIANS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        canvas {
+            display: block;
+        }
+        
+        #loadingScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+        }
+    </style>
 </head>
 <body>
-    
+    <div id="loadingScreen">Loading...</div>
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const loadingScreen = document.getElementById('loadingScreen');
+
+        // Mengatur ukuran canvas sesuai window
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Objek untuk menyimpan status tombol
+        const keys = {
+            w: false,
+            s: false,
+            a: false,
+            d: false
+        };
+
+        // Objek game
+        const game = {
+            player: {
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                speed: 5,
+                width: 120,
+                height: 120,
+                currentSprite: null
+            },
+            assets: {
+                jiraStay: new Image(),
+                jiraLeft: new Image(),
+                jiraRight: new Image(),
+                background: new Image()
+            },
+            loaded: 0,
+            required: 4
+        };
+
+        // Fungsi untuk memuat asset
+        function loadAssets() {
+            for (let asset in game.assets) {
+                game.assets[asset].onload = () => {
+                    game.loaded++;
+                    if (game.loaded === game.required) {
+                        loadingScreen.style.display = 'none';
+                        game.player.currentSprite = game.assets.jiraStay;
+                        requestAnimationFrame(gameLoop);
+                    }
+                };
+            }
+
+            game.assets.jiraStay.src = './assets/img/jiraStay.png';
+            game.assets.jiraLeft.src = './assets/img/jiraLeft.png';
+            game.assets.jiraRight.src = './assets/img/jiraRight.png';
+            game.assets.background.src = './assets/img/gameBg.png';
+        }
+
+        // Event listeners untuk input keyboard
+        window.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() in keys) {
+                keys[e.key.toLowerCase()] = true;
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.key.toLowerCase() in keys) {
+                keys[e.key.toLowerCase()] = false;
+            }
+        });
+
+        // Fungsi untuk mengupdate posisi player
+        function updatePlayer() {
+            const nextX = game.player.x;
+            const nextY = game.player.y;
+
+            if (keys.w && game.player.y > 0) {
+                game.player.y -= game.player.speed;
+                game.player.currentSprite = game.assets.jiraStay;
+            }
+            if (keys.s && game.player.y < canvas.height - game.player.height) {
+                game.player.y += game.player.speed;
+                game.player.currentSprite = game.assets.jiraStay;
+            }
+            if (keys.a && game.player.x > 0) {
+                game.player.x -= game.player.speed;
+                game.player.currentSprite = game.assets.jiraLeft;
+            }
+            if (keys.d && game.player.x < canvas.width - game.player.width) {
+                game.player.x += game.player.speed;
+                game.player.currentSprite = game.assets.jiraRight;
+            }
+
+            if (!keys.w && !keys.s && !keys.a && !keys.d) {
+                game.player.currentSprite = game.assets.jiraStay;
+            }
+        }
+
+    // Fungsi untuk menggambar background secara proporsional
+    function drawBackground() {
+        const imgWidth = game.assets.background.width;
+        const imgHeight = game.assets.background.height;
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+
+        // Hitung rasio untuk "contain"
+        const scale = Math.min(canvasWidth / imgWidth, canvasHeight / imgHeight);
+
+        const bgWidth = imgWidth * scale;
+        const bgHeight = imgHeight * scale;
+
+        // Hitung posisi tengah (agar background berada di tengah)
+        const xOffset = (canvasWidth - bgWidth) / 2;
+        const yOffset = (canvasHeight - bgHeight) / 2;
+
+        ctx.drawImage(game.assets.background, xOffset, yOffset, bgWidth, bgHeight);
+    }
+
+        // Fungsi untuk menggambar player
+        function drawPlayer() {
+            ctx.drawImage(
+                game.player.currentSprite,
+                game.player.x,
+                game.player.y,
+                game.player.width,
+                game.player.height
+            );
+        }
+
+        // Game loop utama
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            drawBackground();
+            updatePlayer();
+            drawPlayer();
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Memulai game dengan memuat assets
+        loadAssets();
+    </script>
 </body>
 </html>
