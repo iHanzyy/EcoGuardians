@@ -13,7 +13,7 @@
     }
 
     body {
-      font-family: Arial, sans-serif;
+      font-family: Helvetica, sans-serif;
       height: 100vh;
       display: flex;
       justify-content: center;
@@ -47,10 +47,9 @@
 
     /* Teks Start dengan efek gradasi dan glow */
     .start-text {
-      background: linear-gradient(90deg, #14aa02, #55c800);
+      background: white;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 0px 0px 15px rgba(85, 200, 0, 0.9);
       animation: flickerText 1.5s infinite alternate;
     }
 
@@ -134,7 +133,7 @@
       padding: 14px 33px;
       justify-content: center;
       align-items: center;
-      font-size: 1.3rem;
+      font-size: 1.7rem;
       font-weight: bold;
       color: white;
       background: linear-gradient(109deg, #14aa02 24.9%, #55c800 70.98%);
@@ -147,6 +146,7 @@
       overflow: hidden;
       opacity: 0;
       transform: translateX(-100vw);
+      font-family: 'Helvetica Bold', sans-serif;
     }
 
     .button:nth-child(1) {
@@ -199,8 +199,8 @@
     }
 
     .popup {
-      background: #1a1a1a;
-      border: 2px solid #14aa02;
+      background: rgba(20, 170, 2, 0.8);
+      border: 2px solid white;
       border-radius: 15px;
       padding: 20px;
       max-width: 600px;
@@ -225,8 +225,9 @@
       text-align: center;
       margin-bottom: 20px;
       font-size: 2rem;
-      color: #55c800;
+      color: white;
       text-shadow: 0 0 5px #14aa02;
+      font-family: 'Helvetica Bold', sans-serif;
     }
 
     .team-members {
@@ -238,7 +239,7 @@
 
     .team-member {
       background: #2b2b2b;
-      border: 2px solid #14aa02;
+      border: 4px solid white;
       border-radius: 10px;
       padding: 10px;
       width: 250px;
@@ -276,7 +277,7 @@
     }
 
     .team-member a {
-      color: #14aa02;
+      color: #3ce629;
       text-decoration: none;
     }
 
@@ -287,7 +288,7 @@
       background: transparent;
       border: none;
       font-size: 1.5rem;
-      color: #55c800;
+      color: white;
       cursor: pointer;
       transition: transform 0.2s ease;
     }
@@ -311,8 +312,9 @@
     <div class="content-wrapper">
       <div class="title"></div>
       <div class="buttons">
+        <!-- Tombol Play -->
         <a href="#" class="button play">Play</a>
-        <!-- Tambahkan id "aboutButton" pada tombol About Us -->
+        <!-- Tombol About Us -->
         <a href="#" class="button" id="aboutButton">About Us</a>
       </div>
     </div>
@@ -334,7 +336,7 @@
           </p>
         </div>
         <div class="team-member">
-          <img src="./assets/img/jojo.jpg" alt="Rafi Julian" />
+          <img src="./assets/img/rafi.jpg" alt="Rafi Julian" />
           <p><strong>Rafi Julian</strong></p>
           <p>SMKN 1 Cibinong</p>
           <p>
@@ -393,6 +395,13 @@
       if (e.target === aboutPopup) {
         aboutPopup.classList.remove("active");
       }
+    });
+
+    // Redirect ke prolog.html ketika tombol Play ditekan
+    const playButton = document.querySelector(".button.play");
+    playButton.addEventListener("click", function(e) {
+      e.preventDefault();
+      window.location.href = "prolog.html";
     });
   </script>
 </body>
