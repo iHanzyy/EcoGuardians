@@ -149,6 +149,33 @@
       font-family: 'Helvetica Bold', sans-serif;
     }
 
+    .button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 200%;
+      height: 100%;
+      background: linear-gradient(120deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.3));
+      transition: all 0.3s ease;
+      transform: skewX(-25deg);
+    }
+
+    .button:hover::before {
+      left: 100%;
+      transition: all 0.5s ease;
+    }
+
+    .button:hover {
+      transform: translateY(3px);
+      box-shadow: 0 3px 0px 0px #000;
+    }
+
+    .button:active {
+      transform: translateY(6px);
+      box-shadow: 0 0px 0px 0px #000;
+    }
+
     .button:nth-child(1) {
       animation: slideIn 0.5s ease-out 1s forwards;
     }
@@ -162,16 +189,6 @@
         opacity: 1;
         transform: translateX(0);
       }
-    }
-
-    .button:hover {
-      transform: translateY(3px);
-      box-shadow: 0 3px 0px 0px #000;
-    }
-
-    .button:active {
-      transform: translateY(6px);
-      box-shadow: 0 0px 0px 0px #000;
     }
 
     /* ========================================= */
@@ -296,6 +313,32 @@
     .close-button:hover {
       transform: scale(1.2);
     }
+
+    .mute-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 68px;
+      height: 64px;
+      cursor: pointer;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      z-index: 1001;
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .mute-toggle.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .mute-toggle:hover {
+      transform: scale(0.9);
+    }
+
+    .mute-toggle:active {
+      transform: scale(0.8);
+    }
     /* ========================================= */
   </style>
 </head>
@@ -348,6 +391,10 @@
     </div>
   </div>
 
+  <div class="mute-toggle" id="muteToggle">
+    <img src="./assets/img/unmuteLogo.svg" alt="Unmute" id="muteIcon" />
+  </div>
+
   <script>
     // Mulai tampilan start screen dan pindah ke konten utama
     const startScreen = document.getElementById("startScreen");
@@ -368,6 +415,7 @@
 
         setTimeout(() => {
           mainContent.style.opacity = "1";
+          muteToggle.classList.add("visible");
         }, 50);
 
         document.body.style.backgroundImage = "url('./assets/img/indexBg.png')";
@@ -402,6 +450,16 @@
     playButton.addEventListener("click", function(e) {
       e.preventDefault();
       window.location.href = "prolog.html";
+    });
+
+    const muteToggle = document.getElementById("muteToggle");
+    const muteIcon = document.getElementById("muteIcon");
+    let isMuted = false;
+
+    muteToggle.addEventListener("click", function () {
+      isMuted = !isMuted;
+      bgMusic.muted = isMuted;
+      muteIcon.src = isMuted ? "./assets/img/muteLogo.svg" : "./assets/img/unmuteLogo.svg";
     });
   </script>
 </body>
