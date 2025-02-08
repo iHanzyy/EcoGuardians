@@ -125,9 +125,38 @@
             opacity: 1;
             pointer-events: auto;
         }
+
+        .button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(120deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.3));
+            transition: all 0.3s ease;
+            transform: skewX(-25deg);
+        }
+
+        .button:hover::before {
+            left: 100%;
+            transition: all 0.5s ease;
+        }
+
+        .button:hover {
+            transform: translateY(3px);
+            box-shadow: 0 3px 0px 0px #000;
+        }
+
+        .button:active {
+            transform: translateY(6px);
+            box-shadow: 0 0px 0px 0px #000;
+        }
     </style>
 </head>
 <body>
+    <!-- Elemen audio untuk efek suara ketikan -->
+    <audio id="typeSound" src="./assets/audio/typingSound.mp3"></audio>
     <div class="scene-container" id="scene-container"></div>
     <div class="narrative" id="narrative"></div>
     <div class="click-hint">Klik untuk melanjutkan...</div>
@@ -140,13 +169,13 @@
                 pages: [
                     `Tahun 2099, kota Seijul menghadapi krisis ekologi yang belum pernah terjadi sebelumnya...\nKota Seijul dijuluki sebagai kota industri terbesar di Bumi karena sebagai pusat produksi kertas.`,
                     `Hal ini menyebabkan kota Seijul menghasilkan limbah air dan juga polusi dari uap yang dihasilkan dari aktivitas industri.\nKarena terlalu berfokus pada industri, penduduk kota Seijul mengabaikan lingkungan disekitarnya.`,
-                    `Sampai pada akhirnya....\nBencana tiba... Polusi yang menutupi kota, sungai tercemar oleh limbah air, ekosistem lingkungan di Kota Seijul menjadi rusak.`
+                    `Sampai pada akhirnya....\nBencana tiba... \nPolusi yang menutupi kota, sungai tercemar oleh limbah air, ekosistem lingkungan di Kota Seijul menjadi rusak.`
                 ]
             },
             {
                 background: 'url("./assets/img/prolog2Bg.png")',
                 pages: [
-                    `Sebagai engineer handal di kota Seijul, anda mencoba menciptakan alat untuk menyelamatkan kota seijul dari kehancuran lingkungan.\n\nPara Penduduk kota seijul telah berhasil di evakuasi dan sementara mengungsi di shelter.`,
+                    `Sebagai engineer handal di kota Seijul, Jira mencoba menciptakan alat untuk menyelamatkan kota seijul dari kehancuran lingkungan.\n\nPara Penduduk kota seijul telah berhasil di evakuasi dan sementara mengungsi di shelter.`,
                     `Tetapi shelter tidak bisa menampung terlalu lama karena bahan persediaannya tidak tercukupi.\n\nAnda hanya memiliki waktu selama 3 hari untuk menciptakan alat tersebut.`,
                     `Setiap keputusan anda akan mempengaruhi nasib jutaan penduduk dan ekosistem yang tersisa.`
                 ]
@@ -170,6 +199,24 @@
             }));
         }
     
+        const sceneContainer = document.getElementById("scene-container");
+        const typeSound = document.getElementById('typeSound');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const overlay = document.getElementById('overlay');
+            overlay.classList.add('active');
+            
+            // Preload gambar terlebih dahulu
+            try {
+                await preloadImages();
+                document.body.addEventListener('click', showNextPage);
+                overlay.classList.remove('active');
+                showScene(currentScene);
+            } catch (error) {
+                console.error('Error loading images:', error);
+            }
+        });
+
         async function typeWriter(element, text, speed = 30) {
             isTyping = true;
             element.innerHTML = '';
@@ -179,6 +226,8 @@
                     break;
                 }
                 element.innerHTML += char;
+                typeSound.currentTime = 0; // Reset waktu audio ke awal
+                typeSound.play().catch(error => console.error('Audio play error:', error)); // Mainkan suara ketikan
                 await new Promise(resolve => setTimeout(resolve, speed));
             }
             isTyping = false;
@@ -270,21 +319,6 @@
                 window.location.href = 'game.html';
             }, 1000);
         }
-    
-        document.addEventListener('DOMContentLoaded', async () => {
-            const overlay = document.getElementById('overlay');
-            overlay.classList.add('active');
-            
-            // Preload gambar terlebih dahulu
-            try {
-                await preloadImages();
-                document.body.addEventListener('click', showNextPage);
-                overlay.classList.remove('active');
-                showScene(currentScene);
-            } catch (error) {
-                console.error('Error loading images:', error);
-            }
-        });
     </script>
 </body>
 </html>

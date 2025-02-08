@@ -339,6 +339,11 @@
     .mute-toggle:active {
       transform: scale(0.8);
     }
+
+    .mute-toggle.disabled {
+      pointer-events: none;
+      opacity: 0.5;
+    }
     /* ========================================= */
   </style>
 </head>
@@ -432,16 +437,19 @@
     aboutButton.addEventListener("click", function (e) {
       e.preventDefault();
       aboutPopup.classList.add("active");
+      muteToggle.classList.add("disabled");
     });
 
     closePopup.addEventListener("click", function () {
       aboutPopup.classList.remove("active");
+      muteToggle.classList.remove("disabled");
     });
 
     // Tutup popup jika klik di luar area popup
     aboutPopup.addEventListener("click", function (e) {
       if (e.target === aboutPopup) {
         aboutPopup.classList.remove("active");
+        muteToggle.classList.remove("disabled");
       }
     });
 
