@@ -1,246 +1,399 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - ECOGUARDIANS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background-image: url('./assets/img/indexBg.png');
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: 'Cinzel', serif;
-            overflow: hidden;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoGuardians</title>
+  <style>
+    /* General reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        .game-title {
-            font-size: 6rem;
-            font-weight: 700;
-            color: #F4D03F;
-            text-shadow: 0 0 20px rgba(0,0,0,0.5);
-            margin-bottom: 50px;
-            opacity: 0;
-            transform: scale(0.8);
-            animation: titleZoomIn 1.5s forwards ease-out;
-        }
+    body {
+      font-family: Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+      overflow: hidden;
+      transition: background 1s ease;
+    }
 
-        .button-container {
-            display: flex;
-            gap: 30px;
-            opacity: 0;
-            transform: translateY(50px);
-            animation: buttonsFadeIn 1.5s forwards 1s;
-        }
+    /* Tampilan Start Screen */
+    .start-screen {
+      color: white;
+      font-size: 2.5rem;
+      text-align: center;
+      cursor: pointer;
+      padding: 40px;
+      background: linear-gradient(120deg, rgba(20, 170, 2, 0.5), rgba(85, 200, 0, 0.2));
+      border-radius: 20px;
+      border: 3px solid rgba(20, 170, 2, 0.8);
+      text-transform: uppercase;
+      font-weight: bold;
+      letter-spacing: 3px;
+      position: relative;
+      box-shadow: 0 0 15px rgba(20, 170, 2, 0.8);
+      transition: all 0.3s ease;
+      animation: pulseGlow 2s infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-        .button {
-            padding: 20px 60px;
-            font-size: 24px;
-            font-weight: 600;
-            color: white;
-            text-transform: uppercase;
-            cursor: pointer;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 15px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(5px);
-            letter-spacing: 2px;
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
-        }
+    /* Teks Start dengan efek gradasi dan glow */
+    .start-text {
+      background: linear-gradient(90deg, #14aa02, #55c800);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0px 0px 15px rgba(85, 200, 0, 0.9);
+      animation: flickerText 1.5s infinite alternate;
+    }
 
-        .button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(255, 255, 255, 0.2),
-                transparent
-            );
-            transition: all 0.6s;
-        }
+    @keyframes pulseGlow {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 20px rgba(20, 170, 2, 0.8);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 40px rgba(85, 200, 0, 1);
+      }
+    }
 
-        .button:hover::before {
-            left: 100%;
-        }
+    @keyframes flickerText {
+      0% { opacity: 1; }
+      50% { opacity: 0.7; }
+      100% { opacity: 1; }
+    }
 
-        .button:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.3);
-            border-color: rgba(255, 255, 255, 0.5);
-        }
+    .start-screen:hover {
+      background: linear-gradient(120deg, rgba(20, 170, 2, 0.7), rgba(85, 200, 0, 0.4));
+      transform: scale(1.08);
+      box-shadow: 0 0 30px rgba(20, 170, 2, 1);
+    }
 
-        .start {
-            background: linear-gradient(135deg, #4158D0, #C850C0);
-            box-shadow: 0 10px 20px rgba(65, 88, 208, 0.3);
-        }
+    /* Kontainer utama */
+    .container {
+      display: none;
+      text-align: center;
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
 
-        .about {
-            background: linear-gradient(135deg, #43CBFF, #9708CC);
-            box-shadow: 0 10px 20px rgba(67, 203, 255, 0.3);
-        }
+    .content-wrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 30px;
+      position: relative;
+      width: 100%;
+    }
 
-        @keyframes titleZoomIn {
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
+    .title {
+      width: 100%;
+      max-width: 770px;
+      height: auto;
+      aspect-ratio: 770 / 434;
+      background: url('./assets/img/logoEcoG.svg') no-repeat center center/contain;
+      animation: dropIn 1s ease-out forwards;
+      opacity: 0;
+      transform: translateY(-100vh);
+    }
 
-        @keyframes buttonsFadeIn {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    @keyframes dropIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: none;
-            z-index: 10;
-        }
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
 
-        .popup {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.8);
-            background: linear-gradient(135deg, #ffffff, #e6e6e6);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            z-index: 20;
-            display: none;
-            animation: popupAppear 0.6s forwards ease-out;
-        }
+    .button {
+      display: flex;
+      width: 100%;
+      max-width: 220px;
+      height: 90px;
+      padding: 14px 33px;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: white;
+      background: linear-gradient(109deg, #14aa02 24.9%, #55c800 70.98%);
+      border: 4px solid #000;
+      border-radius: 20px;
+      box-shadow: 0 6px 0px 0px #000;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateX(-100vw);
+    }
 
-        .popup.active {
-            display: block;
-        }
+    .button:nth-child(1) {
+      animation: slideIn 0.5s ease-out 1s forwards;
+    }
 
-        @keyframes popupAppear {
-            from {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.8);
-            }
-            to {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
-        }
+    .button:nth-child(2) {
+      animation: slideIn 0.5s ease-out 1.2s forwards;
+    }
 
-        .popup h2 {
-            font-size: 2rem;
-            color: #333;
-            margin-bottom: 20px;
-        }
+    @keyframes slideIn {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
 
-        .team-member {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            margin-bottom: 15px;
-        }
+    .button:hover {
+      transform: translateY(3px);
+      box-shadow: 0 3px 0px 0px #000;
+    }
 
-        .team-member img {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: 2px solid #ccc;
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-        }
+    .button:active {
+      transform: translateY(6px);
+      box-shadow: 0 0px 0px 0px #000;
+    }
 
-        .team-member p {
-            font-size: 1.2rem;
-            color: #555;
-        }
+    /* ========================================= */
+    /* ============ POPUP ABOUT US ============= */
+    /* ========================================= */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      z-index: 1000;
+    }
 
-        .team-member span {
-            font-size: 0.9rem;
-            color: #777;
-        }
+    .popup-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
 
-        .popup button {
-            margin-top: 20px;
-            padding: 10px 30px;
-            font-size: 1rem;
-            font-weight: bold;
-            background: linear-gradient(135deg, #4158D0, #C850C0);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
+    .popup {
+      background: #1a1a1a;
+      border: 2px solid #14aa02;
+      border-radius: 15px;
+      padding: 20px;
+      max-width: 600px;
+      width: 90%;
+      position: relative;
+      box-shadow: 0 0 15px rgba(20, 170, 2, 0.8);
+      animation: popupFadeIn 0.5s ease-out;
+    }
 
-        .popup button:hover {
-            background: linear-gradient(135deg, #C850C0, #4158D0);
-        }
-    </style>
+    @keyframes popupFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .popup h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 2rem;
+      color: #55c800;
+      text-shadow: 0 0 5px #14aa02;
+    }
+
+    .team-members {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .team-member {
+      background: #2b2b2b;
+      border: 2px solid #14aa02;
+      border-radius: 10px;
+      padding: 10px;
+      width: 250px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(20, 170, 2, 0.6);
+      animation: slideInUp 0.5s ease-out;
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .team-member img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .team-member img:hover {
+      transform: scale(1.05);
+    }
+
+    .team-member p {
+      color: #fff;
+      margin: 5px 0;
+    }
+
+    .team-member a {
+      color: #14aa02;
+      text-decoration: none;
+    }
+
+    .close-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      color: #55c800;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .close-button:hover {
+      transform: scale(1.2);
+    }
+    /* ========================================= */
+  </style>
 </head>
 <body>
-    <h1 class="game-title">ECOGUARDIANS</h1>
+  <audio id="bgMusic" loop>
+    <source src="./assets/audio/backsoundStart.mp3" type="audio/mpeg" />
+  </audio>
 
-    <div class="button-container">
-        <button class="button start" onclick="window.location.href='prolog.html'">Start</button>
-        <button class="button about" onclick="showPopup()">About</button>
+  <div class="start-screen" id="startScreen">
+    <span class="start-text">▶ Tap to Start ◀</span>
+  </div>
+
+  <div class="container" id="mainContent">
+    <div class="content-wrapper">
+      <div class="title"></div>
+      <div class="buttons">
+        <a href="#" class="button play">Play</a>
+        <!-- Tambahkan id "aboutButton" pada tombol About Us -->
+        <a href="#" class="button" id="aboutButton">About Us</a>
+      </div>
     </div>
+  </div>
 
-    <div class="overlay" id="overlay" onclick="hidePopup()"></div>
-    <div class="popup" id="popup">
-        <h2>Meet the Team</h2>
+  <!-- POPUP ABOUT US -->
+  <div class="popup-overlay" id="aboutPopup">
+    <div class="popup">
+      <button class="close-button" id="closePopup">&times;</button>
+      <h2>About Us</h2>
+      <div class="team-members">
         <div class="team-member">
-            <img src="./assets/img/jojo.jpg" alt="Jojo">
-            <p>Mohammad Jonah Setiawan</p>
-            <span>XI RPL 1</span>
-            <span>SMKN 1 Cibinong</span>
+          <img src="./assets/img/jojo.jpg" alt="Mohammad Jonah Setiawan" />
+          <p><strong>Mohammad Jonah Setiawan</strong></p>
+          <p>SMKN 1 Cibinong</p>
+          <p>
+            Instagram:
+            <a href="https://instagram.com/mojostwn" target="_blank">@mojostwn</a>
+          </p>
         </div>
         <div class="team-member">
-            <img src="./assets/img/jojo.jpg" alt="Rafi">
-            <p>Rafi Julian</p>
-            <span>XI RPL 2</span>
-            <span>SMKN 1 Cibinong</span>
+          <img src="./assets/img/jojo.jpg" alt="Rafi Julian" />
+          <p><strong>Rafi Julian</strong></p>
+          <p>SMKN 1 Cibinong</p>
+          <p>
+            Instagram:
+            <a href="https://instagram.com/rjuliannnn_" target="_blank">@rjuliannnn_</a>
+          </p>
         </div>
-        <button onclick="hidePopup()">Close</button>
+      </div>
     </div>
+  </div>
 
-    <script>
-        function showPopup() {
-            const popup = document.getElementById('popup');
-            const overlay = document.getElementById('overlay');
-            overlay.style.display = 'block';
-            popup.style.display = 'block';
-        }
+  <script>
+    // Mulai tampilan start screen dan pindah ke konten utama
+    const startScreen = document.getElementById("startScreen");
+    const mainContent = document.getElementById("mainContent");
+    const bgMusic = document.getElementById("bgMusic");
 
-        function hidePopup() {
-            const popup = document.getElementById('popup');
-            const overlay = document.getElementById('overlay');
-            overlay.style.display = 'none';
-            popup.style.display = 'none';
-        }
-    </script>
+    startScreen.addEventListener("click", function () {
+      // Mulai mainkan audio
+      bgMusic.play();
+
+      // Fade out start screen
+      startScreen.style.opacity = "0";
+      startScreen.style.transition = "opacity 1s ease";
+
+      setTimeout(() => {
+        startScreen.style.display = "none";
+        mainContent.style.display = "block";
+
+        setTimeout(() => {
+          mainContent.style.opacity = "1";
+        }, 50);
+
+        document.body.style.backgroundImage = "url('./assets/img/indexBg.png')";
+        document.body.style.backgroundSize = "cover";
+        document.body.style.backgroundPosition = "center";
+      }, 1000);
+    });
+
+    // Popup About Us
+    const aboutButton = document.getElementById("aboutButton");
+    const aboutPopup = document.getElementById("aboutPopup");
+    const closePopup = document.getElementById("closePopup");
+
+    aboutButton.addEventListener("click", function (e) {
+      e.preventDefault();
+      aboutPopup.classList.add("active");
+    });
+
+    closePopup.addEventListener("click", function () {
+      aboutPopup.classList.remove("active");
+    });
+
+    // Tutup popup jika klik di luar area popup
+    aboutPopup.addEventListener("click", function (e) {
+      if (e.target === aboutPopup) {
+        aboutPopup.classList.remove("active");
+      }
+    });
+  </script>
 </body>
 </html>
