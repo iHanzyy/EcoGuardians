@@ -455,6 +455,84 @@
       .page-transition.active {
         opacity: 1;
       }
+
+      /* Resource Bar Styles - Wood & Plastic yang sudah disesuaikan dengan linear gradient hijau */
+      .resource-bar {
+          width: 220px;
+          height: 40px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 12px;
+          background: linear-gradient(45deg, #2a8e2a, #50d850); /* Linear gradient hijau */
+          border-radius: 10px;
+          box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.2);
+          padding: 5px;
+          border: 5px solid black;
+      }
+
+      .resource-icon-container {
+          position: relative;
+          display: flex;
+          align-items: center;
+          
+      }
+
+      .resource-icon {
+          width: 30px;
+          height: 40px;
+          filter: drop-shadow(1px 1px 3px rgba(0, 0, 0, 0.3));
+      }
+
+      .resource-text {
+          color: black;
+          font-size: 20px;
+          font-family: 'Poppins', sans-serif;
+          font-weight: 600;
+          text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+          margin-left: 5px;
+      }
+
+      .alat-dom-element {
+        position: fixed;
+        width: 280px;
+        height: 280px;
+        pointer-events: none;
+        background-image: url('./assets/img/alatPenghilangPolusi.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        display: none; /* Default hidden */
+      }
+      
+      #alatPolusi {
+        /* Sesuaikan dengan posisi yang diinginkan */
+        left: 580px;
+        top: 300px;
+      }
+
+      /* CSS untuk alat konversi */
+      #alatKonversi {
+        left: 270px;
+        top: 600px;
+        width: 130px;
+        height: 130px;
+        background-image: url('./assets/img/alatKonversi.png');
+        transform: translate(0, 0); /* Pastikan posisi default */
+      }
+
+      /* Pastikan animasi hanya berlaku untuk alat */
+      #alatKonversi {
+        animation: none; /* Reset default */
+      }
+      
+      @keyframes shake {
+        0% { transform: translate(0, 0); }
+        20% { transform: translate(-3px, 2px); }
+        40% { transform: translate(3px, -2px); }
+        60% { transform: translate(-3px, 1px); }
+        80% { transform: translate(2px, -1px); }
+        100% { transform: translate(0, 0); }
+      }
     </style>
   </head>
   <body>
@@ -519,6 +597,20 @@
 
     <!-- Game Icons -->
     <div id="icons">
+      <!-- Resource Bar: Wood & Plastic -->
+      <div class="resource-bar">
+          <!-- Bagian Plastik -->
+          <div class="resource-icon-container">
+              <img class="resource-icon" src="./assets/img/plastic.svg" alt="Plastic Icon" />
+              <div class="resource-text" id="plasticCount">X 0</div>
+          </div>
+          <!-- Bagian Kayu -->
+          <div class="resource-icon-container">
+              <img class="resource-icon" src="./assets/img/kayu.svg" alt="Wood Icon" />
+              <div class="resource-text" id="woodCount">X 0</div>
+          </div>
+      </div>
+
       <img src="./assets/img/guideButton.svg" alt="Guide Button" class="icon" id="guideButton" />
       <img src="./assets/img/questButton.svg" alt="Quest Button" class="icon" />
     </div>
@@ -600,6 +692,12 @@
     <!-- Page Transition Overlay -->
     <div class="page-transition" id="pageTransition"></div>
 
+    <!-- Tambahkan div untuk alat penghilang polusi di bawah canvas -->
+    <div id="alatPolusi" class="alat-dom-element"></div>
+
+    <!-- Tambahkan div untuk alat konversi air -->
+    <div id="alatKonversi" class="alat-dom-element"></div>
+
     <script>
       /***********************
        * Game Code
@@ -680,7 +778,6 @@
       // Definisikan objek baru untuk posisi dan ukuran alat
       game.tools = {
         alatKonversi: { x: 270, y: 600, width: 130, height: 130 },
-        alatPenghilangPolusi: { x: 580, y: 300, width: 280, height: 280 },
         // Properti untuk animasi shaking pada alat konversi
         konversiShaking: false,
         shakeStartTime: 0
@@ -749,16 +846,13 @@
             
             // Ambil status pohon dari localStorage
             const storedTreeState = localStorage.getItem("treeIsCut");
-            if (storedTreeState === "true") {
-              game.tree.isCut = true;
-              game.currentTreeImage = game.assets.treeCut;
-            } else {
-              game.tree.isCut = false;
-              game.currentTreeImage = game.assets.tree;
-            }
+            game.tree.isCut = storedTreeState === "true";
+            game.currentTreeImage = game.tree.isCut ? game.assets.treeCut : game.assets.tree;
             
             setSpawnPosition();
+            updateToolButtons(); // <-- Memperbarui status tombol berdasarkan data di localStorage
             requestAnimationFrame(gameLoop);
+            initializeButtons(); // Tambah ini
           }
         }
       }
@@ -907,39 +1001,63 @@
           plantButton.classList.remove('visible');
         }
 
+        // Update visibility alat konversi
+        const alatKonversiElement = document.getElementById('alatKonversi');
+        const converterBought = localStorage.getItem("converterBought") === "true";
+        alatKonversiElement.style.display = converterBought ? 'block' : 'none';
+
         // Hitung jarak ke alat konversi
-        const konversiButton = document.getElementById('konversiButton');
-        const konversiCenter = {
-          x: game.tools.alatKonversi.x + game.tools.alatKonversi.width / 2,
-          y: game.tools.alatKonversi.y + game.tools.alatKonversi.height / 2
-        };
-        const distanceToKonversi = Math.hypot(playerCenter.x - konversiCenter.x, playerCenter.y - konversiCenter.y);
+        if (converterBought) {
+          // Gunakan posisi fixed dari CSS bukan getBoundingClientRect()
+          const konversiX = 270; // Sesuai dengan CSS left
+          const konversiY = 600; // Sesuai dengan CSS top
+          const konversiWidth = 130;
+          const konversiHeight = 130;
+          
+          const konversiCenter = {
+            x: konversiX + konversiWidth/2,
+            y: konversiY + konversiHeight/2
+          };
+          
+          const distanceToKonversi = Math.hypot(
+            playerCenter.x - (konversiCenter.x + canvasRect.left),
+            playerCenter.y - (konversiCenter.y + canvasRect.top)
+          );
 
-        if (distanceToKonversi < INTERACTION_DISTANCE) {
-          konversiButton.classList.add('visible');
-          const buttonWidth = konversiButton.offsetWidth;
-          konversiButton.style.left = `${konversiCenter.x - buttonWidth / 2}px`;
-          konversiButton.style.top = `${game.tools.alatKonversi.y + game.tools.alatKonversi.height + 20}px`;
-        } else {
-          konversiButton.classList.remove('visible');
+          if (distanceToKonversi < INTERACTION_DISTANCE) {
+            konversiButton.classList.add('visible');
+            const buttonWidth = konversiButton.offsetWidth;
+            konversiButton.style.left = `${konversiCenter.x - buttonWidth/2}px`;
+            konversiButton.style.top = `${konversiY + konversiHeight + 20}px`;
+          } else {
+            konversiButton.classList.remove('visible');
+          }
         }
 
-        // --- Tambahan: Logika untuk alat penghilang polusi ---
-        const polusiButton = document.getElementById('polusiButton');
-        const polusiCenter = {
-          x: game.tools.alatPenghilangPolusi.x + game.tools.alatPenghilangPolusi.width / 2,
-          y: game.tools.alatPenghilangPolusi.y + game.tools.alatPenghilangPolusi.height / 2
-        };
-        const distanceToPolusi = Math.hypot(playerCenter.x - polusiCenter.x, playerCenter.y - polusiCenter.y);
-        if (distanceToPolusi < INTERACTION_DISTANCE) {
-          polusiButton.classList.add('visible');
-          const buttonWidth = polusiButton.offsetWidth;
-          polusiButton.style.left = `${polusiCenter.x - buttonWidth / 2}px`;
-          polusiButton.style.top = `${game.tools.alatPenghilangPolusi.y + game.tools.alatPenghilangPolusi.height + 20}px`;
-        } else {
-          polusiButton.classList.remove('visible');
+        // --- Modified: Logika untuk alat penghilang polusi ---
+        const alatPolusiElement = document.getElementById('alatPolusi');
+        const pollutionBought = localStorage.getItem("pollutionBought") === "true";
+        alatPolusiElement.style.display = pollutionBought ? 'block' : 'none';
+
+        if (pollutionBought) {
+          const polusiRect = alatPolusiElement.getBoundingClientRect();
+          const polusiCenter = {
+            x: polusiRect.left + polusiRect.width/2,
+            y: polusiRect.top + polusiRect.height/2
+          };
+          
+          const distanceToPolusi = Math.hypot(playerCenter.x - polusiCenter.x, playerCenter.y - polusiCenter.y);
+          
+          if (distanceToPolusi < INTERACTION_DISTANCE) {
+            polusiButton.classList.add('visible');
+            const buttonWidth = polusiButton.offsetWidth;
+            polusiButton.style.left = `${polusiCenter.x - buttonWidth/2}px`;
+            polusiButton.style.top = `${polusiRect.bottom + 20}px`;
+          } else {
+            polusiButton.classList.remove('visible');
+          }
         }
-        // --- End Tambahan ---
+        // --- End Modified ---
 
         // Collision detection (blok rintangan)
         let collisionDetected = false;
@@ -1090,61 +1208,13 @@
         );
       }
 
-      // Fungsi baru untuk menggambar alat konversi dengan animasi shaking
-      function drawConversionTool() {
-        const konversiPos = game.tools.alatKonversi;
-        let shakeOffsetX = 0, shakeOffsetY = 0;
-        
-        if (game.tools.konversiShaking) {
-          const elapsed = Date.now() - game.tools.shakeStartTime;
-          const shakeDuration = 500; // durasi bergetar dalam milidetik (0.5 detik)
-          if (elapsed < shakeDuration) {
-            const maxOffset = 5; // intensitas getar (dapat disesuaikan)
-            // Hitung offset secara acak pada sumbu X dan Y
-            shakeOffsetX = (Math.random() * maxOffset * 2) - maxOffset;
-            shakeOffsetY = (Math.random() * maxOffset * 2) - maxOffset;
-          } else {
-            // Matikan flag shaking setelah durasi selesai
-            game.tools.konversiShaking = false;
-          }
-        }
-        
-        ctx.drawImage(
-          game.assets.alatKonversi,
-          konversiPos.x + shakeOffsetX,
-          konversiPos.y + shakeOffsetY,
-          konversiPos.width,
-          konversiPos.height
-        );
-      }
-
-      // Fungsi baru untuk menggambar alat penghilang polusi (jika diperlukan tampil di layer bawah)
-      function drawPolusiTool() {
-        // Ubah properti x, y, width, dan height di game.tools.alatPenghilangPolusi untuk menyesuaikan posisinya
-        const polusiPos = game.tools.alatPenghilangPolusi;
-        ctx.drawImage(
-          game.assets.alatPenghilangPolusi,
-          polusiPos.x,
-          polusiPos.y,
-          polusiPos.width,
-          polusiPos.height
-        );
-      }
-
       // Game loop utama
       function gameLoop() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawBackground();
         drawTree();
-        
-        // Gambar alat penghilang polusi (tetap di layer belakang player)
-        drawPolusiTool();
-        
         updatePlayer();
         drawPlayer();
-        
-        // Gambar alat konversi (dengan animasi jika aktif) akan tampil di atas player
-        drawConversionTool();
         requestAnimationFrame(gameLoop);
       }
 
@@ -1246,16 +1316,11 @@
       // Fungsi animasi untuk aksi tebangan pohon & animasi karakter menebang
       function animateTreeCut() {
         if (game.tree.isCut) return;
+        
+        // Ubah status pohon ke gundul secara permanen
         game.tree.isCut = true;
-        
-        // Langsung ubah ke gambar pohon gundul (pohonGundul.png)
         game.currentTreeImage = game.assets.treeCut;
-        
-        // Setelah 400ms (sesuaikan waktunya sesuai kebutuhan), kembalikan ke gambar pohon normal (pohon.png)
-        setTimeout(() => {
-          game.currentTreeImage = game.assets.tree;
-          game.tree.isCut = false;
-        }, 400);
+        localStorage.setItem("treeIsCut", "true");
       }
       
       function animatePlayerChop() {
@@ -1270,39 +1335,104 @@
       // Tombol interaksi pohon: Tebang
       const cutButton = document.getElementById('cutButton');
       cutButton.addEventListener('click', () => {
-        // Jika pohon sudah gundul atau animasi chop sedang berjalan, jangan lakukan aksi apa-apa
-        if (game.tree.isCut || game.player.isChopping) return;
-        
-        // Mulai animasi karakter menebang
+        // Cek kondisi sebelum menebang
+        if (game.tree.isCut || 
+            status.nature < 5 || 
+            status.energy < 5 || 
+            game.player.isChopping) return;
+
+        // Mulai animasi
         animatePlayerChop();
+        animateTreeCut();
+
+        // Update status dan resource
+        status.nature = Math.max(0, status.nature - 5);
+        status.energy = Math.max(0, status.energy - 5);
+        resources.wood += 1;
         
-        // Setelah delay sinkronisasi dengan animasi karakter, ubah status pohon ke gundul dan simpan ke localStorage
-        setTimeout(() => {
-          game.currentTreeImage = game.assets.treeCut;
-          game.tree.isCut = true;
-          localStorage.setItem("treeIsCut", "true");
-        }, 600); // Delay (600ms) dapat disesuaikan dengan kebutuhan
+        // Update UI dan simpan
+        updateResourceUI();
+        updateStatusBarUI();
+        saveStatus();
+        localStorage.setItem("wood", resources.wood);
+
+        // Update state tombol
+        cutButton.disabled = true;
+        plantButton.disabled = false;
       });
       
       // Tombol interaksi pohon: Tanam
       const plantButton = document.getElementById('plantButton');
       plantButton.addEventListener('click', () => {
-        // Hanya lakukan aksi tanam jika pohon dalam keadaan gundul
-        if (!game.tree.isCut) return;
-        
-        // Ubah status pohon kembali ke normal dan simpan ke localStorage
-        game.currentTreeImage = game.assets.tree;
+        if (!game.tree.isCut || status.water < 5) return;
+
+        // Kembalikan status pohon
         game.tree.isCut = false;
+        game.currentTreeImage = game.assets.tree;
         localStorage.setItem("treeIsCut", "false");
+
+        // Update status
+        status.nature = Math.min(100, status.nature + 5);
+        status.water = Math.max(0, status.water - 5);
         
-        console.log("Tanam: Pohon telah ditanam kembali.");
+        // Update UI dan simpan
+        updateStatusBarUI();
+        saveStatus();
+
+        // Update state tombol
+        cutButton.disabled = false;
+        plantButton.disabled = true;
       });
 
-      // Tambahkan event listener untuk button Konversi Air (bisa diletakkan di bagian bawah script)
-      konversiButton.addEventListener('click', () => {
-        // Trigger animasi shaking untuk alat konversi
-        game.tools.konversiShaking = true;
-        game.tools.shakeStartTime = Date.now();
+      // Dapatkan elemen tombol Konversi Air
+      const konversiButton = document.getElementById("konversiButton");
+
+      function triggerShakeAnimation() {
+        const alatKonversi = document.getElementById('alatKonversi');
+        
+        // Reset animasi
+        alatKonversi.style.animation = 'none';
+        void alatKonversi.offsetWidth; // Trigger reflow
+        
+        // Terapkan animasi hanya ke alat
+        alatKonversi.style.animation = 'shake 0.5s ease-in-out';
+        
+        setTimeout(() => {
+          alatKonversi.style.animation = '';
+        }, 500);
+      }
+
+      // Modifikasi event listener tombol Konversi Air
+      konversiButton.addEventListener('click', function() {
+        if (localStorage.getItem("converterBought") !== "true") {
+          alert("Alat Konversi Air belum dibuat di Laboratorium.");
+          return;
+        }
+        
+        // Tambah 5% air dan kurangi 5% energi
+        status.water = Math.min(100, status.water + 5);
+        status.energy = Math.max(0, status.energy - 5);
+        
+        // Update UI
+        updateStatusBarUI();
+        
+        // Simpan ke localStorage
+        localStorage.setItem("waterStatus", status.water);
+        localStorage.setItem("energyStatus", status.energy);
+        
+        // Animasi feedback
+        const waterBar = document.querySelector('.water .status-bar-fill');
+        const energyBar = document.querySelector('.energy .status-bar-fill');
+        
+        waterBar.style.backgroundColor = '#00ff00';
+        energyBar.style.backgroundColor = '#ff0000';
+        
+        setTimeout(() => {
+          waterBar.style.backgroundColor = '#26AAF0';
+          energyBar.style.backgroundColor = '#FFEB00';
+        }, 500);
+        
+        triggerShakeAnimation();
       });
 
       // Tombol untuk alat penghilang polusi: Nyalakan Mesin
@@ -1310,6 +1440,154 @@
       polusiButton.addEventListener('click', () => {
         navigateWithTransition('ending.html');
       });
+
+      /***********************
+       * Resource & Status Management
+       ***********************/
+       
+       // Inisialisasi resource dari localStorage atau default
+       const resources = {
+         wood: parseInt(localStorage.getItem("wood")) || 0,
+         plastic: parseInt(localStorage.getItem("plastic")) || 0
+       };
+
+       // Inisialisasi status (dalam persen) untuk pohon (nature), energi, dan limbah (toxic)
+       const status = {
+         nature: parseFloat(localStorage.getItem("natureStatus")) || 100,
+         energy: parseFloat(localStorage.getItem("energyStatus")) || 100,
+         water: parseFloat(localStorage.getItem("waterStatus")) || 100, // Tambah properti water
+         toxic: parseFloat(localStorage.getItem("toxicStatus")) || 0
+       };
+
+       // Fungsi untuk mengupdate tampilan angka resource
+       function updateResourceUI() {
+         document.getElementById('woodCount').textContent = 'X ' + resources.wood;
+         document.getElementById('plasticCount').textContent = 'X ' + resources.plastic;
+       }
+
+       // Fungsi untuk mengupdate tampilan status bar
+       function updateStatusBarUI() {
+         updateStatusBar('nature', status.nature);
+         updateStatusBar('energy', status.energy);
+         updateStatusBar('water', status.water); // Tambah update untuk water
+         updateStatusBar('toxic', status.toxic);
+       }
+
+       // Fungsi pembantu untuk mengubah lebar bar berdasarkan persen
+       function updateStatusBar(barClass, value) {
+         const barFill = document.querySelector(`.${barClass} .status-bar-fill`);
+         if (barFill) {
+           barFill.style.width = Math.max(0, Math.min(value, 100)) + '%';
+         }
+       }
+
+       // Fungsi untuk menyimpan status ke localStorage
+       function saveStatus() {
+         localStorage.setItem("natureStatus", status.nature);
+         localStorage.setItem("energyStatus", status.energy);
+         localStorage.setItem("waterStatus", status.water); // Simpan status water
+         localStorage.setItem("toxicStatus", status.toxic);
+       }
+
+       // Update UI awal
+       updateResourceUI();
+       updateStatusBarUI();
+
+      function updateToolButtons() {
+        // Update Tombol/Ikon Alat Konversi Air
+        const converterBought = localStorage.getItem("converterBought") === "true";
+        const konversiButton = document.getElementById("konversiButton");
+        
+        // Jika terdapat tag <img> di dalam tombol, targetkan juga elemen tersebut
+        const konversiImg = konversiButton.querySelector("img");
+        
+        if (!converterBought) {
+          // Terapkan filter dan kursor pada tombol dan gambar SVG di dalamnya
+          konversiButton.style.filter = "grayscale(100%) brightness(50%)";
+          konversiButton.style.cursor = "not-allowed";
+          if (konversiImg) {
+            konversiImg.style.filter = "grayscale(100%) brightness(50%)";
+            konversiImg.style.cursor = "not-allowed";
+          }
+          konversiButton.disabled = true; // Opsional: nonaktifkan klik pada tombol
+        } else {
+          // Tampilkan secara normal ketika sudah dibuat
+          konversiButton.style.filter = "";
+          konversiButton.style.cursor = "pointer";
+          if (konversiImg) {
+            konversiImg.style.filter = "";
+            konversiImg.style.cursor = "pointer";
+          }
+          konversiButton.disabled = false;
+        }
+        
+        // Update Tombol Alat Penghilang Polusi
+        const pollutionBought = localStorage.getItem("pollutionBought") === "true";
+        const polusiButton = document.getElementById("polusiButton");
+        polusiButton.style.display = pollutionBought ? "block" : "none";
+      }
+
+      // Mengupdate kursor ketika mouse bergerak di dalam canvas
+      canvas.addEventListener("mousemove", function(e) {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        
+        // Cek apakah mouse berada di dalam region alat Konversi Air
+        const convTool = game.tools.alatKonversi;
+        if (mouseX >= convTool.x && mouseX <= convTool.x + convTool.width &&
+            mouseY >= convTool.y && mouseY <= convTool.y + convTool.height) {
+          const converterBought = localStorage.getItem("converterBought") === "true";
+          canvas.style.cursor = converterBought ? "pointer" : "not-allowed";
+          return;
+        }
+        
+        // Kursor default jika mouse berada di luar region alat
+        canvas.style.cursor = "default";
+      });
+
+      // Menangani klik pada canvas untuk alat Konversi Air
+      canvas.addEventListener("click", function(e) {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        
+        // Cek apakah klik terjadi di dalam region alat Konversi Air
+        const convTool = game.tools.alatKonversi;
+        if (mouseX >= convTool.x && mouseX <= convTool.x + convTool.width &&
+            mouseY >= convTool.y && mouseY <= convTool.y + convTool.height) {
+          if (localStorage.getItem("converterBought") !== "true") {
+            alert("Alat Konversi Air belum dibuat di Laboratorium.");
+            return;
+          }
+          // Jika sudah dibeli, mulai aksi konversi (contoh: animasi shaking)
+          triggerShakeAnimation();
+        }
+      });
+
+      // Fungsi untuk memulai animasi shake pada alat konversi
+      function triggerShakeAnimation() {
+        const alatKonversi = document.getElementById('alatKonversi');
+        
+        // Reset animasi terlebih dahulu
+        alatKonversi.style.animation = 'none';
+        // Trigger reflow
+        void alatKonversi.offsetWidth;
+        
+        // Jalankan animasi
+        alatKonversi.style.animation = 'shake 0.5s ease-in-out';
+        
+        // Hapus animasi setelah selesai
+        setTimeout(() => {
+          alatKonversi.style.animation = '';
+        }, 500);
+      }
+
+      // Inisialisasi status tombol saat pertama load
+      function initializeButtons() {
+        cutButton.disabled = game.tree.isCut;
+        plantButton.disabled = !game.tree.isCut;
+      }
     </script>
   </body>
 </html>

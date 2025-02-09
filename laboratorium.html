@@ -155,6 +155,82 @@
     .right-btn .lab-btn:active {
       transform: rotate(20deg) scale(0.98);
     }
+    
+    /* ============================== */
+    /* Store Popup Styles             */
+    /* ============================== */
+    .modal-overlay.store {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+      z-index: 3;
+    }
+    .modal-overlay.store.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .store-container {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.7);
+      position: relative;
+    }
+    .store-container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #222;
+    }
+    .store-items {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .store-item {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      position: relative;
+    }
+    .store-item img.store-item-img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+    }
+    .store-item p {
+      margin: 0;
+      font-size: 14px;
+      color: #333;
+    }
+    .store-buy-btn {
+      margin-left: auto;
+      padding: 8px 16px;
+      background: #064663;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+    .store-buy-btn:disabled {
+      background: #999;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
@@ -166,13 +242,45 @@
   
   <!-- Tombol Daur Ulang: kiri bawah tetap normal -->
   <div class="left-btn">
-    <button class="lab-btn">Daur Ulang</button>
+    <button class="lab-btn" id="recycleButton">Daur Ulang</button>
   </div>
   
-  <!-- Tombol Buat Alat: tetap di posisi kanan tengah, namun tampil miring (dirotasi) -->
+  <!-- Tombol Buat Alat: tetap di posisi kanan tengah, tampil miring (dirotasi) -->
   <div class="right-btn">
-    <button class="lab-btn">Buat Alat</button>
+    <!-- Tambahkan ID untuk memudahkan pengambilan di JavaScript -->
+    <button class="lab-btn" id="createToolBtn">Buat Alat</button>
   </div>
+  
+  <!-- ============================== -->
+  <!-- Store Popup (Modal) Markup     -->
+  <!-- ============================== -->
+  <div id="storePopup" class="modal-overlay store">
+    <div class="store-container">
+      <button class="modal-close" id="storeClose" style="position: absolute; top: 10px; right: 10px; font-size: 20px; background: none; border: none; cursor: pointer;">&times;</button>
+      <h2>Buat Alat</h2>
+      <div class="store-items">
+        <!-- Item Alat Konversi Air -->
+        <div class="store-item" id="converterItem">
+          <img src="./assets/img/alatKonversi.png" alt="Alat Konversi Air" class="store-item-img">
+          <div>
+            <p>Alat Konversi Air</p>
+            <p>Bahan: 10 Kayu</p>
+          </div>
+          <button class="store-buy-btn" id="buyConverterBtn">Buat</button>
+        </div>
+        <!-- Item Alat Penghilang Polusi -->
+        <div class="store-item" id="pollutionItem">
+          <img src="./assets/img/alatPenghilangPolusi.png" alt="Alat Penghilang Polusi" class="store-item-img">
+          <div>
+            <p>Alat Penghilang Polusi</p>
+            <p>Bahan: 10 Kayu, 10 Plastik</p>
+          </div>
+          <button class="store-buy-btn" id="buyPollutionBtn">Buat</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
   
   <!-- Script untuk animasi transisi saat tombol Exit ditekan -->
   <script>
@@ -184,6 +292,143 @@
         setTimeout(function() {
           window.location.href = exitButton.href;
         }, 1000); // Durasi timeout sesuai dengan animasi (1 detik)
+      });
+    });
+  </script>
+  
+  <!-- ============================== -->
+  <!-- Store Popup JavaScript        -->
+  <!-- ============================== -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const createToolBtn = document.getElementById('createToolBtn');
+      const storePopup = document.getElementById('storePopup');
+      const storeClose = document.getElementById('storeClose');
+      const buyConverterBtn = document.getElementById('buyConverterBtn');
+      const buyPollutionBtn = document.getElementById('buyPollutionBtn');
+      const converterItem = document.getElementById('converterItem');
+      const pollutionItem = document.getElementById('pollutionItem');
+      
+      // Fungsi utilitas untuk mengambil resource (kayu & plastik) dari localStorage
+      function getResources() {
+        const wood = parseInt(localStorage.getItem("wood")) || 0;
+        const plastic = parseInt(localStorage.getItem("plastic")) || 0;
+        return { wood, plastic };
+      }
+      
+      // Fungsi untuk mengupdate resource ke localStorage
+      function updateResources(newWood, newPlastic) {
+        localStorage.setItem("wood", newWood);
+        localStorage.setItem("plastic", newPlastic);
+      }
+      
+      // Update tampilan store berdasarkan status pembelian
+      function updateStoreUI() {
+        const converterBought = localStorage.getItem("converterBought") === "true";
+        const pollutionBought = localStorage.getItem("pollutionBought") === "true";
+        
+        if (converterBought) {
+          converterItem.classList.remove("locked");
+          buyConverterBtn.textContent = "Telah dibuat";
+          buyConverterBtn.disabled = true;
+        } else {
+          converterItem.classList.add("locked");
+          buyConverterBtn.textContent = "Beli";
+          buyConverterBtn.disabled = false;
+        }
+        
+        if (pollutionBought) {
+          buyPollutionBtn.textContent = "Telah dibuat";
+          buyPollutionBtn.disabled = true;
+        } else {
+          buyPollutionBtn.textContent = "Beli";
+          buyPollutionBtn.disabled = false;
+        }
+      }
+      
+      // Buka popup store saat tombol "Buat Alat" ditekan
+      createToolBtn.addEventListener('click', function() {
+        updateStoreUI();
+        storePopup.classList.add('active');
+      });
+      
+      // Tutup popup store
+      storeClose.addEventListener('click', function() {
+        storePopup.classList.remove('active');
+      });
+      
+      // Proses pembelian Alat Konversi Air (butuh 10 kayu)
+      buyConverterBtn.addEventListener('click', function() {
+        if (localStorage.getItem("converterBought") === "true") {
+          alert("Alat Konversi Air sudah dibuat.");
+          return;
+        }
+        const resources = getResources();
+        if (resources.wood < 10) {
+          alert("Tidak cukup kayu untuk membuat Alat Konversi Air.");
+          return;
+        }
+        // Kurangi 10 kayu
+        updateResources(resources.wood - 10, resources.plastic);
+        localStorage.setItem("converterBought", "true");
+        updateStoreUI();
+        alert("Alat Konversi Air berhasil dibuat!");
+      });
+      
+      // Proses pembelian Alat Penghilang Polusi (butuh 10 kayu dan 10 plastik)
+      buyPollutionBtn.addEventListener('click', function() {
+        if (localStorage.getItem("pollutionBought") === "true") {
+          alert("Alat Penghilang Polusi sudah dibuat.");
+          return;
+        }
+        const resources = getResources();
+        if (resources.wood < 10 || resources.plastic < 10) {
+          alert("Tidak cukup sumber daya untuk membuat Alat Penghilang Polusi.");
+          return;
+        }
+        // Kurangi 10 kayu dan 10 plastik
+        updateResources(resources.wood - 10, resources.plastic - 10);
+        localStorage.setItem("pollutionBought", "true");
+        updateStoreUI();
+        alert("Alat Penghilang Polusi berhasil dibuat!");
+      });
+    });
+  </script>
+  
+  <!-- ============================== -->
+  <!-- Daur Ulang JavaScript        -->
+  <!-- ============================== -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const recycleButton = document.getElementById('recycleButton');
+      
+      recycleButton.addEventListener('click', function() {
+        // Ambil data dari localStorage
+        let plastic = parseInt(localStorage.getItem("plastic")) || 0;
+        let toxic = parseFloat(localStorage.getItem("toxicStatus")) || 0;
+        let energy = parseFloat(localStorage.getItem("energyStatus")) || 100;
+
+        // Cek energi cukup
+        if(energy < 5) {
+          alert("Energi tidak cukup untuk melakukan daur ulang!");
+          return;
+        }
+
+        // Kurangi energi 5% dan toxic 3%
+        energy = Math.max(0, energy - 5);
+        toxic = Math.max(0, toxic - 3);
+        plastic += 1;
+
+        // Simpan ke localStorage
+        localStorage.setItem("plastic", plastic);
+        localStorage.setItem("toxicStatus", toxic);
+        localStorage.setItem("energyStatus", energy);
+
+        // Update tampilan
+        alert(`Daur Ulang berhasil!\nEnergi -5% | Limbah -3%\nPlastik +1`);
+        
+        // Optional: Update UI jika diperlukan
+        // updateStatusBars(); 
       });
     });
   </script>

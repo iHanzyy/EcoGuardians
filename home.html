@@ -162,5 +162,27 @@
       });
     });
   </script>
+  
+  <!-- Script untuk menambahkan fungsi makan -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const makanButton = document.querySelector('.makan-btn');
+      
+      makanButton.addEventListener('click', function() {
+        // Ambil nilai energy dan toxic yang tersimpan, default 100 dan 0
+        let energy = parseFloat(localStorage.getItem("energyStatus")) || 100;
+        let toxic = parseFloat(localStorage.getItem("toxicStatus")) || 0;
+        
+        // Update nilai: energi naik 10%, limbah naik 3%
+        energy = Math.min(100, energy + 10);
+        toxic = Math.min(100, toxic + 3);
+        
+        localStorage.setItem("energyStatus", energy);
+        localStorage.setItem("toxicStatus", toxic);
+        
+        alert('Makan berhasil! Energi +10%, Limbah +3%.');
+      });
+    });
+  </script>
 </body>
 </html>
