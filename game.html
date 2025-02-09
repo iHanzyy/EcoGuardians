@@ -13,6 +13,7 @@
         margin: 0;
         padding: 0;
         box-sizing: border-box;
+        font-family: 'Arial Rounded MT Bold', sans-serif;
       }
 
       canvas {
@@ -532,6 +533,27 @@
         60% { transform: translate(-3px, 1px); }
         80% { transform: translate(2px, -1px); }
         100% { transform: translate(0, 0); }
+      }
+      #actionPopup {
+        position: fixed;
+        top: 20%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.85);
+        color: #fff;
+        padding: 20px 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        font-size: 16px;
+        text-align: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+        z-index: 999;
+      }
+      #actionPopup.active {
+        opacity: 1;
+        visibility: visible;
       }
     </style>
   </head>
@@ -1359,6 +1381,8 @@
         // Update state tombol
         cutButton.disabled = true;
         plantButton.disabled = false;
+
+        showActionPopup("Kamu telah menebang pohon, kayu bertambah!");
       });
       
       // Tombol interaksi pohon: Tanam
@@ -1382,6 +1406,8 @@
         // Update state tombol
         cutButton.disabled = false;
         plantButton.disabled = true;
+
+        showActionPopup("Kamu telah menanam pohon baru, lingkungan menjadi lebih hijau!");
       });
 
       // Dapatkan elemen tombol Konversi Air
@@ -1405,32 +1431,19 @@
       // Modifikasi event listener tombol Konversi Air
       konversiButton.addEventListener('click', function() {
         if (localStorage.getItem("converterBought") !== "true") {
-          alert("Alat Konversi Air belum dibuat di Laboratorium.");
+          showActionPopup("Alat Konversi Air belum dibuat di Laboratorium.");
           return;
         }
         
-        // Tambah 5% air dan kurangi 5% energi
+        // Misal, tambahkan air 5% dan kurangi energi 5%
         status.water = Math.min(100, status.water + 5);
         status.energy = Math.max(0, status.energy - 5);
         
-        // Update UI
         updateStatusBarUI();
-        
-        // Simpan ke localStorage
         localStorage.setItem("waterStatus", status.water);
         localStorage.setItem("energyStatus", status.energy);
         
-        // Animasi feedback
-        const waterBar = document.querySelector('.water .status-bar-fill');
-        const energyBar = document.querySelector('.energy .status-bar-fill');
-        
-        waterBar.style.backgroundColor = '#00ff00';
-        energyBar.style.backgroundColor = '#ff0000';
-        
-        setTimeout(() => {
-          waterBar.style.backgroundColor = '#26AAF0';
-          energyBar.style.backgroundColor = '#FFEB00';
-        }, 500);
+        showActionPopup("Kamu telah melakukan konversi air, sumber daya airmu bertambah sebanyak 5%!");
         
         triggerShakeAnimation();
       });
@@ -1589,5 +1602,18 @@
         plantButton.disabled = !game.tree.isCut;
       }
     </script>
+    <script>
+      function showActionPopup(message) {
+        const popup = document.getElementById('actionPopup');
+        if (!popup) return;
+        popup.textContent = message;
+        popup.classList.add('active');
+        // Popup akan hilang setelah 3 detik
+        setTimeout(() => {
+          popup.classList.remove('active');
+        }, 3000);
+      }
+    </script>
+    <div id="actionPopup"></div>
   </body>
 </html>
