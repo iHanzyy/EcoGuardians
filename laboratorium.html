@@ -492,20 +492,26 @@
         let toxic = parseFloat(localStorage.getItem("toxicStatus")) || 0;
         let energy = parseFloat(localStorage.getItem("energyStatus")) || 100;
 
-        if (energy < 5) {
+        if (energy < 8) {
           showActionPopup("Energi tidak cukup untuk melakukan daur ulang!");
           return;
         }
-
-        energy = Math.max(0, energy - 5);
-        toxic = Math.max(0, toxic - 3);
+        if (toxic < 5) {
+          showActionPopup("Tidak ada sampah yang bisa didaur ulang!");
+          return;
+        }
+        
+        energy = Math.max(0, energy - 8);
+        toxic = Math.max(0, toxic - 5);
         plastic += 1;
 
         localStorage.setItem("plastic", plastic);
         localStorage.setItem("toxicStatus", toxic);
         localStorage.setItem("energyStatus", energy);
 
-        showActionPopup("Daur Ulang berhasil! Energi -5% | Limbah -3% | Plastik +1");
+        showActionPopup("Daur ulang berhasil! Energy -8%, Toxic -5%, Plastic +1.");
+
+        updateQuestProgress();
       });
     });
   </script>

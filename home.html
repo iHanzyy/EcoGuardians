@@ -313,15 +313,14 @@
         let energy = parseFloat(localStorage.getItem("energyStatus")) || 100;
         let toxic = parseFloat(localStorage.getItem("toxicStatus")) || 0;
         
-        // Update status: Energi naik 10%, Limbah naik 3%
-        energy = Math.min(100, energy + 10);
-        toxic = Math.min(100, toxic + 3);
+        // Update status: Energy +15%, Toxic +7%
+        energy = Math.min(100, energy + 15);
+        toxic = Math.min(100, toxic + 7);
         
         localStorage.setItem("energyStatus", energy);
         localStorage.setItem("toxicStatus", toxic);
         
-        // Tampilkan pesan notifikasi
-        showActionPopup('Makan berhasil! Energi +10%, Limbah +3%.');
+        showActionPopup("Makan berhasil! Energy +15%, Toxic +7%.");
       });
     });
   </script>

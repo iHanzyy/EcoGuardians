@@ -678,25 +678,29 @@
         <button class="modal-close" id="questModalClose">&times;</button>
         <h2 style="text-align: center; color: #fff">Misi</h2>
         <div class="mission-content">
+          <!-- Misi: Buat Alat Konversi Air -->
           <div class="mission-item">
-            <img src="./assets/img/itemIcon.svg" alt="Item Icon" class="mission-icon" />
+            <img src="./assets/img/alatKonversi.png" alt="Air Converter Icon" class="mission-icon" />
             <div class="mission-details">
-              <h3 class="mission-title">Kumpulkan 10 batang pohon</h3>
+              <h3 class="mission-title">Buat Alat Konversi Air</h3>
               <div class="mission-progress">
-                <div class="mission-progress-bar"></div>
+                <div class="mission-progress-bar" id="converterQuestProgress"></div>
               </div>
             </div>
           </div>
+          <!-- Misi: Buat Alat Penghilang Polusi -->
           <div class="mission-item">
-            <img src="./assets/img/itemIcon.svg" alt="Item Icon" class="mission-icon" />
+            <img src="./assets/img/alatPenghilangPolusi.png" alt="Pollution Removal Icon" class="mission-icon" />
             <div class="mission-details">
-              <h3 class="mission-title">Kumpulkan 10 batang pohon</h3>
+              <h3 class="mission-title">Buat Alat Penghilang Polusi</h3>
               <div class="mission-progress">
-                <div class="mission-progress-bar"></div>
+                <div class="mission-progress-bar" id="pollutionQuestProgress"></div>
               </div>
             </div>
           </div>
         </div>
+        <button class="nav-arrow nav-prev" id="prevBtn">&#10094;</button>
+        <button class="nav-arrow nav-next" id="nextBtn">&#10095;</button>
       </div>
     </div>
 
@@ -1354,104 +1358,99 @@
         }, 800);
       }
       
-      // Tombol interaksi pohon: Tebang
+      // --- Aksi Tebang (Cut) ---
       const cutButton = document.getElementById('cutButton');
       cutButton.addEventListener('click', () => {
-        // Cek kondisi sebelum menebang
-        if (game.tree.isCut || 
-            status.nature < 5 || 
-            status.energy < 5 || 
-            game.player.isChopping) return;
-
-        // Mulai animasi
+        // Cek apakah pohon bisa ditebang
+        if (game.tree.isCut || status.nature < 10 || status.energy < 5 || game.player.isChopping) return;
+        
+        game.player.isChopping = true;
         animatePlayerChop();
         animateTreeCut();
 
-        // Update status dan resource
-        status.nature = Math.max(0, status.nature - 5);
+        // Update status: Nature -10%, Energy -5% dan tambahkan 1 kayu
+        status.nature = Math.max(0, status.nature - 10);
         status.energy = Math.max(0, status.energy - 5);
         resources.wood += 1;
-        
-        // Update UI dan simpan
+
         updateResourceUI();
         updateStatusBarUI();
         saveStatus();
         localStorage.setItem("wood", resources.wood);
 
-        // Update state tombol
+        // Ubah state tombol
         cutButton.disabled = true;
         plantButton.disabled = false;
 
-        showActionPopup("Kamu telah menebang pohon, kayu bertambah!");
+        showActionPopup("Pohon ditebang! Nature -10%, Energy -5%, Wood +1.");
+
+        // Update progress quest
+        updateQuestProgress();
+
+        // Reset flag chopping setelah animasi selesai (misalnya 1 detik)
+        setTimeout(() => {
+          game.player.isChopping = false;
+        }, 1000);
       });
-      
-      // Tombol interaksi pohon: Tanam
+
+      // --- Aksi Tanam (Plant) ---
       const plantButton = document.getElementById('plantButton');
       plantButton.addEventListener('click', () => {
-        if (!game.tree.isCut || status.water < 5) return;
-
-        // Kembalikan status pohon
+        if (!game.tree.isCut || status.water < 10) {
+          showActionPopup("Air tidak cukup untuk menanam pohon!");
+          return;
+        }
+        
         game.tree.isCut = false;
         game.currentTreeImage = game.assets.tree;
         localStorage.setItem("treeIsCut", "false");
 
-        // Update status
-        status.nature = Math.min(100, status.nature + 5);
-        status.water = Math.max(0, status.water - 5);
-        
-        // Update UI dan simpan
+        // Update status: Nature +20%, Water -10%
+        status.nature = Math.min(100, status.nature + 20);
+        status.water = Math.max(0, status.water - 10);
+
         updateStatusBarUI();
         saveStatus();
 
-        // Update state tombol
+        // Ubah state tombol
         cutButton.disabled = false;
         plantButton.disabled = true;
 
-        showActionPopup("Kamu telah menanam pohon baru, lingkungan menjadi lebih hijau!");
+        showActionPopup("Pohon ditanam! Nature +20%, Air -10%.");
+
+        updateQuestProgress();
       });
 
-      // Dapatkan elemen tombol Konversi Air
+      // --- Aksi Konversi Air ---
       const konversiButton = document.getElementById("konversiButton");
-
       function triggerShakeAnimation() {
         const alatKonversi = document.getElementById('alatKonversi');
-        
-        // Reset animasi
+        // Reset dan jalankan animasi shake
         alatKonversi.style.animation = 'none';
-        void alatKonversi.offsetWidth; // Trigger reflow
-        
-        // Terapkan animasi hanya ke alat
+        void alatKonversi.offsetWidth;
         alatKonversi.style.animation = 'shake 0.5s ease-in-out';
-        
         setTimeout(() => {
           alatKonversi.style.animation = '';
         }, 500);
       }
-
-      // Modifikasi event listener tombol Konversi Air
       konversiButton.addEventListener('click', function() {
         if (localStorage.getItem("converterBought") !== "true") {
           showActionPopup("Alat Konversi Air belum dibuat di Laboratorium.");
           return;
         }
         
-        // Misal, tambahkan air 5% dan kurangi energi 5%
-        status.water = Math.min(100, status.water + 5);
-        status.energy = Math.max(0, status.energy - 5);
+        // Update status: Water +8%, Energy -8%
+        status.water = Math.min(100, status.water + 8);
+        status.energy = Math.max(0, status.energy - 8);
         
         updateStatusBarUI();
         localStorage.setItem("waterStatus", status.water);
         localStorage.setItem("energyStatus", status.energy);
         
-        showActionPopup("Kamu telah melakukan konversi air, sumber daya airmu bertambah sebanyak 5%!");
+        showActionPopup("Konversi air berhasil! Water +8%, Energy -8%.");
         
         triggerShakeAnimation();
-      });
-
-      // Tombol untuk alat penghilang polusi: Nyalakan Mesin
-      const polusiButton = document.getElementById('polusiButton');
-      polusiButton.addEventListener('click', () => {
-        navigateWithTransition('ending.html');
+        updateQuestProgress();
       });
 
       /***********************
@@ -1601,6 +1600,33 @@
         cutButton.disabled = game.tree.isCut;
         plantButton.disabled = !game.tree.isCut;
       }
+
+      let winNotified = false; // Flag agar pesan kemenangan hanya muncul sekali
+
+      function updateQuestProgress() {
+        // Quest 1: Buat Alat Konversi Air
+        const converterBought = localStorage.getItem("converterBought") === "true";
+        const converterProgressBar = document.getElementById("converterQuestProgress");
+        if (converterProgressBar) {
+          converterProgressBar.style.width = converterBought ? "100%" : "0%";
+        }
+
+        // Quest 2: Buat Alat Penghilang Polusi
+        const pollutionBought = localStorage.getItem("pollutionBought") === "true";
+        const pollutionProgressBar = document.getElementById("pollutionQuestProgress");
+        if (pollutionProgressBar) {
+          pollutionProgressBar.style.width = pollutionBought ? "100%" : "0%";
+        }
+
+        // Jika kedua alat sudah dibuat dan belum pernah diberitahukan, tampilkan pesan kemenangan
+        if (converterBought && pollutionBought && !winNotified) {
+          showActionPopup("Selamat! Kamu telah menciptakan kedua alat canggih dan memenangkan game ini!");
+          winNotified = true;
+        }
+      }
+
+      // Panggil updateQuestProgress secara berkala, misalnya setiap 1 detik
+      setInterval(updateQuestProgress, 1000);
     </script>
     <script>
       function showActionPopup(message) {
