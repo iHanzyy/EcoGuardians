@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home - ECOGUARDIANS</title>
+  <style>
+    /* Reset dan pengaturan font global */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial Rounded MT Bold', sans-serif;
+    }
+    
+    /* Animasi fade-out untuk transisi ke halaman lain */
+    .fade-out {
+      animation: fadeOut 1s forwards;
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to   { opacity: 0; }
+    }
+    
+    /* Body tanpa background warna, hanya gambar sebagai background */
+    body {
+      min-height: 100vh;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: none;
+    }
+    
+    /* Gambar background full screen */
+    .home-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      opacity: 1;
+    }
+    
+    /* Container untuk tombol Makan yang digeser ke kiri sekitar 3rem */
+    .button-container {
+      position: relative;
+      z-index: 1;
+      transform: translateX(-27rem);
+    }
+    
+    /* --- Style tombol Keluar --- */
+    .keluar-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 1;
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #FF4B4B;
+      background: transparent;
+      border: 2px solid #FF4B4B;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      overflow: hidden;
+      text-decoration: none;
+    }
+    .keluar-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 15px rgba(255,75,75,0.7);
+    }
+    .keluar-btn:active {
+      transform: scale(0.95);
+    }
+    .keluar-btn::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(120deg, transparent, rgba(255,75,75,0.4), transparent);
+      transform: skewX(-25deg);
+    }
+    .keluar-btn:hover::after {
+      animation: shineExit 0.75s forwards;
+    }
+    @keyframes shineExit {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+    
+    /* --- Style tombol Makan (disesuaikan dengan tombol Keluar namun dengan warna hijau) --- */
+    .makan-btn {
+      position: relative;
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #55C800;
+      background: transparent;
+      border: 2px solid #55C800;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      overflow: hidden;
+    }
+    .makan-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 15px rgba(85,200,0,0.7);
+    }
+    .makan-btn:active {
+      transform: scale(0.95);
+    }
+    .makan-btn::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(120deg, transparent, rgba(85,200,0,0.4), transparent);
+      transform: skewX(-25deg);
+    }
+    .makan-btn:hover::after {
+      animation: shineMakan 0.75s forwards;
+    }
+    @keyframes shineMakan {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Gambar background -->
+  <img src="./assets/img/home.png" alt="Home" class="home-image">
+  
+  <!-- Tombol Keluar dengan style custom -->
+  <a href="game.html" class="keluar-btn">Keluar</a>
+  
+  <!-- Tombol Makan dengan style serupa, ditempatkan di container yang sudah digeser ke kiri -->
+  <div class="button-container">
+    <button class="makan-btn">Makan</button>
+  </div>
+  
+  <!-- Script untuk animasi transisi saat tombol Keluar ditekan -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const exitButton = document.querySelector('.keluar-btn');
+      exitButton.addEventListener('click', function(e) {
+        e.preventDefault(); // Mencegah navigasi langsung
+        document.body.classList.add('fade-out'); // Tambahkan class untuk animasi fade-out
+        // Setelah animasi selesai, navigasi ke halaman tujuan
+        setTimeout(function() {
+          window.location.href = exitButton.href;
+        }, 1000); // Sesuaikan durasi timeout dengan animasi (1 detik)
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laboratorium - ECOGUARDIANS</title>
+  <style>
+    /* Reset dan pengaturan font global */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial Rounded MT Bold', sans-serif;
+    }
+    
+    /* Animasi fade-out untuk transisi ke halaman lain */
+    .fade-out {
+      animation: fadeOut 1s forwards;
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to   { opacity: 0; }
+    }
+    
+    /* Body tanpa background warna, hanya gambar sebagai background */
+    body {
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+      background: none;
+    }
+    
+    /* Gambar background full screen */
+    .home-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+    
+    /* --- Tombol Exit --- */
+    .exit-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 2;
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #FF4B4B;
+      background: transparent;
+      border: 2px solid #FF4B4B;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      overflow: hidden;
+      text-decoration: none;
+    }
+    .exit-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 15px rgba(255,75,75,0.7);
+    }
+    .exit-btn:active {
+      transform: scale(0.95);
+    }
+    .exit-btn::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(120deg, transparent, rgba(255,75,75,0.4), transparent);
+      transform: skewX(-25deg);
+    }
+    .exit-btn:hover::after {
+      animation: shineExit 0.75s forwards;
+    }
+    @keyframes shineExit {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+    
+    /* --- Style tombol Lab (Dark Ocean) --- */
+    .lab-btn {
+      position: relative;
+      padding: 1.2rem 2.5rem;
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #fff;
+      background: linear-gradient(145deg, #022F40, #064663);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      overflow: hidden;
+      text-align: center;
+      display: inline-block;
+    }
+    .lab-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(6,70,99,0.7);
+    }
+    .lab-btn:active {
+      transform: scale(0.98);
+    }
+    .lab-btn::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+      transform: skewX(-25deg);
+    }
+    .lab-btn:hover::after {
+      animation: shineLab 0.75s forwards;
+    }
+    @keyframes shineLab {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+    
+    /* --- Posisi tombol Daur Ulang (kiri bawah) --- */
+    .left-btn {
+      position: absolute;
+      bottom: 3rem;
+      left: 16.5rem;
+      z-index: 2;
+    }
+    /* Mengurangi padding horizontal untuk tombol Daur Ulang agar lebarnya lebih kecil */
+    .left-btn .lab-btn {
+      padding: 1.2rem 1.5rem;
+    }
+    
+    /* --- Posisi tombol Buat Alat (kanan tengah) --- */
+    .right-btn {
+      position: absolute;
+      top: 53%;
+      right: 12rem;
+      z-index: 2;
+      transform: translateY(-50%);
+    }
+    /* Memiringkan tombol "Buat Alat" */
+    .right-btn .lab-btn {
+      transform: rotate(20deg);
+    }
+    .right-btn .lab-btn:hover {
+      transform: rotate(20deg) scale(1.05);
+    }
+    .right-btn .lab-btn:active {
+      transform: rotate(20deg) scale(0.98);
+    }
+  </style>
+</head>
+<body>
+  <!-- Gambar background -->
+  <img src="./assets/img/laboratorium.png" alt="laboratorium" class="home-image">
+  
+  <!-- Tombol Exit -->
+  <a href="game.html" class="exit-btn">Keluar</a>
+  
+  <!-- Tombol Daur Ulang: kiri bawah tetap normal -->
+  <div class="left-btn">
+    <button class="lab-btn">Daur Ulang</button>
+  </div>
+  
+  <!-- Tombol Buat Alat: tetap di posisi kanan tengah, namun tampil miring (dirotasi) -->
+  <div class="right-btn">
+    <button class="lab-btn">Buat Alat</button>
+  </div>
+  
+  <!-- Script untuk animasi transisi saat tombol Exit ditekan -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const exitButton = document.querySelector('.exit-btn');
+      exitButton.addEventListener('click', function(e) {
+        e.preventDefault(); // Mencegah navigasi langsung
+        document.body.classList.add('fade-out'); // Tambahkan class untuk animasi fade-out
+        setTimeout(function() {
+          window.location.href = exitButton.href;
+        }, 1000); // Durasi timeout sesuai dengan animasi (1 detik)
+      });
+    });
+  </script>
+</body>
+</html>

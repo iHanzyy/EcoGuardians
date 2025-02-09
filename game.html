@@ -489,38 +489,111 @@
         player: {
           x: canvas.width / 2,
           y: canvas.height / 2,
-          speed: 5,
-          width: 120,
-          height: 120,
-          currentSprite: null,
+          speed: 3,
+          maxSpeed: 4,
+          acceleration: 0.2,
+          friction: 0.15,
+          width: 40,
+          height: 70,
+          currentFrame: 0,
+          frameInterval: 200,
+          lastFrameTime: 0,
+          direction: 'down',
+          velocityX: 0,
+          velocityY: 0,
+          upFrames: [new Image(), new Image()]
         },
         assets: {
           jiraStay: new Image(),
-          jiraLeft: new Image(),
-          jiraRight: new Image(),
-          background: new Image(),
+          leftFrames: [new Image(), new Image(), new Image()],
+          rightFrames: [new Image(), new Image(), new Image()],
+          downLeftFrame: new Image(),
+          downRightFrame: new Image(),
+          upLeftFrame: new Image(),
+          upRightFrame: new Image(),
+          upFrames: [new Image(), new Image()],
+          background: new Image()
         },
         loaded: 0,
-        required: 4,
+        required: 13
       };
 
       // Fungsi memuat asset
       function loadAssets() {
-        for (let asset in game.assets) {
-          game.assets[asset].onload = () => {
+        // Load frame jalan bawah kiri (single image)
+        game.assets.downLeftFrame.onload = () => {
+          game.loaded++;
+          checkLoading();
+        };
+        game.assets.downLeftFrame.src = "./assets/img/jalanBawahKiri.png";
+
+        // Load frame jalan bawah kanan (single image)
+        game.assets.downRightFrame.onload = () => {
+          game.loaded++;
+          checkLoading();
+        };
+        game.assets.downRightFrame.src = "./assets/img/jalanBawahKanan.png";
+
+        // Load frame jalan atas kiri
+        game.assets.upLeftFrame.onload = () => {
+          game.loaded++;
+          checkLoading();
+        };
+        game.assets.upLeftFrame.src = "./assets/img/jalanAtasKiri.png";
+
+        // Load frame jalan atas kanan
+        game.assets.upRightFrame.onload = () => {
+          game.loaded++;
+          checkLoading();
+        };
+        game.assets.upRightFrame.src = "./assets/img/jalanAtasKanan.png";
+
+        // Load frame jalan ke kiri
+        game.assets.leftFrames.forEach((frame, index) => {
+          frame.onload = () => {
             game.loaded++;
-            if (game.loaded === game.required) {
-              loadingScreen.style.display = "none";
-              game.player.currentSprite = game.assets.jiraStay;
-              requestAnimationFrame(gameLoop);
-            }
+            checkLoading();
           };
-        }
+          frame.src = `./assets/img/jalanKiri${index + 1}.png`;
+        });
+
+        // Load frame jalan ke kanan
+        game.assets.rightFrames.forEach((frame, index) => {
+          frame.onload = () => {
+            game.loaded++;
+            checkLoading();
+          };
+          frame.src = `./assets/img/jalanKanan${index + 1}.png`;
+        });
+
+        // Load frame jalan atas (2 frame animasi)
+        game.assets.upFrames.forEach((frame, index) => {
+          frame.onload = () => {
+            game.loaded++;
+            checkLoading();
+          };
+          frame.src = `./assets/img/jalanAtas${index + 1}.png`;
+        });
+
+        // Load asset lainnya
+        game.assets.jiraStay.onload = () => {
+          game.loaded++;
+          checkLoading();
+        };
         game.assets.jiraStay.src = "./assets/img/jiraStay.png";
-        game.assets.jiraLeft.src = "./assets/gif/jalanKiri.gif";
-        game.assets.jiraRight.src = "./assets/gif/jalanKanan.gif";
+        
+        game.assets.background.onload = () => {
+          game.loaded++;
+          checkLoading();
+        };
         game.assets.background.src = "./assets/img/gameBg.png";
 
+        function checkLoading() {
+          if (game.loaded === game.required) {
+            loadingScreen.style.display = "none";
+            requestAnimationFrame(gameLoop);
+          }
+        }
       }
 
       // Event listener keyboard
@@ -537,31 +610,75 @@
 
       // Update posisi player
       function updatePlayer() {
-        // Update posisi player berdasarkan input
-        if (keys.w && game.player.y > 0) {
-          game.player.y -= game.player.speed;
+        const now = Date.now();
+        game.player.isMoving = false;
+        
+        // Update velocity dengan acceleration
+        if (keys.w) game.player.velocityY = Math.max(game.player.velocityY - game.player.acceleration, -game.player.maxSpeed);
+        if (keys.s) game.player.velocityY = Math.min(game.player.velocityY + game.player.acceleration, game.player.maxSpeed);
+        if (keys.a) game.player.velocityX = Math.max(game.player.velocityX - game.player.acceleration, -game.player.maxSpeed);
+        if (keys.d) game.player.velocityX = Math.min(game.player.velocityX + game.player.acceleration, game.player.maxSpeed);
+
+        // Terapkan gesekan ketika tidak ada input
+        if (!keys.w && !keys.s) {
+          game.player.velocityY *= (1 - game.player.friction);
+          if (Math.abs(game.player.velocityY) < 0.1) game.player.velocityY = 0;
         }
-        if (keys.s && game.player.y < canvas.height - game.player.height) {
-          game.player.y += game.player.speed;
+        
+        if (!keys.a && !keys.d) {
+          game.player.velocityX *= (1 - game.player.friction);
+          if (Math.abs(game.player.velocityX) < 0.1) game.player.velocityX = 0;
         }
-        if (keys.a && game.player.x > 0) {
-          game.player.x -= game.player.speed;
+
+        // Update posisi dengan velocity
+        game.player.x += game.player.velocityX;
+        game.player.y += game.player.velocityY;
+
+        // Batasi posisi dalam canvas
+        game.player.x = Math.max(0, Math.min(game.player.x, canvas.width - game.player.width));
+        game.player.y = Math.max(0, Math.min(game.player.y, canvas.height - game.player.height));
+
+        // Bagian penentuan arah
+        if (game.player.velocityX !== 0 || game.player.velocityY !== 0) {
+          game.player.isMoving = true;
+          
+          if (game.player.velocityY < 0) {
+            if (game.player.velocityX > 0) game.player.direction = 'up-right';
+            else if (game.player.velocityX < 0) game.player.direction = 'up-left';
+            else game.player.direction = 'up';
+          }
+          else if (game.player.velocityY > 0) {
+            if (game.player.velocityX > 0) game.player.direction = 'down-right';
+            else if (game.player.velocityX < 0) game.player.direction = 'down-left';
+            else game.player.direction = 'down';
+          }
+          else {
+            game.player.direction = game.player.velocityX > 0 ? 'right' : 'left';
+          }
+        } else {
+          game.player.isMoving = false;
+          game.player.currentFrame = 0;
         }
-        if (keys.d && game.player.x < canvas.width - game.player.width) {
-          game.player.x += game.player.speed;
+
+        // Update animasi frame
+        if (game.player.isMoving) {
+          const isDiagonalMove = (game.player.velocityX !== 0 && game.player.velocityY !== 0);
+          const isHorizontalOnly = game.player.velocityX !== 0 && game.player.velocityY === 0;
+          
+          if (isHorizontalOnly && (now - game.player.lastFrameTime > game.player.frameInterval)) {
+            game.player.currentFrame = (game.player.currentFrame + 1) % 3;
+            game.player.lastFrameTime = now;
+          } else if (isDiagonalMove) {
+            game.player.currentFrame = 0;
+          }
         }
-      
-        // Tentukan sprite yang seharusnya aktif berdasarkan input
-        let desiredSprite = game.assets.jiraStay; // default idle
-        if (keys.a) {
-          desiredSprite = game.assets.jiraLeft;
-        } else if (keys.d) {
-          desiredSprite = game.assets.jiraRight;
-        }
-      
-        // Hanya perbarui sprite jika berbeda dengan yang sedang aktif
-        if (game.player.currentSprite !== desiredSprite) {
-          game.player.currentSprite = desiredSprite;
+
+        // Update animasi frame untuk gerakan atas
+        if (game.player.direction === 'up') {
+          if (Date.now() - game.player.lastFrameTime > game.player.frameInterval) {
+            game.player.currentFrame = (game.player.currentFrame + 1) % 2;
+            game.player.lastFrameTime = Date.now();
+          }
         }
       }
       
@@ -593,8 +710,41 @@
 
       // Gambar player
       function drawPlayer() {
+        let currentFrame;
+        switch(game.player.direction) {
+          case 'left':
+            currentFrame = game.assets.leftFrames[game.player.currentFrame];
+            break;
+          case 'right':
+            currentFrame = game.assets.rightFrames[game.player.currentFrame];
+            break;
+          case 'down-left':
+            currentFrame = game.assets.downLeftFrame;
+            break;
+          case 'down-right':
+            currentFrame = game.assets.downRightFrame;
+            break;
+          case 'up-left':
+            currentFrame = game.assets.upLeftFrame;
+            break;
+          case 'up-right':
+            currentFrame = game.assets.upRightFrame;
+            break;
+          case 'up':
+            currentFrame = game.assets.upFrames[game.player.currentFrame];
+            break;
+          default: // 'down'
+            currentFrame = game.assets.jiraStay;
+        }
+
+        // Tambahkan pengecekan gambar
+        if (!currentFrame || currentFrame.complete === false || currentFrame.naturalHeight === 0) {
+          console.error('Gambar tidak ditemukan untuk arah:', game.player.direction);
+          return;
+        }
+
         ctx.drawImage(
-          game.player.currentSprite,
+          currentFrame,
           game.player.x,
           game.player.y,
           game.player.width,
