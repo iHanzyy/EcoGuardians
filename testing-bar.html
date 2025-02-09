@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Status Bars - Game UI</title>
+  <style>
+    /* Styling Global */
+    body {
+      background: #1a1a1a;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    /* Container grid: setiap progress bar berukuran 400px, sehingga grid-nya 2 kolom dengan lebar tetap */
+    .status-container {
+      display: grid;
+      grid-template-columns: repeat(2, 400px);
+      gap: 25px;
+      padding: 20px;
+      margin: 0 auto;
+    }
+    
+    /* Styling Bar */
+    .status-bar {
+      position: relative;
+      background: #333;
+      border-radius: 30px;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7);
+      overflow: hidden;
+      height: 50px;
+    }
+    .status-bar-fill {
+      height: 100%;
+      width: 0; /* Dimulai dari 0 untuk animasi */
+      box-sizing: border-box;
+      /* Secara default hanya membulatkan sisi kiri */
+      border-radius: 30px 0 0 30px;
+      transition: width 1s ease-in-out;
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding-left: 50px; /* Ruang untuk icon */
+      font-weight: bold;
+    }
+    
+    /* Perbaikan posisi ikon */
+    .status-icon {
+      position: absolute;
+      left: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      background: #222;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      border: 2px solid;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+      transition: transform 0.3s ease;
+    }
+    .status-icon:hover {
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    /* Nature Bar */
+    .nature .status-bar-fill {
+      background: linear-gradient(135deg, #2a8e2a, #50d850);
+    }
+    .nature .status-icon {
+      border-color: #1cbf21;
+    }
+
+    /* Energy Bar */
+    .energy .status-bar-fill {
+      background: linear-gradient(135deg, #cc9a00, #ffe600);
+    }
+    .energy .status-icon {
+      border-color: #ffb41e;
+    }
+
+    /* Water Bar */
+    .water .status-bar-fill {
+      background: linear-gradient(135deg, #1e8ac0, #26aaf0);
+    }
+    .water .status-icon {
+      border-color: #b8deff;
+    }
+
+    /* Toxic Bar */
+    .toxic .status-bar-fill {
+      background: linear-gradient(135deg, #3a3a3a, #484740);
+    }
+    .toxic .status-icon {
+      border-color: #000000;
+    }
+    
+    /* Jika bar hampir penuh (>= 90%), bulatkan kedua sisi */
+    .status-bar-fill.full {
+      border-radius: 30px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Urutan: Kolom kiri atas (Nature), Kolom kanan atas (Water),
+       Kolom kiri bawah (Energy), Kolom kanan bawah (Toxic) -->
+  <div class="status-container">
+    <!-- Nature -->
+    <div class="status-bar nature">
+      <div class="status-icon">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#1cbf21" stroke-width="2" width="24" height="24">
+          <path d="M12 2L22 12H16V22H8V12H2L12 2Z"/>
+        </svg>
+      </div>
+      <div class="status-bar-fill"></div>
+    </div>
+
+    <!-- Water -->
+    <div class="status-bar water">
+      <div class="status-icon">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#26aaf0" stroke-width="2" width="24" height="24">
+          <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+        </svg>
+      </div>
+      <div class="status-bar-fill"></div>
+    </div>
+
+    <!-- Energy -->
+    <div class="status-bar energy">
+      <div class="status-icon">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#ffb41e" stroke-width="2" width="24" height="24">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+      </div>
+      <div class="status-bar-fill"></div>
+    </div>
+
+    <!-- Toxic -->
+    <div class="status-bar toxic">
+      <div class="status-icon">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#484740" stroke-width="2" width="24" height="24">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 8l4 4-4 4-4-4 4-4z"/>
+        </svg>
+      </div>
+      <div class="status-bar-fill"></div>
+    </div>
+  </div>
+
+  <script>
+    // Animasi pengisian bar
+    document.addEventListener('DOMContentLoaded', () => {
+      const bars = document.querySelectorAll('.status-bar');
+      bars.forEach(bar => {
+        const fill = bar.querySelector('.status-bar-fill');
+        // Mendapatkan nilai random antara 30% dan 100%
+        const randomValue = Math.floor(Math.random() * (100 - 30 + 1)) + 30;
+        // Delay sedikit untuk transisi yang lebih halus
+        setTimeout(() => {
+          fill.style.width = randomValue + '%';
+          // Jika nilai >= 90, tambahkan kelas 'full' agar kedua sisi membulat
+          if (randomValue >= 90) {
+            fill.classList.add('full');
+          } else {
+            fill.classList.remove('full');
+          }
+        }, 200);
+      });
+    });
+  </script>
+</body>
+</html>
