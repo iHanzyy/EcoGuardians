@@ -413,6 +413,22 @@
         color: white;
       }
 
+      /* -- Tombol interaksi untuk pohon -- */
+      .interactive-button.cut {
+        background: linear-gradient(45deg, #d32f2f, #f44336);
+        color: white;
+      }
+      .interactive-button.plant {
+        background: linear-gradient(45deg, #388e3c, #4caf50);
+        color: white;
+      }
+
+      /* Tombol interaksi untuk alat penghilang polusi */
+      .interactive-button.polusi {
+        background: linear-gradient(45deg, #34495e, #2c3e50);
+        color: white;
+      }
+
       .interactive-button:hover {
         transform: scale(1.05);
         box-shadow: 0 6px 20px rgba(0,0,0,0.3);
@@ -458,8 +474,6 @@
     <div class="roadBlock" id="blockGrass"></div>
     <div class="roadBlock" id="blockGrass2"></div>
     <!-- Status Bars UI -->
-
-
     <div class="status-container">
       <!-- Nature Status Bar -->
       <div class="status-bar nature">
@@ -575,6 +589,13 @@
     <!-- Interactive Buttons -->
     <button class="interactive-button home" id="homeButton">Rumah</button>
     <button class="interactive-button lab" id="labButton">Laboratorium</button>
+    <!-- Tombol interaksi untuk pohon -->
+    <button class="interactive-button cut" id="cutButton">Tebang</button>
+    <button class="interactive-button plant" id="plantButton">Tanam</button>
+    <!-- Tombol interaksi untuk alat Konversi Air -->
+    <button class="interactive-button konversi" id="konversiButton">Konversi Air</button>
+    <!-- Tombol interaksi untuk alat penghilang polusi -->
+    <button class="interactive-button polusi" id="polusiButton">Nyalakan Mesin</button>
 
     <!-- Page Transition Overlay -->
     <div class="page-transition" id="pageTransition"></div>
@@ -607,15 +628,19 @@
           maxSpeed: 4,
           acceleration: 0.2,
           friction: 0.15,
-          width: 40,
-          height: 70,
+          width: 40,       // Ukuran normal lebar karakter
+          height: 70,      // Ukuran normal tinggi karakter
+          chopWidth: 65,   // Lebar khusus untuk animasi nebang
+          chopHeight: 90,  // Tinggi khusus untuk animasi nebang
           currentFrame: 0,
           frameInterval: 200,
           lastFrameTime: 0,
           direction: 'down',
           velocityX: 0,
           velocityY: 0,
-          isMoving: false
+          isMoving: false,
+          isChopping: false,          // Flag untuk animasi penebangan pada karakter
+          chopAnimationStartTime: 0   // Waktu mulai animasi chop
         },
         assets: {
           jiraStay: new Image(),
@@ -627,16 +652,39 @@
           upRightFrame: new Image(),
           upFrames: [new Image(), new Image()],
           background: new Image(),
-          tree: new Image()
+          tree: new Image(),      // Gambar pohon normal
+          treeCut: new Image(),   // Gambar pohon gundul (untuk animasi penebangan)
+          chopFrames: [new Image(), new Image()],  // Frame animasi karakter ketika menebang (nebang1.png dan nebang2.png)
+          alatKonversi: new Image(),            // Asset untuk alat konversi
+          alatPenghilangPolusi: new Image()     // Asset untuk alat penghilang polusi
         },
         tree: {
-          x: 620,
-          y: 70,
-          width: 150,
-          height: 250
+          x: 620,      // Posisi X pohon normal
+          y: 70,       // Posisi Y pohon normal
+          width: 150,  // Lebar pohon normal
+          height: 250, // Tinggi pohon normal
+
+          // Properti untuk kondisi pohon gundul
+          cutX: 670,   // Ubah nilai ini untuk mengatur posisi X pohon gundul
+          cutY: 250,   // Ubah nilai ini untuk mengatur posisi Y pohon gundul
+          cutWidth: 60,   // Lebar pohon gundul
+          cutHeight: 70,  // Tinggi pohon gundul
+
+          isCut: false  // false = pohon normal, true = pohon sudah ditebang/gundul
         },
+        currentTreeImage: null, // Akan di-set setelah asset termuat, misalnya game.assets.tree
         loaded: 0,
-        required: 14
+        required: 20 // Pastikan jumlah ini sudah mencakup asset treeCut juga
+      };
+
+      // Definisikan objek baru untuk posisi dan ukuran alat
+      game.tools = {
+        alatKonversi: { x: 270, y: 600, width: 130, height: 130 },
+        alatPenghilangPolusi: { x: 580, y: 300, width: 280, height: 280 },
+        // Properti untuk animasi shaking pada alat konversi
+        konversiShaking: false,
+        shakeStartTime: 0
+
       };
 
       // Fungsi untuk memuat asset gambar
@@ -674,12 +722,41 @@
         game.assets.background.onload = () => { game.loaded++; checkLoading(); };
         game.assets.background.src = "./assets/img/gameBg.png";
 
+        // Memuat aset pohon (pohon.png)
         game.assets.tree.onload = () => { game.loaded++; checkLoading(); };
         game.assets.tree.src = "./assets/img/pohon.png";
+
+        // Memuat aset pohon gundul (pohonGundul.png)
+        game.assets.treeCut.onload = () => { game.loaded++; checkLoading(); };
+        game.assets.treeCut.src = "./assets/img/pohonGundul.png";
+
+        // Memuat frame animasi untuk karakter (nebang1.png dan nebang2.png)
+        game.assets.chopFrames.forEach((frame, index) => {
+          frame.onload = () => { game.loaded++; checkLoading(); };
+          frame.src = `./assets/img/nebang${index + 1}.png`;
+        });
+
+        // ==== Pemuatan asset baru ====
+        game.assets.alatKonversi.onload = () => { game.loaded++; checkLoading(); };
+        game.assets.alatKonversi.src = "./assets/img/alatKonversi.png";
+
+        game.assets.alatPenghilangPolusi.onload = () => { game.loaded++; checkLoading(); };
+        game.assets.alatPenghilangPolusi.src = "./assets/img/alatPenghilangPolusi.png";
 
         function checkLoading() {
           if (game.loaded === game.required) {
             loadingScreen.style.display = "none";
+            
+            // Ambil status pohon dari localStorage
+            const storedTreeState = localStorage.getItem("treeIsCut");
+            if (storedTreeState === "true") {
+              game.tree.isCut = true;
+              game.currentTreeImage = game.assets.treeCut;
+            } else {
+              game.tree.isCut = false;
+              game.currentTreeImage = game.assets.tree;
+            }
+            
             setSpawnPosition();
             requestAnimationFrame(gameLoop);
           }
@@ -694,11 +771,11 @@
         if (e.key.toLowerCase() in keys) keys[e.key.toLowerCase()] = false;
       });
 
-      // Tambahkan di bagian atas script
+      // Tombol interaksi dan transisi halaman
       const homeButton = document.getElementById('homeButton');
       const labButton = document.getElementById('labButton');
       const pageTransition = document.getElementById('pageTransition');
-      const INTERACTION_DISTANCE = 150; // Jarak dalam pixel (diperbesar)
+      const INTERACTION_DISTANCE = 150;
 
       // Fungsi navigasi dengan transisi
       function navigateWithTransition(url) {
@@ -708,32 +785,26 @@
         }, 500);
       }
 
-      // Fungsi untuk mengatur posisi spawn player menggunakan data koordinat yang disimpan tanpa JSON
+      // Fungsi untuk mengatur posisi spawn player dari data spawn tersimpan
       function setSpawnPosition() {
         const spawnX = sessionStorage.getItem('spawnX');
         const spawnY = sessionStorage.getItem('spawnY');
         if (spawnX !== null && spawnY !== null) {
-          // Konversi nilai string ke number menggunakan parseFloat
           game.player.x = parseFloat(spawnX) - (game.player.width / 2);
           game.player.y = parseFloat(spawnY) - (game.player.height / 2);
-          // Hapus data spawn setelah digunakan
           sessionStorage.removeItem('spawnX');
           sessionStorage.removeItem('spawnY');
           sessionStorage.removeItem('spawnType');
           return;
         }
-        
-        // Jika data spawn tidak tersedia, fallback ke cek spawnLocation (jika ada)
         const spawnTarget = sessionStorage.getItem('spawnLocation');
         if (!spawnTarget) return;
-        
         let targetBlock;
         if (spawnTarget === 'home') {
           targetBlock = document.getElementById('blockHome');
         } else if (spawnTarget === 'lab') {
           targetBlock = document.getElementById('blockLaboratorium');
         }
-        
         if (targetBlock) {
           const rect = targetBlock.getBoundingClientRect();
           game.player.x = rect.left + (rect.width / 2) - (game.player.width / 2);
@@ -742,21 +813,18 @@
         sessionStorage.removeItem('spawnLocation');
       }
 
-      // Fungsi untuk update posisi player dan cek collision dengan blok rintangan
+      // Fungsi untuk update posisi player dan mengecek jarak interaksi
       function updatePlayer() {
         const now = Date.now();
-        // Simpan posisi sebelumnya agar bisa dikembalikan jika terjadi collision
         const prevX = game.player.x;
         const prevY = game.player.y;
         game.player.isMoving = false;
 
-        // Update velocity berdasarkan input keyboard
         if (keys.w) game.player.velocityY = Math.max(game.player.velocityY - game.player.acceleration, -game.player.maxSpeed);
         if (keys.s) game.player.velocityY = Math.min(game.player.velocityY + game.player.acceleration, game.player.maxSpeed);
         if (keys.a) game.player.velocityX = Math.max(game.player.velocityX - game.player.acceleration, -game.player.maxSpeed);
         if (keys.d) game.player.velocityX = Math.min(game.player.velocityX + game.player.acceleration, game.player.maxSpeed);
 
-        // Terapkan gesekan jika tidak ada input
         if (!keys.w && !keys.s) {
           game.player.velocityY *= (1 - game.player.friction);
           if (Math.abs(game.player.velocityY) < 0.1) game.player.velocityY = 0;
@@ -766,31 +834,23 @@
           if (Math.abs(game.player.velocityX) < 0.1) game.player.velocityX = 0;
         }
 
-        // Update posisi player
         game.player.x += game.player.velocityX;
         game.player.y += game.player.velocityY;
 
-        // Pastikan player tidak keluar dari canvas
         game.player.x = Math.max(0, Math.min(game.player.x, canvas.width - game.player.width));
         game.player.y = Math.max(0, Math.min(game.player.y, canvas.height - game.player.height));
 
-        // Dapatkan posisi canvas relatif terhadap viewport
         const canvasRect = canvas.getBoundingClientRect();
-        
-        // Hitung posisi pusat player (mempertimbangkan posisi canvas)
         const playerCenter = {
           x: game.player.x + game.player.width/2 + canvasRect.left,
           y: game.player.y + game.player.height/2 + canvasRect.top
         };
 
-        // Dapatkan blok home dan laboratorium
+        // Tombol Home dan Laboratorium
         const homeBlock = document.getElementById('blockHome');
         const labBlock = document.getElementById('blockLaboratorium');
-        
         const homeRect = homeBlock.getBoundingClientRect();
         const labRect = labBlock.getBoundingClientRect();
-
-        // Hitung posisi pusat masing-masing blok
         const homeCenter = {
           x: homeRect.left + homeRect.width/2,
           y: homeRect.top + homeRect.height/2
@@ -800,35 +860,88 @@
           y: labRect.top + labRect.height/2
         };
 
-        // Deteksi jarak ke pusat blok
-        const distanceToHome = Math.hypot(
-          playerCenter.x - homeCenter.x,
-          playerCenter.y - homeCenter.y
-        );
-        const distanceToLab = Math.hypot(
-          playerCenter.x - labCenter.x,
-          playerCenter.y - labCenter.y
-        );
+        const distanceToHome = Math.hypot(playerCenter.x - homeCenter.x, playerCenter.y - homeCenter.y);
+        const distanceToLab = Math.hypot(playerCenter.x - labCenter.x, playerCenter.y - labCenter.y);
 
-        // Update tampilan button berdasarkan jarak
         homeButton.classList.toggle('visible', distanceToHome < INTERACTION_DISTANCE);
         labButton.classList.toggle('visible', distanceToLab < INTERACTION_DISTANCE);
-        
-        // Posisikan tombol di bawah blok dengan menggunakan posisi pusat blok
+
         if (distanceToHome < INTERACTION_DISTANCE) {
           const buttonWidth = homeButton.offsetWidth;
           homeButton.style.left = `${homeCenter.x - (buttonWidth/2)}px`;
           homeButton.style.top = `${homeRect.bottom + 20}px`;
         }
-        
+
         if (distanceToLab < INTERACTION_DISTANCE) {
           const buttonWidth = labButton.offsetWidth;
           labButton.style.left = `${labCenter.x - (buttonWidth/2)}px`;
           labButton.style.top = `${labRect.bottom + 20}px`;
         }
-        
-        // ----- Collision Detection dengan semua blok rintangan -----
-        const blocks = document.querySelectorAll(".roadBlock");
+
+        // Tombol interaksi pohon (Tebang & Tanam)
+        const treeRect = {
+          left: canvasRect.left + game.tree.x,
+          top: canvasRect.top + game.tree.y,
+          width: game.tree.width,
+          height: game.tree.height
+        };
+        const treeCenter = {
+          x: treeRect.left + treeRect.width/2,
+          y: treeRect.top + treeRect.height/2
+        };
+        const distanceToTree = Math.hypot(playerCenter.x - treeCenter.x, playerCenter.y - treeCenter.y);
+
+        const cutButton = document.getElementById('cutButton');
+        const plantButton = document.getElementById('plantButton');
+
+        if (distanceToTree < INTERACTION_DISTANCE) {
+          cutButton.classList.add('visible');
+          plantButton.classList.add('visible');
+          const buttonMargin = 10;
+          // Posisi tombol ditempatkan di bawah pohon
+          cutButton.style.left = `${treeCenter.x - cutButton.offsetWidth - buttonMargin}px`;
+          plantButton.style.left = `${treeCenter.x + buttonMargin}px`;
+          cutButton.style.top = plantButton.style.top = `${treeRect.top + treeRect.height + 20}px`;
+        } else {
+          cutButton.classList.remove('visible');
+          plantButton.classList.remove('visible');
+        }
+
+        // Hitung jarak ke alat konversi
+        const konversiButton = document.getElementById('konversiButton');
+        const konversiCenter = {
+          x: game.tools.alatKonversi.x + game.tools.alatKonversi.width / 2,
+          y: game.tools.alatKonversi.y + game.tools.alatKonversi.height / 2
+        };
+        const distanceToKonversi = Math.hypot(playerCenter.x - konversiCenter.x, playerCenter.y - konversiCenter.y);
+
+        if (distanceToKonversi < INTERACTION_DISTANCE) {
+          konversiButton.classList.add('visible');
+          const buttonWidth = konversiButton.offsetWidth;
+          konversiButton.style.left = `${konversiCenter.x - buttonWidth / 2}px`;
+          konversiButton.style.top = `${game.tools.alatKonversi.y + game.tools.alatKonversi.height + 20}px`;
+        } else {
+          konversiButton.classList.remove('visible');
+        }
+
+        // --- Tambahan: Logika untuk alat penghilang polusi ---
+        const polusiButton = document.getElementById('polusiButton');
+        const polusiCenter = {
+          x: game.tools.alatPenghilangPolusi.x + game.tools.alatPenghilangPolusi.width / 2,
+          y: game.tools.alatPenghilangPolusi.y + game.tools.alatPenghilangPolusi.height / 2
+        };
+        const distanceToPolusi = Math.hypot(playerCenter.x - polusiCenter.x, playerCenter.y - polusiCenter.y);
+        if (distanceToPolusi < INTERACTION_DISTANCE) {
+          polusiButton.classList.add('visible');
+          const buttonWidth = polusiButton.offsetWidth;
+          polusiButton.style.left = `${polusiCenter.x - buttonWidth / 2}px`;
+          polusiButton.style.top = `${game.tools.alatPenghilangPolusi.y + game.tools.alatPenghilangPolusi.height + 20}px`;
+        } else {
+          polusiButton.classList.remove('visible');
+        }
+        // --- End Tambahan ---
+
+        // Collision detection (blok rintangan)
         let collisionDetected = false;
         const playerRect = {
           x: game.player.x,
@@ -836,7 +949,7 @@
           width: game.player.width,
           height: game.player.height
         };
-
+        const blocks = document.querySelectorAll(".roadBlock");
         blocks.forEach(blockElem => {
           const blockRect = blockElem.getBoundingClientRect();
           if (
@@ -848,17 +961,13 @@
             collisionDetected = true;
           }
         });
-
         if (collisionDetected) {
-          // Jika terjadi collision, kembalikan posisi dan reset velocity
           game.player.x = prevX;
           game.player.y = prevY;
           game.player.velocityX = 0;
           game.player.velocityY = 0;
         }
-        // ------------------------------------------------------------
 
-        // Tentukan arah player untuk animasi
         if (game.player.velocityX !== 0 || game.player.velocityY !== 0) {
           game.player.isMoving = true;
           if (game.player.velocityY < 0) {
@@ -877,7 +986,6 @@
           game.player.currentFrame = 0;
         }
 
-        // Update animasi frame secara sederhana
         if (game.player.isMoving && Date.now() - game.player.lastFrameTime > game.player.frameInterval) {
           if (game.player.direction === 'up') {
             game.player.currentFrame = (game.player.currentFrame + 1) % 2;
@@ -888,7 +996,7 @@
         }
       }
 
-      // Menggambar background dengan menyesuaikan ukuran canvas
+      // Menggambar background
       function drawBackground() {
         const img = game.assets.background;
         const canvasRatio = canvas.width / canvas.height;
@@ -908,57 +1016,118 @@
         ctx.drawImage(img, xOffset, yOffset, drawWidth, drawHeight);
       }
 
-      // Menggambar player sesuai arah dan frame yang sedang aktif
+      // Menggambar player (override dengan animasi chop jika sedang menebang)
       function drawPlayer() {
         let currentFrame;
-        switch(game.player.direction) {
-          case 'left':
-            currentFrame = game.assets.leftFrames[game.player.currentFrame];
-            break;
-          case 'right':
-            currentFrame = game.assets.rightFrames[game.player.currentFrame];
-            break;
-          case 'down-left':
-            currentFrame = game.assets.downLeftFrame;
-            break;
-          case 'down-right':
-            currentFrame = game.assets.downRightFrame;
-            break;
-          case 'up-left':
-            currentFrame = game.assets.upLeftFrame;
-            break;
-          case 'up-right':
-            currentFrame = game.assets.upRightFrame;
-            break;
-          case 'up':
-            currentFrame = game.assets.upFrames[game.player.currentFrame];
-            break;
-          default:
-            currentFrame = game.assets.jiraStay;
+        if (game.player.isChopping) {
+          const elapsed = Date.now() - game.player.chopAnimationStartTime;
+          const frameIndex = Math.floor(elapsed / 200) % game.assets.chopFrames.length;
+          currentFrame = game.assets.chopFrames[frameIndex];
+        } else {
+          switch(game.player.direction) {
+            case 'left':
+              currentFrame = game.assets.leftFrames[game.player.currentFrame];
+              break;
+            case 'right':
+              currentFrame = game.assets.rightFrames[game.player.currentFrame];
+              break;
+            case 'down-left':
+              currentFrame = game.assets.downLeftFrame;
+              break;
+            case 'down-right':
+              currentFrame = game.assets.downRightFrame;
+              break;
+            case 'up-left':
+              currentFrame = game.assets.upLeftFrame;
+              break;
+            case 'up-right':
+              currentFrame = game.assets.upRightFrame;
+              break;
+            case 'up':
+              currentFrame = game.assets.upFrames[game.player.currentFrame];
+              break;
+            default:
+              currentFrame = game.assets.jiraStay;
+          }
         }
         if (!currentFrame || !currentFrame.complete || currentFrame.naturalHeight === 0) {
           console.error('Gambar tidak ditemukan untuk arah:', game.player.direction);
           return;
         }
+        
+        // Tentukan ukuran gambar berdasarkan status animasi
+        const drawWidth = game.player.isChopping ? game.player.chopWidth : game.player.width;
+        const drawHeight = game.player.isChopping ? game.player.chopHeight : game.player.height;
+        
         ctx.drawImage(
           currentFrame,
           game.player.x,
           game.player.y,
-          game.player.width,
-          game.player.height
+          drawWidth,
+          drawHeight
         );
       }
 
-      // Fungsi untuk menggambar aset pohon pada canvas
+      // Menggambar pohon menggunakan game.currentTreeImage
       function drawTree() {
-        // Gambar pohon.png pada posisi yang diatur melalui game.tree
-        // Ubah nilai game.tree.x dan game.tree.y untuk memindahkan posisi pohon
+        // Cek apakah gambar pohon yang sedang digunakan adalah aset pohon gundul (treeCut)
+        const isCutState = game.currentTreeImage === game.assets.treeCut;
+        
+        // Tentukan ukuran gambar yang akan digunakan (sesuai state)
+        const drawWidth = isCutState && game.tree.cutWidth ? game.tree.cutWidth : game.tree.width;
+        const drawHeight = isCutState && game.tree.cutHeight ? game.tree.cutHeight : game.tree.height;
+        
+        // Jika dalam state gundul dan properti cutX/cutY telah didefinisikan, gunakan posisi tersebut
+        const posX = isCutState && typeof game.tree.cutX !== 'undefined' ? game.tree.cutX : game.tree.x;
+        const posY = isCutState && typeof game.tree.cutY !== 'undefined' ? game.tree.cutY : game.tree.y;
+        
         ctx.drawImage(
-          game.assets.tree, 
-          game.tree.x, 
-          game.tree.y, 
-          game.tree.width, 
-          game.tree.height
+          game.currentTreeImage,
+          posX,
+          posY,
+          drawWidth,
+          drawHeight
+        );
+      }
+
+      // Fungsi baru untuk menggambar alat konversi dengan animasi shaking
+      function drawConversionTool() {
+        const konversiPos = game.tools.alatKonversi;
+        let shakeOffsetX = 0, shakeOffsetY = 0;
+        
+        if (game.tools.konversiShaking) {
+          const elapsed = Date.now() - game.tools.shakeStartTime;
+          const shakeDuration = 500; // durasi bergetar dalam milidetik (0.5 detik)
+          if (elapsed < shakeDuration) {
+            const maxOffset = 5; // intensitas getar (dapat disesuaikan)
+            // Hitung offset secara acak pada sumbu X dan Y
+            shakeOffsetX = (Math.random() * maxOffset * 2) - maxOffset;
+            shakeOffsetY = (Math.random() * maxOffset * 2) - maxOffset;
+          } else {
+            // Matikan flag shaking setelah durasi selesai
+            game.tools.konversiShaking = false;
+          }
+        }
+        
+        ctx.drawImage(
+          game.assets.alatKonversi,
+          konversiPos.x + shakeOffsetX,
+          konversiPos.y + shakeOffsetY,
+          konversiPos.width,
+          konversiPos.height
+        );
+      }
+
+      // Fungsi baru untuk menggambar alat penghilang polusi (jika diperlukan tampil di layer bawah)
+      function drawPolusiTool() {
+        // Ubah properti x, y, width, dan height di game.tools.alatPenghilangPolusi untuk menyesuaikan posisinya
+        const polusiPos = game.tools.alatPenghilangPolusi;
+        ctx.drawImage(
+          game.assets.alatPenghilangPolusi,
+          polusiPos.x,
+          polusiPos.y,
+          polusiPos.width,
+          polusiPos.height
         );
       }
 
@@ -966,10 +1135,16 @@
       function gameLoop() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawBackground();
-        drawTree(); // <-- Panggil fungsi drawTree() untuk menggambar asset pohon
+        drawTree();
+        
+        // Gambar alat penghilang polusi (tetap di layer belakang player)
+        drawPolusiTool();
         
         updatePlayer();
         drawPlayer();
+        
+        // Gambar alat konversi (dengan animasi jika aktif) akan tampil di atas player
+        drawConversionTool();
         requestAnimationFrame(gameLoop);
       }
 
@@ -1026,7 +1201,6 @@
       updateStatusBar('energy', 100);
       updateStatusBar('toxic', 100);
 
-
       // Quest Popup Code
       const questButton = document.querySelector('.icon[alt="Quest Button"]');
       const questModalOverlay = document.getElementById("questModalOverlay");
@@ -1045,22 +1219,19 @@
       }
       updateMissionProgress(50);
 
-      // Ubah event listener untuk tombol Home dengan menyimpan koordinat spawn secara terpisah
+      // Tombol Home
       homeButton.addEventListener('click', () => {
-        // Hitung bounding client rect untuk tombol dan canvas
         const buttonRect = homeButton.getBoundingClientRect();
         const canvasRect = canvas.getBoundingClientRect();
-        // Hitung pusat tombol relatif terhadap canvas
         const spawnX = (buttonRect.left - canvasRect.left) + (buttonRect.width / 2);
         const spawnY = (buttonRect.top - canvasRect.top) + (buttonRect.height / 2);
-        // Simpan koordinat spawn sebagai item terpisah di sessionStorage
         sessionStorage.setItem('spawnX', spawnX);
         sessionStorage.setItem('spawnY', spawnY);
         sessionStorage.setItem('spawnType', 'home');
         navigateWithTransition('home.html');
       });
-
-      // Lakukan hal yang sama untuk tombol Laboratorium
+      
+      // Tombol Laboratorium
       labButton.addEventListener('click', () => {
         const buttonRect = labButton.getBoundingClientRect();
         const canvasRect = canvas.getBoundingClientRect();
@@ -1070,6 +1241,74 @@
         sessionStorage.setItem('spawnY', spawnY);
         sessionStorage.setItem('spawnType', 'lab');
         navigateWithTransition('laboratorium.html');
+      });
+      
+      // Fungsi animasi untuk aksi tebangan pohon & animasi karakter menebang
+      function animateTreeCut() {
+        if (game.tree.isCut) return;
+        game.tree.isCut = true;
+        
+        // Langsung ubah ke gambar pohon gundul (pohonGundul.png)
+        game.currentTreeImage = game.assets.treeCut;
+        
+        // Setelah 400ms (sesuaikan waktunya sesuai kebutuhan), kembalikan ke gambar pohon normal (pohon.png)
+        setTimeout(() => {
+          game.currentTreeImage = game.assets.tree;
+          game.tree.isCut = false;
+        }, 400);
+      }
+      
+      function animatePlayerChop() {
+        if (game.player.isChopping) return;
+        game.player.isChopping = true;
+        game.player.chopAnimationStartTime = Date.now();
+        setTimeout(() => {
+          game.player.isChopping = false;
+        }, 800);
+      }
+      
+      // Tombol interaksi pohon: Tebang
+      const cutButton = document.getElementById('cutButton');
+      cutButton.addEventListener('click', () => {
+        // Jika pohon sudah gundul atau animasi chop sedang berjalan, jangan lakukan aksi apa-apa
+        if (game.tree.isCut || game.player.isChopping) return;
+        
+        // Mulai animasi karakter menebang
+        animatePlayerChop();
+        
+        // Setelah delay sinkronisasi dengan animasi karakter, ubah status pohon ke gundul dan simpan ke localStorage
+        setTimeout(() => {
+          game.currentTreeImage = game.assets.treeCut;
+          game.tree.isCut = true;
+          localStorage.setItem("treeIsCut", "true");
+        }, 600); // Delay (600ms) dapat disesuaikan dengan kebutuhan
+      });
+      
+      // Tombol interaksi pohon: Tanam
+      const plantButton = document.getElementById('plantButton');
+      plantButton.addEventListener('click', () => {
+        // Hanya lakukan aksi tanam jika pohon dalam keadaan gundul
+        if (!game.tree.isCut) return;
+        
+        // Ubah status pohon kembali ke normal dan simpan ke localStorage
+        game.currentTreeImage = game.assets.tree;
+        game.tree.isCut = false;
+        localStorage.setItem("treeIsCut", "false");
+        
+        console.log("Tanam: Pohon telah ditanam kembali.");
+      });
+
+      // Tambahkan event listener untuk button Konversi Air (bisa diletakkan di bagian bawah script)
+      konversiButton.addEventListener('click', () => {
+        // Trigger animasi shaking untuk alat konversi
+        game.tools.konversiShaking = true;
+        game.tools.shakeStartTime = Date.now();
+      });
+
+      // Tombol untuk alat penghilang polusi: Nyalakan Mesin
+      const polusiButton = document.getElementById('polusiButton');
+      polusiButton.addEventListener('click', () => {
+        navigateWithTransition('ending.html');
       });
     </script>
   </body>
