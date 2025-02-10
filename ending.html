@@ -5,8 +5,131 @@
     <link rel="icon" href="./assets/img/logoEcoG.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ending - ECOGUARDIANS</title>
+    <style>
+      /* Reset & Global Styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body,
+      html {
+        height: 100%;
+        font-family: Arial, sans-serif;
+      }
+      
+      /* Container untuk halaman ending */
+      .ending-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+        background: #111;
+        color: #fff;
+        text-align: center;
+      }
+      
+      /* Gaya untuk gambar ending */
+      .ending-image {
+        max-width: 100%;
+        max-height: 60vh;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+      }
+      
+      /* Gaya untuk dialog teks ending */
+      .ending-text {
+        font-size: 1.5rem;
+        margin-bottom: 30px;
+        line-height: 1.4;
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+      }
+      
+      /* Tombol "Coba Lagi" untuk bad ending */
+      .try-again-button {
+        padding: 12px 24px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #fff;
+        background: linear-gradient(45deg, #d32f2f, #f44336);
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      
+      .try-again-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      }
+      
+      .try-again-button:active {
+        transform: scale(0.95);
+      }
+    </style>
 </head>
 <body>
-    
+    <div class="ending-container">
+      <!-- Gambar Ending -->
+      <img id="endingImage" class="ending-image" src="" alt="Ending" />
+      <!-- Teks dialog ending -->
+      <div id="endingText" class="ending-text"></div>
+      <!-- Tombol "Coba Lagi" hanya muncul jika ending merupakan bad ending -->
+      <button id="tryAgainButton" class="try-again-button" style="display: none;">
+        Coba Lagi
+      </button>
+    </div>
+    <script>
+      // Pemetaan setiap ending dengan gambar dan teks dialognya
+      const endings = {
+        good: {
+          image: "./assets/img/goodEnding.jpg",
+          text: "Selamat! Jira telah menyelamatkan kota dari bencana krisis ekologi. Kota kini pulih, alam bangkit, dan harapan menyala di setiap sudut.",
+        },
+        badTree: {
+          image: "./assets/img/badPohon.jpg",
+          text: "Tragis! Jira gagal menjaga ekosistem pohon. Oksigen menipis dan polusi merajalela, hingga kota tenggelam dalam kegelapan. Akhirnya, Jira pun menyerah pada kekurangan oksigen.",
+        },
+        badWater: {
+          image: "./assets/img/badAir.jpg",
+          text: "Menyedihkan! Jira gagal merawat ekosistem air. Kekurangan pasokan air bersih membuat tanaman layu, dan dehidrasi perlahan merenggut nyawanya.",
+        },
+        badEnergy: {
+          image: "./assets/img/badEnergi.jpg",
+          text: "Mengerikan! Jira tak mampu menjaga energi tubuhnya. Kelelahan ekstrim menghancurkan semangat, hingga akhirnya ia tak mampu bertahan.",
+        },
+        badToxic: {
+          image: "./assets/img/badLimbah.jpg",
+          text: "Menghancurkan! Jira gagal mengendalikan limbah yang menumpuk. Lingkungan tercemar menyelimuti kota, dan racun mematikan mengakhiri perjuangannya.",
+        },
+      };
+
+      // Ambil tipe ending dari localStorage (harus diset sebelum navigasi ke ending.html)
+      let endingType = localStorage.getItem("endingType");
+      // Jika tidak ditemukan atau tidak sesuai, default ke good ending
+      if (!endingType || !endings[endingType]) {
+        endingType = "good";
+      }
+
+      // Update tampilan gambar dan dialog sesuai tipe ending
+      const endingData = endings[endingType];
+      document.getElementById("endingImage").src = endingData.image;
+      document.getElementById("endingText").textContent = endingData.text;
+
+      // Jika ending merupakan bad ending, tampilkan tombol "Coba Lagi"
+      if (endingType !== "good") {
+        const tryAgainBtn = document.getElementById("tryAgainButton");
+        tryAgainBtn.style.display = "inline-block";
+        tryAgainBtn.addEventListener("click", function () {
+          // Reset localStorage untuk memulai ulang permainan
+          localStorage.clear();
+          // Alihkan ke halaman index.html
+          window.location.href = "index.html";
+        });
+      }
+    </script>
 </body>
 </html>

@@ -780,7 +780,8 @@
           treeCut: new Image(),   // Gambar pohon gundul (untuk animasi penebangan)
           chopFrames: [new Image(), new Image()],  // Frame animasi karakter ketika menebang (nebang1.png dan nebang2.png)
           alatKonversi: new Image(),            // Asset untuk alat konversi
-          alatPenghilangPolusi: new Image()     // Asset untuk alat penghilang polusi
+          alatPenghilangPolusi: new Image(),     // Asset untuk alat penghilang polusi
+          downFrames: [new Image(), new Image()], // Tambahkan array frame jalan bawah
         },
         tree: {
           x: 620,      // Posisi X pohon normal
@@ -798,7 +799,7 @@
         },
         currentTreeImage: null, // Akan di-set setelah asset termuat, misalnya game.assets.tree
         loaded: 0,
-        required: 20 // Pastikan jumlah ini sudah mencakup asset treeCut juga
+        required: 22 // Pastikan jumlah ini sudah mencakup asset treeCut juga
       };
 
       // Definisikan objek baru untuk posisi dan ukuran alat
@@ -865,6 +866,12 @@
 
         game.assets.alatPenghilangPolusi.onload = () => { game.loaded++; checkLoading(); };
         game.assets.alatPenghilangPolusi.src = "./assets/img/alatPenghilangPolusi.png";
+
+        // Memuat frame jalan bawah
+        game.assets.downFrames.forEach((frame, index) => {
+          frame.onload = () => { game.loaded++; checkLoading(); };
+          frame.src = `./assets/img/jalanBawah${index + 1}.png`;
+        });
 
         function checkLoading() {
           if (game.loaded === game.required) {
@@ -1135,6 +1142,8 @@
             game.player.currentFrame = (game.player.currentFrame + 1) % 2;
           } else if (game.player.direction === 'left' || game.player.direction === 'right') {
             game.player.currentFrame = (game.player.currentFrame + 1) % 3;
+          } else if (game.player.direction === 'down') {
+            game.player.currentFrame = (game.player.currentFrame + 1) % 2; // Gunakan modulo 2 untuk 2 frame
           }
           game.player.lastFrameTime = Date.now();
         }
@@ -1167,6 +1176,8 @@
           const elapsed = Date.now() - game.player.chopAnimationStartTime;
           const frameIndex = Math.floor(elapsed / 200) % game.assets.chopFrames.length;
           currentFrame = game.assets.chopFrames[frameIndex];
+        } else if (!game.player.isMoving) { // Tambah kondisi untuk idle state
+          currentFrame = game.assets.jiraStay;
         } else {
           switch(game.player.direction) {
             case 'left':
@@ -1189,6 +1200,9 @@
               break;
             case 'up':
               currentFrame = game.assets.upFrames[game.player.currentFrame];
+              break;
+            case 'down':
+              currentFrame = game.assets.downFrames[game.player.currentFrame % 2];
               break;
             default:
               currentFrame = game.assets.jiraStay;
@@ -1627,6 +1641,51 @@
 
       // Panggil updateQuestProgress secara berkala, misalnya setiap 1 detik
       setInterval(updateQuestProgress, 1000);
+
+      // Tambahkan event listener untuk tombol "Nyalakan Mesin" (polusiButton)
+      // Ketika tombol ini diklik, panggil fungsi navigateWithTransition untuk menuju ke ending.html
+      const polusiButton = document.getElementById('polusiButton');
+      polusiButton.addEventListener('click', () => {
+        navigateWithTransition('ending.html');
+      });
+
+      // Fungsi untuk mengecek kondisi game over (bad ending)
+      let gameOverTriggered = false; // Flag agar proses game over hanya terjadi sekali
+
+      function checkGameOver() {
+        if (gameOverTriggered) return; // Cegah pemanggilan berulang
+
+        if (status.nature <= 0) {
+          gameOverTriggered = true;
+          localStorage.setItem("endingType", "badTree");
+          window.location.href = "ending.html";
+          return;
+        }
+        
+        if (status.water <= 0) {
+          gameOverTriggered = true;
+          localStorage.setItem("endingType", "badWater");
+          window.location.href = "ending.html";
+          return;
+        }
+        
+        if (status.energy <= 0) {
+          gameOverTriggered = true;
+          localStorage.setItem("endingType", "badEnergy");
+          window.location.href = "ending.html";
+          return;
+        }
+        
+        if (status.toxic >= 100) {
+          gameOverTriggered = true;
+          localStorage.setItem("endingType", "badToxic");
+          window.location.href = "ending.html";
+          return;
+        }
+      }
+
+      // Panggil fungsi checkGameOver secara periodik setiap 500ms
+      setInterval(checkGameOver, 500);
     </script>
     <script>
       function showActionPopup(message) {
