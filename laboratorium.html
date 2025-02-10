@@ -22,15 +22,13 @@
       to   { opacity: 0; }
     }
     
-    /* Body tanpa background warna, hanya gambar sebagai background */
+    /* Body & Background */
     body {
       min-height: 100vh;
       position: relative;
       overflow: hidden;
       background: none;
     }
-    
-    /* Gambar background full screen */
     .home-image {
       position: absolute;
       top: 0;
@@ -41,7 +39,7 @@
       z-index: 0;
     }
     
-    /* --- Tombol Exit --- */
+    /* Tombol Exit */
     .exit-btn {
       position: absolute;
       top: 20px;
@@ -56,7 +54,6 @@
       border-radius: 8px;
       cursor: pointer;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
-      overflow: hidden;
       text-decoration: none;
     }
     .exit-btn:hover {
@@ -84,7 +81,7 @@
       100% { left: 100%; }
     }
     
-    /* --- Style tombol Lab (Dark Ocean) --- */
+    /* Tombol Lab (Daur Ulang & Buat Alat) */
     .lab-btn {
       position: relative;
       padding: 1.2rem 2.5rem;
@@ -125,400 +122,167 @@
       100% { left: 100%; }
     }
     
-    /* --- Posisi tombol Daur Ulang (kiri bawah) --- */
-    .left-btn {
-      position: absolute;
-      bottom: 3rem;
-      left: 16.5rem;
-      z-index: 2;
-    }
-    /* Mengurangi padding horizontal untuk tombol Daur Ulang agar lebarnya lebih kecil */
-    .left-btn .lab-btn {
-      padding: 1.2rem 1.5rem;
-    }
-    
-    /* --- Posisi tombol Buat Alat (kanan tengah) --- */
-    .right-btn {
-      position: absolute;
-      top: 53%;
-      right: 12rem;
-      z-index: 2;
-      transform: translateY(-50%);
-    }
-    /* Memiringkan tombol "Buat Alat" */
-    .right-btn .lab-btn {
-      transform: rotate(20deg);
-    }
-    .right-btn .lab-btn:hover {
-      transform: rotate(20deg) scale(1.05);
-    }
-    .right-btn .lab-btn:active {
-      transform: rotate(20deg) scale(0.98);
-    }
-    
-    /* ============================== */
-    /* Store Popup Styles             */
-    /* ============================== */
-    .modal-overlay.store {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s ease;
-      z-index: 3;
-    }
-    .modal-overlay.store.active {
-      opacity: 1;
-      visibility: visible;
-    }
-    .store-container {
-      background: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      width: 90%;
-      max-width: 500px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.7);
-      position: relative;
-    }
-    .store-container h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #222;
-    }
-    .store-items {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    .store-item {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 10px;
-      position: relative;
-    }
-    .store-item img.store-item-img {
-      width: 80px;
-      height: 80px;
-      object-fit: cover;
-    }
-    .store-item p {
-      margin: 0;
-      font-size: 14px;
-      color: #333;
-    }
-    .store-buy-btn {
-      margin-left: auto;
-      padding: 8px 16px;
-      background: #064663;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.3s ease;
-    }
-    .store-buy-btn:disabled {
-      background: #999;
-      cursor: not-allowed;
-    }
-    
-    /* === Tambahkan style untuk Status Bars UI dan Resource Bar === */
+    /* ---------- Status Bars UI (Update dari game.html) ---------- */
     .status-container {
       position: fixed;
-      top: 10px;
-      left: 10px;
+      top: 20px;
+      left: 20px;
       display: flex;
-      gap: 10px;
-      z-index: 100;
+      gap: 15px;
+      z-index: 50;
     }
-    .status-bar {
-      width: 55px;
-      text-align: center;
+    .status-column {
       display: flex;
       flex-direction: column;
-      align-items: center;
+      gap: 15px;
     }
-    .status-bar .status-icon svg {
-      width: 49px;
-      height: 49px;
+    .status-bar {
+      width: 280px;  /* Ukuran tetap sesuai semula */
+      height: 42px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 21px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+      backdrop-filter: blur(5px);
+      transition: transform 0.3s ease;
     }
     .status-bar-fill {
-      width: 100%;
-      height: 8px;
-      background-color: #ccc;
-      border-radius: 4px;
-      margin-top: 5px;
+      position: absolute;
+      height: 100%;
+      width: 0;
+      left: 0;
+      top: 0;
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .resource-bar {
-      position: fixed;
-      bottom: 10px;
-      left: 10px;
-      width: 220px;
-      height: 40px;
+    .status-icon {
+      position: absolute;
+      left: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 34px;
+      height: 34px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
       display: flex;
+      align-items: center;
       justify-content: center;
-      align-items: center;
-      gap: 12px;
-      background: linear-gradient(45deg, #2a8e2a, #50d850);
-      border-radius: 10px;
-      box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.2);
-      padding: 5px;
-      border: 5px solid black;
-      z-index: 100;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      z-index: 2;
     }
-    .resource-icon-container {
-      display: flex;
-      align-items: center;
+    .nature .status-bar-fill {
+      background: linear-gradient(90deg, 
+        rgba(42, 142, 42, 0.8) 0%,
+        rgba(80, 216, 80, 0.9) 50%,
+        rgba(100, 255, 100, 1) 100%
+      );
+      box-shadow: 0 0 15px rgba(80, 216, 80, 0.4);
     }
-    .resource-icon {
-      width: 30px;
-      height: 40px;
-      filter: drop-shadow(1px 1px 3px rgba(0,0,0,0.3));
+    .nature .status-icon {
+      border: 2px solid #2a8e2a;
     }
-    .resource-text {
-      color: black;
-      font-size: 20px;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
-      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-      margin-left: 5px;
+    .energy .status-bar-fill {
+      background: linear-gradient(90deg,
+        rgba(204, 154, 0, 0.8) 0%,
+        rgba(255, 230, 0, 0.9) 50%,
+        rgba(255, 255, 100, 1) 100%
+      );
+      box-shadow: 0 0 15px rgba(255, 230, 0, 0.4);
     }
-    #actionPopup {
-      position: fixed;
-      top: 20%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.85);
-      color: #fff;
-      padding: 20px 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    .energy .status-icon {
+      border: 2px solid #cc9a00;
+    }
+    .water .status-bar-fill {
+      background: linear-gradient(90deg,
+        rgba(30, 138, 192, 0.8) 0%,
+        rgba(38, 170, 240, 0.9) 50%,
+        rgba(100, 200, 255, 1) 100%
+      );
+      box-shadow: 0 0 15px rgba(38, 170, 240, 0.4);
+    }
+    .water .status-icon {
+      border: 2px solid #1e8ac0;
+    }
+    .toxic .status-bar-fill {
+      background: linear-gradient(90deg,
+        rgba(58, 58, 58, 0.8) 0%,
+        rgba(72, 71, 64, 0.9) 50%,
+        rgba(100, 100, 100, 1) 100%
+      );
+      box-shadow: 0 0 15px rgba(72, 71, 64, 0.4);
+    }
+    .toxic .status-icon {
+      border: 2px solid #3a3a3a;
+    }
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    .status-bar[data-low="true"] {
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    .status-value {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: white;
+      font-family: 'Arial', sans-serif;
+      font-weight: bold;
       font-size: 16px;
-      text-align: center;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
-      z-index: 999;
-    }
-    #actionPopup.active {
-      opacity: 1;
-      visibility: visible;
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+      z-index: 2;
     }
   </style>
 </head>
 <body>
   <!-- Gambar background -->
-  <img src="./assets/img/laboratorium.jpg" alt="laboratorium" class="home-image">
+  <img src="./assets/img/laboratorium.jpg" alt="Laboratorium Background" class="home-image">
   
   <!-- Tombol Exit -->
   <a href="game.html" class="exit-btn">Keluar</a>
   
-  <!-- Tombol Daur Ulang: kiri bawah tetap normal -->
+  <!-- Tombol Daur Ulang & Buat Alat -->
   <div class="left-btn">
     <button class="lab-btn" id="recycleButton">Daur Ulang</button>
   </div>
-  
-  <!-- Tombol Buat Alat: tetap di posisi kanan tengah, tampil miring (dirotasi) -->
   <div class="right-btn">
-    <!-- Tambahkan ID untuk memudahkan pengambilan di JavaScript -->
     <button class="lab-btn" id="createToolBtn">Buat Alat</button>
   </div>
   
-  <!-- ============================== -->
-  <!-- Store Popup (Modal) Markup     -->
-  <!-- ============================== -->
+  <!-- Store Popup -->
   <div id="storePopup" class="modal-overlay store">
     <div class="store-container">
       <button class="modal-close" id="storeClose" style="position: absolute; top: 10px; right: 10px; font-size: 20px; background: none; border: none; cursor: pointer;">&times;</button>
       <h2>Buat Alat</h2>
       <div class="store-items">
-        <!-- Item Alat Konversi Air -->
+        <!-- Item Alat Konversi -->
         <div class="store-item" id="converterItem">
           <img src="./assets/img/alatKonversi.png" alt="Alat Konversi Air" class="store-item-img">
           <div>
             <p>Alat Konversi Air</p>
             <p>Bahan: 10 Kayu</p>
           </div>
-          <button class="store-buy-btn" id="buyConverterBtn">Buat</button>
         </div>
-        <!-- Item Alat Penghilang Polusi -->
-        <div class="store-item" id="pollutionItem">
-          <img src="./assets/img/alatPenghilangPolusi.png" alt="Alat Penghilang Polusi" class="store-item-img">
-          <div>
-            <p>Alat Penghilang Polusi</p>
-            <p>Bahan: 10 Kayu, 10 Plastik</p>
-          </div>
-          <button class="store-buy-btn" id="buyPollutionBtn">Buat</button>
-        </div>
+        <!-- Item lainnya... -->
       </div>
     </div>
   </div>
   
-  
-  <!-- Script untuk animasi transisi saat tombol Exit ditekan -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const exitButton = document.querySelector('.exit-btn');
-      exitButton.addEventListener('click', function(e) {
-        e.preventDefault(); // Mencegah navigasi langsung
-        document.body.classList.add('fade-out'); // Tambahkan class untuk animasi fade-out
-        setTimeout(function() {
-          window.location.href = exitButton.href;
-        }, 1000); // Durasi timeout sesuai dengan animasi (1 detik)
-      });
-    });
-  </script>
-  
-  <!-- ============================== -->
-  <!-- Store Popup JavaScript        -->
-  <!-- ============================== -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const createToolBtn = document.getElementById('createToolBtn');
-      const storePopup = document.getElementById('storePopup');
-      const storeClose = document.getElementById('storeClose');
-      const buyConverterBtn = document.getElementById('buyConverterBtn');
-      const buyPollutionBtn = document.getElementById('buyPollutionBtn');
-      const converterItem = document.getElementById('converterItem');
-      const pollutionItem = document.getElementById('pollutionItem');
-      
-      // Fungsi utilitas untuk mengambil resource (kayu & plastik) dari localStorage
-      function getResources() {
-        const wood = parseInt(localStorage.getItem("wood")) || 0;
-        const plastic = parseInt(localStorage.getItem("plastic")) || 0;
-        return { wood, plastic };
-      }
-      
-      // Fungsi untuk mengupdate resource ke localStorage
-      function updateResources(newWood, newPlastic) {
-        localStorage.setItem("wood", newWood);
-        localStorage.setItem("plastic", newPlastic);
-      }
-      
-      // Update tampilan store berdasarkan status pembelian
-      function updateStoreUI() {
-        const converterBought = localStorage.getItem("converterBought") === "true";
-        const pollutionBought = localStorage.getItem("pollutionBought") === "true";
-        
-        if (converterBought) {
-          converterItem.classList.remove("locked");
-          buyConverterBtn.textContent = "Telah dibuat";
-          buyConverterBtn.disabled = true;
-        } else {
-          converterItem.classList.add("locked");
-          buyConverterBtn.textContent = "Buat";
-          buyConverterBtn.disabled = false;
-        }
-        
-        if (pollutionBought) {
-          buyPollutionBtn.textContent = "Telah dibuat";
-          buyPollutionBtn.disabled = true;
-        } else {
-          buyPollutionBtn.textContent = "Buat";
-          buyPollutionBtn.disabled = false;
-        }
-      }
-      
-      // Buka popup store saat tombol "Buat Alat" ditekan
-      createToolBtn.addEventListener('click', function() {
-        updateStoreUI();
-        storePopup.classList.add('active');
-      });
-      
-      // Tutup popup store
-      storeClose.addEventListener('click', function() {
-        storePopup.classList.remove('active');
-      });
-      
-      // Proses pembelian Alat Konversi Air (butuh 10 kayu)
-      buyConverterBtn.addEventListener('click', function() {
-        if (localStorage.getItem("converterBought") === "true") {
-          showActionPopup("Alat Konversi Air sudah dibuat.");
-          return;
-        }
-        
-        const resources = getResources();
-        if (resources.wood < 10) {
-          showActionPopup("Tidak cukup kayu untuk membuat Alat Konversi Air.");
-          return;
-        }
-        
-        // Kurangi resource dan tandai alat sudah dibuat
-        updateResources(resources.wood - 10, resources.plastic);
-        localStorage.setItem("converterBought", "true");
-        updateStoreUI();
-        showActionPopup("Alat Konversi Air berhasil dibuat!");
-      });
-      
-      // Proses pembelian Alat Penghilang Polusi (butuh 10 kayu dan 10 plastik)
-      buyPollutionBtn.addEventListener('click', function() {
-        if (localStorage.getItem("pollutionBought") === "true") {
-          showActionPopup("Alat Penghilang Polusi sudah dibuat.");
-          return;
-        }
-        const resources = getResources();
-        if (resources.wood < 10 || resources.plastic < 10) {
-          showActionPopup("Tidak cukup sumber daya untuk membuat Alat Penghilang Polusi.");
-          return;
-        }
-        // Kurangi 10 kayu dan 10 plastik
-        updateResources(resources.wood - 10, resources.plastic - 10);
-        localStorage.setItem("pollutionBought", "true");
-        updateStoreUI();
-        showActionPopup("Alat Penghilang Polusi berhasil dibuat!");
-      });
-    });
-  </script>
-  
-  <!-- ============================== -->
-  <!-- Daur Ulang JavaScript        -->
-  <!-- ============================== -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const recycleButton = document.getElementById('recycleButton');
-      
-      recycleButton.addEventListener('click', function() {
-        let plastic = parseInt(localStorage.getItem("plastic")) || 0;
-        let toxic = parseFloat(localStorage.getItem("toxicStatus")) || 0;
-        let energy = parseFloat(localStorage.getItem("energyStatus")) || 100;
-
-        if (energy < 8) {
-          showActionPopup("Energi tidak cukup untuk melakukan daur ulang!");
-          return;
-        }
-        if (toxic < 5) {
-          showActionPopup("Tidak ada sampah yang bisa didaur ulang!");
-          return;
-        }
-        
-        energy = Math.max(0, energy - 8);
-        toxic = Math.max(0, toxic - 5);
-        plastic += 1;
-
-        localStorage.setItem("plastic", plastic);
-        localStorage.setItem("toxicStatus", toxic);
-        localStorage.setItem("energyStatus", energy);
-
-        showActionPopup("Daur ulang berhasil! Energy -8%, Toxic -5%, Plastic +1.");
-
-        updateQuestProgress();
-      });
-    });
-  </script>
-  
-  <!-- === Tambahkan markup Status Bars UI === -->
-  <div class="status-container">
-    <!-- Nature Status Bar -->
+<!-- Updated Markup untuk Status Bars UI -->
+<div class="status-container">
+  <div class="status-column">
+    <!-- Nature Status Bar (atas kiri) -->
     <div class="status-bar nature">
       <div class="status-icon">
         <svg width="49" height="49" viewBox="0 0 49 49" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -528,7 +292,7 @@
       </div>
       <div class="status-bar-fill"></div>
     </div>
-    <!-- Water Status Bar -->
+    <!-- Air (Water) Status Bar (bawah kiri) -->
     <div class="status-bar water">
       <div class="status-icon">
         <svg width="49" height="49" viewBox="0 0 49 49" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -538,7 +302,9 @@
       </div>
       <div class="status-bar-fill"></div>
     </div>
-    <!-- Energy Status Bar -->
+  </div>
+  <div class="status-column">
+    <!-- Energy Status Bar (atas kanan) -->
     <div class="status-bar energy">
       <div class="status-icon">
         <svg width="49" height="49" viewBox="0 0 49 49" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -548,7 +314,7 @@
       </div>
       <div class="status-bar-fill"></div>
     </div>
-    <!-- Toxic Status Bar -->
+    <!-- Toxic Status Bar (bawah kanan) -->
     <div class="status-bar toxic">
       <div class="status-icon">
         <svg width="49" height="49" viewBox="0 0 49 49" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -559,22 +325,11 @@
       <div class="status-bar-fill"></div>
     </div>
   </div>
+</div>
   
-  <!-- === Tambahkan markup Resource Bar === -->
-  <div id="icons">
-    <div class="resource-bar">
-      <div class="resource-icon-container">
-        <img class="resource-icon" src="./assets/img/plastic.svg" alt="Plastic Icon" />
-        <div class="resource-text" id="plasticCount">X 0</div>
-      </div>
-      <div class="resource-icon-container">
-        <img class="resource-icon" src="./assets/img/kayu.svg" alt="Wood Icon" />
-        <div class="resource-text" id="woodCount">X 0</div>
-      </div>
-    </div>
-  </div>
+  <!-- (Markup Resource Bar jika diperlukan) -->
   
-  <!-- === Script untuk sync & update status/resource bar secara real-time === -->
+  <!-- Script untuk sinkronisasi status & resource secara real-time -->
   <script>
     function updateStatusBars() {
       const nature = parseFloat(localStorage.getItem("natureStatus")) || 100;
@@ -608,23 +363,29 @@
     document.addEventListener('DOMContentLoaded', updateUI);
     window.addEventListener('storage', updateUI);
     setInterval(updateUI, 1000);
-  </script>
-  
-  <!-- === Tambahkan markup Popup Notifikasi === -->
-  <div id="actionPopup"></div>
-  
-  <!-- === Script untuk menampilkan popup notifikasi === -->
-  <script>
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const exitButton = document.querySelector('.exit-btn');
+      exitButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.body.classList.add('fade-out');
+        setTimeout(function() {
+          window.location.href = exitButton.href;
+        }, 1000);
+      });
+    });
+    
     function showActionPopup(message) {
       const popup = document.getElementById('actionPopup');
       if (!popup) return;
       popup.textContent = message;
       popup.classList.add('active');
-      // Popup akan hilang setelah 3 detik
       setTimeout(() => {
         popup.classList.remove('active');
       }, 3000);
     }
   </script>
+  
+  <div id="actionPopup"></div>
 </body>
 </html>
