@@ -359,74 +359,148 @@
     .store-container h2 {
       text-align: center;
       margin-bottom: 20px;
-      color: #333;
+      color: white;
       font-size: 24px;
     }
 
     .store-items {
       display: grid;
-      gap: 20px;
-      padding: 10px;
+      gap: 25px;
+      padding: 20px;
     }
 
     .store-item {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      padding: 15px;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      position: relative;
+      background: linear-gradient(145deg, #1a1a2e, #16213e);
+      border: 2px solid #00ff88;
+      border-radius: 15px;
+      padding: 1.5rem;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      overflow: hidden;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transform-style: preserve-3d;
+    }
+
+    .store-item::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, 
+        transparent 20%, 
+        rgba(0, 255, 136, 0.1) 40%, 
+        transparent 60%);
+      transform: rotate(45deg);
+      transition: 0.5s;
     }
 
     .store-item:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
+      box-shadow: 0 15px 30px rgba(0, 255, 136, 0.4);
+    }
+
+    .store-item:hover::before {
+      animation: itemShine 1.5s forwards;
+    }
+
+    @keyframes itemShine {
+      0% { top: -50%; left: -50%; }
+      100% { top: 150%; left: 150%; }
     }
 
     .store-item-img {
-      width: 80px;
-      height: 80px;
+      width: 100px;
+      height: 100px;
       object-fit: contain;
+      border: 3px solid #00ff88;
+      border-radius: 15px;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
     }
 
-    .store-item div {
-      flex: 1;
-    }
-
-    .store-item p {
-      margin: 5px 0;
-      color: #333;
+    .store-item:hover .store-item-img {
+      transform: scale(1.1) rotate(-5deg);
+      filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.5));
     }
 
     .store-item p:first-child {
-      font-weight: bold;
-      font-size: 1.1em;
+      font-family: 'Arial Rounded MT Bold', sans-serif;
+      font-size: 1.4em;
+      color: white;
+      text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+      margin-bottom: 0.8rem;
+      position: relative;
+      display: inline-block;
     }
 
-    .modal-close {
+    .store-item p:first-child::after {
+      content: '';
       position: absolute;
-      top: 15px;
-      right: 15px;
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: #666;
-      padding: 5px 10px;
-      border-radius: 5px;
-      transition: background-color 0.2s;
+      bottom: -5px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #00ff88, transparent);
     }
 
-    .modal-close:hover {
-      background-color: rgba(0, 0, 0, 0.1);
+    .item-desc {
+      color: #8c8c8c;
+      font-size: 0.95em;
+      line-height: 1.4;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      position: relative;
     }
 
-    .modal-overlay.active {
+    .item-desc::before {
+      content: '✨';
+      position: absolute;
+      left: -10px;
+      top: -10px;
+      filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+    }
+
+    /* Harga Item Styling */
+    .item-cost {
       display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 10px 0;
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 8px;
+      border: 1px solid #ffd700;
     }
+
+    .item-cost img {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* Animasi Masuk Item */
+    @keyframes itemEntry {
+      0% {
+        opacity: 0;
+        transform: translateY(50px) rotateX(90deg);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) rotateX(0);
+      }
+    }
+
+    .store-item {
+      animation: itemEntry 0.6s ease-out backwards;
+    }
+
+    .store-item:nth-child(1) { animation-delay: 0.2s; }
+    .store-item:nth-child(2) { animation-delay: 0.4s; }
+
 
     /* Resource Bar Styling (Anime) */
     #resource-bar {
@@ -477,6 +551,199 @@
       color: #fff;
       font-weight: bold;
     }
+
+    /* Container untuk Tombol Daur Ulang (Kiri Bawah) */
+    .recycle-btn-container {
+      position: fixed;
+      bottom: 3.5rem;  /* Sesuaikan jarak dari bawah */
+      left: 15rem;    /* Sesuaikan jarak dari kiri */
+      z-index: 70;
+    }
+
+    /* Container untuk Tombol Buat Alat (Kanan Tengah) */
+    .create-tool-container {
+      position: fixed;
+      right: 9rem;   /* Sesuaikan jarak dari kanan */
+      top: 56%;      /* Posisi tengah secara vertikal */
+      transform: translateY(-50%) rotate(24deg);  /* Geser ke tengah dan putar 45° ke kanan bawah */
+      z-index: 70;
+    }
+
+    /* Updated Popup Store CSS Styles (Anime-Style) */
+    .modal-overlay.store {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(5px);
+    }
+    
+    /* Ketika popup aktif, gunakan class active untuk menampilkan dengan animasi */
+    .modal-overlay.store.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .store-container {
+      background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
+      border: 2px solid #00ff88;
+      border-radius: 15px;
+      padding: 2rem;
+      width: 90%;
+      max-width: 600px;
+      position: relative;
+      transform: scale(0.8);
+      opacity: 0;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+    }
+
+    .modal-overlay.store.active .store-container {
+      transform: scale(1);
+      opacity: 1;
+      animation: animePopup 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes animePopup {
+      0% {
+        transform: scale(0.5) rotate(-5deg);
+      }
+      50% {
+        transform: scale(1.05) rotate(2deg);
+      }
+      100% {
+        transform: scale(1) rotate(0deg);
+      }
+    }
+
+    .store-item {
+      background: linear-gradient(145deg, #2b2b2b, #3d3d3d);
+      border: 1px solid #00ff88;
+      border-radius: 10px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .store-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0, 255, 136, 0.2);
+    }
+
+    .item-desc {
+      color: #8c8c8c;
+      font-size: 0.9em;
+      margin-top: 0.5rem;
+    }
+
+    /* Styling Anime untuk Tombol Close */
+    .modal-close {
+      position: absolute;
+      top: -15px;
+      right: -15px;
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(145deg, #ff3860, #ff1443);
+      border: 2px solid #ffd700;
+      border-radius: 50%;
+      color: white;
+      font-size: 1.8rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 15px rgba(255, 56, 96, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1001;
+    }
+
+    .modal-close::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, 
+        transparent 30%, 
+        rgba(255, 255, 255, 0.3) 50%, 
+        transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-close:hover {
+      transform: scale(1.1) rotate(90deg);
+      box-shadow: 0 0 25px rgba(255, 56, 96, 0.8);
+      background: linear-gradient(145deg, #ff1443, #ff3860);
+    }
+
+    .modal-close:hover::before {
+      opacity: 1;
+      animation: buttonShine 1s infinite;
+    }
+
+    .modal-close:active {
+      transform: scale(0.9) rotate(45deg);
+      box-shadow: 0 0 10px rgba(255, 56, 96, 0.3);
+    }
+
+    @keyframes buttonShine {
+      0% { transform: translateX(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) rotate(45deg); }
+    }
+
+    /* Animasi Muncul Tombol */
+    @keyframes closeButtonEntry {
+      0% {
+        opacity: 0;
+        transform: scale(0) rotate(180deg);
+      }
+      80% {
+        transform: scale(1.2) rotate(-20deg);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+      }
+    }
+
+    .modal-close {
+      animation: closeButtonEntry 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+    }
+
+    .modal-close::after {
+      content: '✧';
+      position: absolute;
+      pointer-events: none;
+      opacity: 0;
+      font-size: 1.2rem;
+      color: #ffd700;
+      transition: all 0.3s ease;
+    }
+
+    .modal-close:active::after {
+      animation: particleExplosion 0.4s ease-out;
+    }
+
+    @keyframes particleExplosion {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--x), var(--y)) scale(0);
+      }
+    }
   </style>
 </head>
 <body>
@@ -500,36 +767,42 @@
     <a href="game.html" class="exit-btn">Keluar</a>
   </div>
   
-  <!-- Tombol Daur Ulang & Buat Alat -->
-  <div class="lab-buttons-container">
-    <div class="left-btn">
-      <button class="lab-btn" id="recycleButton">Daur Ulang</button>
-    </div>
-    <div class="right-btn">
-      <button class="lab-btn" id="createToolBtn">Buat Alat</button>
-    </div>
+  <!-- Tombol Daur Ulang (Kiri Bawah) -->
+  <div class="recycle-btn-container">
+    <button class="lab-btn" id="recycleButton">Daur Ulang</button>
+  </div>
+
+  <!-- Tombol Buat Alat (Kanan Tengah) -->
+  <div class="create-tool-container">
+    <button class="lab-btn" id="createToolBtn">Buat Alat</button>
   </div>
   
   <!-- Store Popup -->
-  <div id="storePopup" class="modal-overlay store" style="display: none;">
+  <div id="storePopup" class="modal-overlay store">
     <div class="store-container">
-      <button class="modal-close" id="storeClose" style="position: absolute; top: 10px; right: 10px; font-size: 20px; background: none; border: none; cursor: pointer;">&times;</button>
-      <h2>Buat Alat</h2>
+      <button class="modal-close" id="storeClose">&times;</button>
+      <h2>Workshop Alat ECO</h2>
       <div class="store-items">
-        <!-- Item Alat Konversi Air -->
         <div class="store-item" id="converterItem">
           <img src="./assets/img/alatKonversi.png" alt="Alat Konversi Air" class="store-item-img">
           <div>
-            <p>Alat Konversi Air</p>
-            <p>Bahan: 10 Kayu</p>
+            <p>Hydro Converter 3000</p>
+            <div class="item-cost">
+              <img src="./assets/img/kayu.svg" alt="Kayu">
+              <span>10</span>
+            </div>
+            <p class="item-desc">Mengubah air tercemar menjadi bersih!</p>
           </div>
         </div>
-        <!-- Item Alat Penghilang Polusi -->
         <div class="store-item" id="pollutionItem">
           <img src="./assets/img/alatPenghilangPolusi.png" alt="Alat Penghilang Polusi" class="store-item-img">
           <div>
-            <p>Alat Penghilang Polusi</p>
-            <p>Bahan: 5 Plastik</p>
+            <p>Polusion Buster 2.0</p>
+            <div class="item-cost">
+              <img src="./assets/img/plastic.svg" alt="Plastik">
+              <span>5</span>
+            </div>
+            <p class="item-desc">Menetralisir polusi di lingkungan!</p>
           </div>
         </div>
       </div>
@@ -680,48 +953,76 @@
         if(plasticCount) plasticCount.textContent = 'X ' + plastic;
       }
       
+      // Menggabungkan update status dan resource dalam satu fungsi
       function updateUI() {
         updateStatusBars();
         updateResources();
       }
       
-      // Update status bar secara berkala setiap 100ms
-      setInterval(updateStatusBars, 100);
+      // Memperbarui secara realtime dengan interval setiap 100ms
+      setInterval(updateUI, 100);
 
-      // Listener untuk event 'storage' agar update antar-tab/halaman berjalan
+      // Event listener untuk storage, memonitor juga perubahan pada resource keys
       window.addEventListener('storage', function(e) {
-        if (['natureStatus', 'waterStatus', 'energyStatus', 'toxicStatus'].includes(e.key)) {
-          updateStatusBars();
+        if (['natureStatus', 'waterStatus', 'energyStatus', 'toxicStatus', 'wood', 'plastic'].includes(e.key)) {
+          updateUI();
         }
       });
-
-      // Inisialisasi saat halaman dimuat
-      updateStatusBars();
 
       // Event listener untuk tombol Buat Alat
       const createToolBtn = document.getElementById('createToolBtn');
       const storePopup = document.getElementById('storePopup');
       const storeClose = document.getElementById('storeClose');
 
-      if (createToolBtn && storePopup) {
-        createToolBtn.addEventListener('click', function() {
-          storePopup.style.display = 'flex';
+      if (createToolBtn) {
+        createToolBtn.addEventListener('click', () => {
+          storePopup.classList.add('active');
+          document.body.style.overflow = 'hidden'; // Prevent background scroll
         });
       }
 
-      if (storeClose && storePopup) {
-        storeClose.addEventListener('click', function() {
-          storePopup.style.display = 'none';
+      if (storeClose) {
+        storeClose.addEventListener('click', () => {
+          storePopup.classList.remove('active');
+          document.body.style.overflow = '';
         });
       }
 
-      // Menutup popup jika mengklik area di luar popup
-      if (storePopup) {
-        storePopup.addEventListener('click', function(e) {
-          if (e.target === storePopup) {
-            storePopup.style.display = 'none';
-          }
+      // Tutup saat klik di luar
+      storePopup.addEventListener('click', (e) => {
+        if (e.target === storePopup) {
+          storePopup.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      });
+
+      // Handle pembelian item
+      document.querySelectorAll('.store-item').forEach(item => {
+        item.addEventListener('click', function() {
+          // Logika pembelian alat
+          showActionPopup("Alat berhasil dibuat! 🎉");
+          storePopup.classList.remove('active');
         });
+      });
+
+      // Efek partikel saat tombol close diklik
+      storeClose.addEventListener('click', function(e) {
+        createParticles(e.clientX, e.clientY);
+      });
+
+      function createParticles(x, y) {
+        const particles = 8;
+        for(let i = 0; i < particles; i++) {
+          const particle = document.createElement('div');
+          particle.className = 'particle';
+          particle.style.setProperty('--x', `${Math.random() * 40 - 20}px`);
+          particle.style.setProperty('--y', `${Math.random() * 40 - 20}px`);
+          particle.style.left = `${x}px`;
+          particle.style.top = `${y}px`;
+          document.body.appendChild(particle);
+          
+          setTimeout(() => particle.remove(), 400);
+        }
       }
     });
   </script>
