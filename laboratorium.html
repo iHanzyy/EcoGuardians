@@ -41,44 +41,64 @@
     
     /* Tombol Exit */
     .exit-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      z-index: 2;
       padding: 1rem 2rem;
-      font-size: 1.2rem;
+      font-size: 1.4rem;
       font-weight: bold;
-      color: #FF4B4B;
-      background: transparent;
-      border: 2px solid #FF4B4B;
-      border-radius: 8px;
+      color: #fff;
+      background-color: red;
+      border: none;
+      border-radius: 15px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      position: static;
+      overflow: hidden;
       cursor: pointer;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: pulseGlow 2s infinite;
+      box-shadow: 0 0 15px rgba(200, 0, 100, 0.5);
       text-decoration: none;
+      top: auto;
+      right: auto;
+      z-index: 2;
     }
-    .exit-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 15px rgba(255,75,75,0.7);
+
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: 0 0 15px rgba(200, 0, 100, 0.5);
+      }
+      50% {
+        box-shadow: 0 0 30px rgba(200, 0, 100, 0.8);
+      }
     }
-    .exit-btn:active {
-      transform: scale(0.95);
-    }
+
     .exit-btn::after {
       content: "";
       position: absolute;
       top: 0;
-      left: -100%;
-      width: 100%;
+      left: -75%;
+      width: 50%;
       height: 100%;
-      background: linear-gradient(120deg, transparent, rgba(255,75,75,0.4), transparent);
+      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.4), transparent);
       transform: skewX(-25deg);
     }
-    .exit-btn:hover::after {
-      animation: shineExit 0.75s forwards;
+
+    .exit-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
     }
-    @keyframes shineExit {
-      0% { left: -100%; }
-      100% { left: 100%; }
+
+    .exit-btn:hover::after {
+      animation: slideShine 0.7s forwards;
+    }
+
+    .exit-btn:active {
+      transform: scale(0.95);
+    }
+
+    @keyframes slideShine {
+      100% {
+        left: 150%;
+      }
     }
     
     /* Tombol Lab (Daur Ulang & Buat Alat) */
@@ -409,14 +429,78 @@
     .modal-overlay.active {
       display: flex;
     }
+
+    /* Resource Bar Styling (Anime) */
+    #resource-bar {
+      /* Hapus positioning yang lama */
+    }
+
+    /* Tambahkan styling baru */
+    /* Header Bar: Resource Bar dan Tombol Keluar */
+    .header-bar {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      z-index: 60;
+    }
+
+    .resource-bar {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.5rem 1rem;
+      background: rgba(0,0,0,0.6);
+      border: 2px solid #FFD700;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+
+    .resource-icon-container {
+      background: rgba(255,255,255,0.2);
+      padding: 0.5rem;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .resource-icon {
+      width: 40px;
+      height: 40px;
+      display: block;
+    }
+
+    .resource-text {
+      margin-left: 0.5rem;
+      font-size: 1.2rem;
+      color: #fff;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
   <!-- Gambar background -->
   <img src="./assets/img/laboratorium.png" alt="Laboratorium Background" class="home-image">
   
-  <!-- Tombol Exit -->
-  <a href="game.html" class="exit-btn">Keluar</a>
+  <!-- Header Bar: Resource Bar dan Tombol Keluar -->
+  <div class="header-bar">
+    <div id="resource-bar">
+      <div class="resource-bar">
+        <div class="resource-icon-container">
+          <img class="resource-icon" src="./assets/img/plastic.svg" alt="Plastic Icon" />
+          <div class="resource-text" id="plasticCount">X 0</div>
+        </div>
+        <div class="resource-icon-container">
+          <img class="resource-icon" src="./assets/img/kayu.svg" alt="Wood Icon" />
+          <div class="resource-text" id="woodCount">X 0</div>
+        </div>
+      </div>
+    </div>
+    <a href="game.html" class="exit-btn">Keluar</a>
+  </div>
   
   <!-- Tombol Daur Ulang & Buat Alat -->
   <div class="lab-buttons-container">
@@ -501,23 +585,6 @@
     </div>
   </div>
 </div>
-  
-  <!-- Header Bar: Resource Bar dan Tombol Keluar -->
-  <div class="header-bar">
-    <div id="resource-bar">
-      <div class="resource-bar">
-        <div class="resource-icon-container">
-          <img class="resource-icon" src="./assets/img/plastic.svg" alt="Plastic Icon" />
-          <div class="resource-text" id="plasticCount">X 0</div>
-        </div>
-        <div class="resource-icon-container">
-          <img class="resource-icon" src="./assets/img/kayu.svg" alt="Wood Icon" />
-          <div class="resource-text" id="woodCount">X 0</div>
-        </div>
-      </div>
-    </div>
-    <a href="game.html" class="keluar-btn">Keluar</a>
-  </div>
   
   <!-- Script untuk sinkronisasi status & resource secara real-time -->
   <script>
