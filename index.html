@@ -22,62 +22,89 @@
       background: #000;
       overflow: hidden;
       transition: background 1s ease;
+      position: relative; /* Penting agar child dengan position absolute mengacu ke body */
+    }
+
+    /* Kontainer burung yang selalu berada di belakang */
+    #birdContainer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
     }
 
     /* Tampilan Start Screen */
     .start-screen {
-      color: white;
+      position: relative;
+      color: #fff;
       font-size: 2.5rem;
       text-align: center;
       cursor: pointer;
-      padding: 40px;
-      background: linear-gradient(120deg, rgba(20, 170, 2, 0.5), rgba(85, 200, 0, 0.2));
+      padding: 40px 60px;
+      background: linear-gradient(130deg, rgba(64,191,1,0.7), rgba(64,191,1,0.3));
+      border: 3px solid rgba(64,191,1,0.8);
       border-radius: 20px;
-      border: 3px solid rgba(20, 170, 2, 0.8);
       text-transform: uppercase;
       font-weight: bold;
-      letter-spacing: 3px;
-      position: relative;
-      box-shadow: 0 0 15px rgba(20, 170, 2, 0.8);
-      transition: all 0.3s ease;
-      animation: pulseGlow 2s infinite;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      letter-spacing: 4px;
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(64,191,1,0.8);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: glowPulse 2s infinite alternate;
     }
 
-    /* Teks Start dengan efek gradasi dan glow */
-    .start-text {
-      background: white;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: flickerText 1.5s infinite alternate;
-    }
-
-    @keyframes pulseGlow {
-      0%, 100% {
+    /* Animasi pulsating dan scale kecil */
+    @keyframes glowPulse {
+      0% {
+        box-shadow: 0 0 20px rgba(64,191,1,0.6);
+        transform: scale(0.98);
+      }
+      100% {
+        box-shadow: 0 0 40px rgba(64,191,1,1);
         transform: scale(1);
-        box-shadow: 0 0 20px rgba(20, 170, 2, 0.8);
       }
-      50% {
-        transform: scale(1.05);
-        box-shadow: 0 0 40px rgba(85, 200, 0, 1);
-      }
-    }
-
-    @keyframes flickerText {
-      0% { opacity: 1; }
-      50% { opacity: 0.7; }
-      100% { opacity: 1; }
     }
 
     .start-screen:hover {
-      background: linear-gradient(120deg, rgba(20, 170, 2, 0.7), rgba(85, 200, 0, 0.4));
-      transform: scale(1.08);
-      box-shadow: 0 0 30px rgba(20, 170, 2, 1);
+      transform: scale(1.05);
+      box-shadow: 0 0 50px rgba(64,191,1,1);
     }
 
-    /* Kontainer utama */
+    /* Efek animasi untuk teks dengan gradient dan flicker */
+    .start-text {
+      background: linear-gradient(90deg, #ffffff, #c0ffc0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: textFlicker 1.5s infinite alternate;
+    }
+
+    @keyframes textFlicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    /* Pseudo-element untuk background dinamis dan rotasi */
+    .start-screen::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, transparent 20%, rgba(64,191,1,0.2) 60%);
+      animation: rotateBG 6s linear infinite;
+      z-index: -1;
+    }
+
+    @keyframes rotateBG {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Main Content Container */
     .container {
       display: none;
       text-align: center;
@@ -193,7 +220,7 @@
     }
 
     /* ========================================= */
-    /* ============ POPUP ABOUT US ============= */
+    /* ============ POPUP ABOUT US (Anime Style) ============= */
     /* ========================================= */
     .popup-overlay {
       position: fixed;
@@ -217,64 +244,114 @@
     }
 
     .popup {
-      background: rgba(20, 170, 2, 0.8);
-      border: 2px solid white;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      border: 3px solid #ff557f;
       border-radius: 15px;
       padding: 20px;
       max-width: 600px;
       width: 90%;
       position: relative;
-      box-shadow: 0 0 15px rgba(20, 170, 2, 0.8);
-      animation: popupFadeIn 0.5s ease-out;
+      box-shadow: 0 0 20px rgba(255, 85, 127, 0.6);
+      animation: animePopupEnter 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), float 3s ease-in-out infinite;
     }
 
-    @keyframes popupFadeIn {
-      from {
+    .popup::before {
+      content: "";
+      position: absolute;
+      top: -3px;
+      left: -3px;
+      right: -3px;
+      bottom: -3px;
+      background: linear-gradient(45deg, #ff9a9e, #fad0c4, #ff557f);
+      z-index: -1;
+      filter: blur(5px);
+      opacity: 0.8;
+      border-radius: 18px;
+      animation: gradientShift 6s ease infinite;
+    }
+
+    @keyframes animePopupEnter {
+      0% {
         opacity: 0;
-        transform: scale(0.8);
+        transform: scale(0.5) rotate(-10deg);
       }
-      to {
+      50% {
+        opacity: 1;
+        transform: scale(1.05) rotate(2deg);
+      }
+      100% {
         opacity: 1;
         transform: scale(1);
+      }
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0); }
+    }
+
+    @keyframes gradientShift {
+      0% {
+        filter: hue-rotate(0deg);
+      }
+      100% {
+        filter: hue-rotate(360deg);
       }
     }
 
     .popup h2 {
       text-align: center;
       margin-bottom: 20px;
-      font-size: 2rem;
-      color: white;
-      text-shadow: 0 0 5px #14aa02;
-      font-family: 'Helvetica Bold', sans-serif;
+      font-size: 2.2rem;
+      font-weight: bold;
+      background: white;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
     }
 
+    /* ============ TEAM MEMBERS (Anime Game Style) dengan Dominan Warna rgb(64,191,1) ============= */
     .team-members {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 20px;
+      animation: teamMembersFadeIn 1s ease-out forwards;
+    }
+
+    @keyframes teamMembersFadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .team-member {
-      background: #2b2b2b;
-      border: 4px solid white;
+      background: linear-gradient(135deg, #141414, #2a2a2a);
+      border: 4px solid transparent;
+      border-image: linear-gradient(45deg, rgb(64,191,1), rgba(64,191,1,0.6)) 1;
       border-radius: 10px;
-      padding: 10px;
+      padding: 15px;
       width: 250px;
       text-align: center;
-      box-shadow: 0 0 10px rgba(20, 170, 2, 0.6);
-      animation: slideInUp 0.5s ease-out;
+      box-shadow: 0 0 10px rgba(64,191,1,0.8);
+      animation: popIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    @keyframes slideInUp {
+    @keyframes popIn {
       from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: scale(0.5) rotate(-10deg);
       }
       to {
         opacity: 1;
-        transform: translateY(0);
+        transform: scale(1) rotate(0deg);
       }
+    }
+
+    .team-member:hover {
+      transform: scale(1.05) rotate(1deg);
+      box-shadow: 0 0 20px rgba(64,191,1,1);
     }
 
     .team-member img {
@@ -282,37 +359,72 @@
       height: auto;
       border-radius: 10px;
       margin-bottom: 10px;
-      transition: transform 0.3s ease;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
     .team-member img:hover {
-      transform: scale(1.05);
+      transform: scale(1.1);
+      box-shadow: 0 0 15px rgba(64,191,1,0.6);
     }
 
     .team-member p {
-      color: #fff;
+      color: #ffffff;
       margin: 5px 0;
+      animation: textFadeIn 1s ease-in-out forwards;
+    }
+
+    @keyframes textFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .team-member a {
-      color: #3ce629;
+      color: rgb(64,191,1);
       text-decoration: none;
+      position: relative;
+      transition: color 0.3s ease;
+    }
+
+    .team-member a::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -2px;
+      width: 100%;
+      height: 2px;
+      background: rgb(64,191,1);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+
+    .team-member a:hover {
+      color: rgb(64,191,1);
+    }
+
+    .team-member a:hover::after {
+      transform: scaleX(1);
     }
 
     .close-button {
       position: absolute;
-      top: 10px;
-      right: 10px;
-      background: transparent;
+      top: -15px;
+      right: -15px;
+      background: #ff557f;
       border: none;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
       font-size: 1.5rem;
-      color: white;
+      color: #ffffff;
       cursor: pointer;
-      transition: transform 0.2s ease;
+      transition: background 0.3s ease, transform 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     }
 
     .close-button:hover {
-      transform: scale(1.2);
+      background: #e04e70;
+      transform: scale(1.1);
     }
 
     .mute-toggle {
@@ -346,12 +458,35 @@
       opacity: 0.5;
     }
     /* ========================================= */
+
+    /* CSS untuk burung */
+    .bird {
+      position: absolute;
+      width: 60px; /* Ukuran default, bisa diubah secara dinamis via JS */
+      height: auto;
+      pointer-events: none;
+    }
+
+    /* Keyframes untuk burung terbang dari kiri ke kanan */
+    @keyframes flyLR {
+      from { transform: translateX(0); }
+      to { transform: translateX(calc(100vw + 150px)); }
+    }
+
+    /* Keyframes untuk burung terbang dari kanan ke kiri */
+    @keyframes flyRL {
+      from { transform: translateX(0) scaleX(-1); }
+      to { transform: translateX(calc(-100vw - 150px)) scaleX(-1); }
+    }
   </style>
 </head>
 <body>
   <audio id="bgMusic" loop>
     <source src="./assets/audio/backsoundIndex.mp3" type="audio/mpeg" />
   </audio>
+
+  <!-- Kontainer burung (selalu di belakang elemen UI) -->
+  <div id="birdContainer"></div>
 
   <div class="start-screen" id="startScreen">
     <span class="start-text">▶ Tap to Start ◀</span>
@@ -427,6 +562,9 @@
         document.body.style.backgroundImage = "url('./assets/img/indexBg.png')";
         document.body.style.backgroundSize = "cover";
         document.body.style.backgroundPosition = "center";
+
+        // Mulai spawn burung hanya setelah pengguna klik start screen
+        spawnBird();
       }, 1000);
     });
 
@@ -470,6 +608,65 @@
       bgMusic.muted = isMuted;
       muteIcon.src = isMuted ? "./assets/img/muteLogo.svg" : "./assets/img/unmuteLogo.svg";
     });
+
+    /* ---------------------------------------
+       Bird spawn and animation logic
+    ------------------------------------------ */
+    function spawnBird() {
+      try {
+        const bird = document.createElement("img");
+        bird.classList.add("bird");
+        // Mulai dengan frame gambar burung 1
+        bird.src = "./assets/img/burung1.png";
+        
+        // Tentukan arah terbang secara acak
+        const leftToRight = Math.random() >= 0.5;
+        // Atur posisi vertikal secara acak antara 5vh dan 80vh
+        const randomTop = Math.random() * (80 - 5) + 5;
+        bird.style.top = randomTop + "vh";
+        
+        // Acak ukuran burung antara 50px dan 80px
+        const birdSize = Math.random() * (80 - 50) + 50;
+        bird.style.width = birdSize + "px";
+        
+        // Durasi animasi antara 10 dan 20 detik
+        const duration = Math.random() * (20 - 10) + 10;
+        
+        // Gunakan properti 'left' untuk kedua arah agar konsisten
+        if (leftToRight) {
+          bird.style.left = "-150px";
+          bird.style.animation = `flyLR ${duration}s linear forwards`;
+        } else {
+          bird.style.left = "100vw";
+          // Pastikan gambar terbalik agar menghadap ke kiri
+          bird.style.animation = `flyRL ${duration}s linear forwards`;
+        }
+        
+        // Tempelkan burung ke dalam kontainer
+        const birdContainer = document.getElementById("birdContainer");
+        birdContainer.appendChild(bird);
+        
+        // Animasi frame-by-frame: ganti gambar setiap 200ms antara burung1 dan burung2
+        let currentFrame = 1;
+        const frameInterval = 200; // ms
+        const birdFrameInterval = setInterval(function() {
+          currentFrame = currentFrame === 1 ? 2 : 1;
+          bird.src = `./assets/img/burung${currentFrame}.png`;
+        }, frameInterval);
+        
+        // Hapus burung dan clear interval setelah animasi selesai
+        bird.addEventListener("animationend", function() {
+          clearInterval(birdFrameInterval);
+          bird.remove();
+        });
+      } catch (error) {
+        console.error("Error spawning bird:", error);
+      }
+      
+      // Jadwalkan spawn burung berikutnya (delay acak antara 3 dan 7 detik)
+      const nextDelay = Math.random() * (4000 - 2000) + 2000;
+      setTimeout(spawnBird, nextDelay);
+    }
   </script>
 </body>
 </html>
