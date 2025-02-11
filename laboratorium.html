@@ -988,8 +988,8 @@
         
         // Update status kepemilikan alat
         document.querySelectorAll('.store-item').forEach(item => {
-          if((item.id === 'converterItem' && localStorage.getItem('hasConverterTool') === 'true') ||
-             (item.id === 'pollutionItem' && localStorage.getItem('hasPollutionTool') === 'true')) {
+          if((item.id === 'converterItem' && localStorage.getItem('converterBought') === 'true') ||
+             (item.id === 'pollutionItem' && localStorage.getItem('pollutionBought') === 'true')) {
             item.classList.add('owned');
             item.style.opacity = '0.7';
             item.style.cursor = 'not-allowed';
@@ -1052,22 +1052,27 @@
             const plastic = parseInt(localStorage.getItem('plastic')) || 0;
             
             if(this.id === 'converterItem') {
-              if(localStorage.getItem('hasConverterTool') === 'true') {
+              if(localStorage.getItem('converterBought') === 'true') {
                 showActionPopup("Hydro Converter 3000 sudah dimiliki!");
                 return;
               }
               
               if(wood >= 10) {
                 localStorage.setItem('wood', wood - 10);
-                localStorage.setItem('hasConverterTool', 'true');
+                localStorage.setItem('converterBought', 'true');
+                localStorage.setItem('converterPlaced', 'false');
                 showActionPopup("Hydro Converter 3000 berhasil dibuat! 🎉\nAlat ini sekarang tersedia di inventory game");
+                
+                // Trigger event untuk update inventory
+                const event = new Event('storage');
+                window.dispatchEvent(event);
               } else {
                 showActionPopup("Kayu tidak cukup!\nDibutuhkan 50 kayu");
                 return;
               }
             }
             else if(this.id === 'pollutionItem') {
-              if(localStorage.getItem('hasPollutionTool') === 'true') {
+              if(localStorage.getItem('pollutionBought') === 'true') {
                 showActionPopup("Polusion Buster 2.0 sudah dimiliki!");
                 return;
               }
@@ -1075,8 +1080,13 @@
               if(wood >= 70 && plastic >= 30) {
                 localStorage.setItem('wood', wood - 70);
                 localStorage.setItem('plastic', plastic - 30);
-                localStorage.setItem('hasPollutionTool', 'true'); 
+                localStorage.setItem('pollutionBought', 'true');
+                localStorage.setItem('pollutionPlaced', 'false');
                 showActionPopup("Polusion Buster 2.0 berhasil dibuat! 🎉\nAlat ini sekarang tersedia di inventory game");
+                
+                // Trigger event untuk update inventory
+                const event = new Event('storage');
+                window.dispatchEvent(event);
               } else {
                 showActionPopup("Resource tidak cukup!\nDibutuhkan 70 kayu dan 30 plastik");
                 return;

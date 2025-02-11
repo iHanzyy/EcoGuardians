@@ -426,6 +426,37 @@
         height: 14%;
       }
 
+      #tempatAlatKonversi {
+        position: fixed;
+        bottom: 12%;
+        left: 18%;
+        width: 7rem;
+        height: 14%;
+        pointer-events: none;
+        border: 3px dashed #00ff00;
+        background: rgba(0, 255, 0, 0.1);
+        animation: pulseBorder 1.5s infinite;
+        display: none; /* Awalnya disembunyikan */
+      }
+      
+      #tempatAlatPenghisap {
+        position: fixed;
+        bottom: 37%;
+        left: 42%;
+        width: 7rem;
+        height: 23%;
+        pointer-events: none;
+        border: 3px dashed #00ff00;
+        background: rgba(0, 255, 0, 0.1);
+        animation: pulseBorder 1.5s infinite;
+        display: none; /* Awalnya disembunyikan */
+      }
+
+      /* Tambahkan class untuk menampilkan area target */
+      .show-placement {
+        display: block !important;
+      }
+
       /* Interactive Buttons Styles */
       .interactive-button {
         position: fixed;
@@ -775,6 +806,120 @@
           opacity: 1;
         }
       }
+
+      /* Inventory Styles */
+      .inventory-modal .modal-container {
+        max-width: 500px;
+        background: linear-gradient(145deg, #1a1a2e, #16213e);
+      }
+
+      .inventory-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        padding: 20px;
+      }
+
+      .inventory-slot {
+        position: relative;
+        background: rgba(255,255,255,0.1);
+        border: 2px solid #00fff9;
+        border-radius: 10px;
+        padding: 15px;
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+      }
+
+      .inventory-slot img {
+        width: 60%;
+        height: auto;
+      }
+
+      .item-count {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: rgba(0,0,0,0.7);
+        color: #fff;
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-size: 12px;
+      }
+
+      .use-button {
+        position: absolute;
+        bottom: 10px;
+        padding: 5px 10px;
+        background: #00fff9;
+        color: #1a1a2e;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .tool-slot:hover .use-button {
+        opacity: 1;
+      }
+
+      .placement-guide {
+        position: fixed;
+        border: 3px dashed #00ff00;
+        background: rgba(0,255,0,0.1);
+        display: none;
+        pointer-events: none;
+        animation: pulseBorder 1.5s infinite;
+      }
+
+      @keyframes pulseBorder {
+        0% { opacity: 0.5; }
+        50% { opacity: 1; }
+        100% { opacity: 0.5; }
+      }
+
+      /* Placement Hint Styles */
+      .placement-hint {
+        position: fixed;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        z-index: 1000;
+      }
+
+      .placement-area {
+        width: 100%;
+        height: 100%;
+        border: 3px dashed #00ff00;
+        background: rgba(0,255,0,0.1);
+        animation: pulseBorder 1.5s infinite;
+      }
+
+      .pasang-button {
+        padding: 8px 20px;
+        background: #00ff88;
+        color: #1a1a2e;
+        border: none;
+        border-radius: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .pasang-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 15px #00ff88;
+      }
+
+      .alat-installed {
+        user-select: none;
+        pointer-events: none;
+        image-rendering: crisp-edges;
+      }
     </style>
   </head>
   <body>
@@ -793,6 +938,8 @@
     <div class="roadBlock" id="blockTree2"></div>
     <div class="roadBlock" id="blockGrass"></div>
     <div class="roadBlock" id="blockGrass2"></div>
+    <div class="roadBlock" id="tempatAlatKonversi"></div>
+    <div class="roadBlock" id="tempatAlatPenghisap"></div>
 <!-- Updated Markup untuk Status Bars UI -->
 <div class="status-container">
   <div class="status-column">
@@ -872,6 +1019,13 @@
         id="guideButton"
       />
       <img src="./assets/img/questButton.svg" alt="Quest Button" class="icon" />
+      <!-- Di dalam div#icons -->
+      <img 
+        src="./assets/img/tas.png" 
+        alt="Inventory" 
+        class="icon" 
+        id="inventoryButton"
+      />
     </div>
 
     <!-- Popup Modal (Guide) -->
@@ -994,10 +1148,46 @@
     <div class="page-transition" id="pageTransition"></div>
 
     <!-- Tambahkan div untuk alat penghilang polusi di bawah canvas -->
-    <div id="alatPolusi" class="alat-dom-element"></div>
+    <div id="alatPolusi" class="alat-dom-element" style="display: none;"></div>
 
     <!-- Tambahkan div untuk alat konversi air -->
-    <div id="alatKonversi" class="alat-dom-element"></div>
+    <div id="alatKonversi" class="alat-dom-element" style="display: none;"></div>
+
+    <!-- Popup Inventory -->
+    <div class="modal-overlay inventory-modal" id="inventoryModal">
+      <div class="modal-container">
+        <button class="modal-close" id="inventoryClose">&times;</button>
+        <h2 style="text-align: center; color: #00fff9">INVENTORY</h2>
+        <div class="inventory-grid">
+          <!-- Slot Item -->
+          <div class="inventory-slot" data-item="wood">
+            <img src="./assets/img/kayu.svg" alt="Kayu">
+            <span class="item-count">0</span>
+          </div>
+          <div class="inventory-slot" data-item="plastic">
+            <img src="./assets/img/plastic.svg" alt="Plastik">
+            <span class="item-count">0</span>
+          </div>
+          <div class="inventory-slot tool-slot" data-item="converter">
+            <img src="./assets/img/alatKonversi.png" alt="Alat Konversi">
+            <button class="use-button">USE</button>
+          </div>
+          <div class="inventory-slot tool-slot" data-item="pollution">
+            <img src="./assets/img/alatPenghilangPolusi.png" alt="Alat Polusi">
+            <button class="use-button">USE</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Placement Area -->
+    <div id="placementArea" class="placement-guide"></div>
+
+    <!-- Tambahkan div untuk area pasang alat -->
+    <div id="placementHint" class="placement-hint">
+      <div class="placement-area"></div>
+      <button id="confirmPlacement" class="pasang-button">Pasang</button>
+    </div>
 
     <script>
       /***********************
@@ -1080,6 +1270,8 @@
       // Definisikan objek baru untuk posisi dan ukuran alat
       game.tools = {
         alatKonversi: { x: 270, y: 600, width: 130, height: 130 },
+        // Tambahan: Definisikan juga alat penghilang polusi
+        alatPolusi: { x: 580, y: 300, width: 250, height: 250 },
         // Properti untuk animasi shaking pada alat konversi
         konversiShaking: false,
         shakeStartTime: 0,
@@ -1398,48 +1590,70 @@
         }
 
         // Update visibility alat konversi
-        const alatKonversiElement = document.getElementById("alatKonversi");
-        const converterBought =
-          localStorage.getItem("converterBought") === "true";
-        alatKonversiElement.style.display = converterBought ? "block" : "none";
-
-        // Hitung jarak ke alat konversi
-        if (converterBought) {
-          // Gunakan posisi fixed dari CSS bukan getBoundingClientRect()
-          const konversiX = 270; // Sesuai dengan CSS left
-          const konversiY = 600; // Sesuai dengan CSS top
-          const konversiWidth = 130;
-          const konversiHeight = 130;
-
+        const converterActive = localStorage.getItem("converterPlaced") === "true";
+        let alatKonversiElement = document.getElementById("alatKonversi");
+        if (converterActive) {
+          if (!alatKonversiElement) {
+            alatKonversiElement = document.createElement("img");
+            alatKonversiElement.id = "alatKonversi";
+            alatKonversiElement.className = "alat-installed";
+            alatKonversiElement.src = "./assets/img/alatKonversi.png";
+            alatKonversiElement.style.pointerEvents = "none";
+            const pos = game.tools.alatKonversi;
+            alatKonversiElement.style.position = "fixed";
+            alatKonversiElement.style.left = `${pos.x}px`;
+            alatKonversiElement.style.top = `${pos.y}px`;
+            alatKonversiElement.style.width = `${pos.width}px`;
+            alatKonversiElement.style.height = `${pos.height}px`;
+            document.body.appendChild(alatKonversiElement);
+          }
+          alatKonversiElement.style.display = "block";
+          
+          // Hitung jarak ke alat konversi
+          const konversiRect = alatKonversiElement.getBoundingClientRect();
           const konversiCenter = {
-            x: konversiX + konversiWidth / 2,
-            y: konversiY + konversiHeight / 2,
+            x: konversiRect.left + konversiRect.width / 2,
+            y: konversiRect.top + konversiRect.height / 2,
           };
 
           const distanceToKonversi = Math.hypot(
-            playerCenter.x - (konversiCenter.x + canvasRect.left),
-            playerCenter.y - (konversiCenter.y + canvasRect.top)
+            playerCenter.x - konversiCenter.x,
+            playerCenter.y - konversiCenter.y
           );
 
           if (distanceToKonversi < INTERACTION_DISTANCE) {
             konversiButton.classList.add("visible");
             const buttonWidth = konversiButton.offsetWidth;
-            konversiButton.style.left = `${
-              konversiCenter.x - buttonWidth / 2
-            }px`;
-            konversiButton.style.top = `${konversiY + konversiHeight + 20}px`;
+            konversiButton.style.left = `${konversiCenter.x - buttonWidth / 2}px`;
+            konversiButton.style.top = `${konversiRect.bottom + 20}px`;
           } else {
             konversiButton.classList.remove("visible");
           }
+        } else if (alatKonversiElement) {
+          alatKonversiElement.style.display = "none";
+          konversiButton.classList.remove("visible");
         }
 
-        // --- Modified: Logika untuk alat penghilang polusi ---
-        const alatPolusiElement = document.getElementById("alatPolusi");
-        const pollutionBought =
-          localStorage.getItem("pollutionBought") === "true";
-        alatPolusiElement.style.display = pollutionBought ? "block" : "none";
-
-        if (pollutionBought) {
+        // Update visibility untuk Polusion Buster 2.0
+        const pollutionActive = localStorage.getItem("pollutionPlaced") === "true";
+        let alatPolusiElement = document.getElementById("alatPolusi");
+        if (pollutionActive) {
+          if (!alatPolusiElement) {
+            alatPolusiElement = document.createElement("img");
+            alatPolusiElement.id = "alatPolusi";
+            alatPolusiElement.className = "alat-installed";
+            alatPolusiElement.src = "./assets/img/alatPenghilangPolusi.png";
+            const pos = game.tools.alatPolusi;
+            alatPolusiElement.style.position = "fixed";
+            alatPolusiElement.style.left = `${pos.x}px`;
+            alatPolusiElement.style.top = `${pos.y}px`;
+            alatPolusiElement.style.width = `${pos.width}px`;
+            alatPolusiElement.style.height = `${pos.height}px`;
+            document.body.appendChild(alatPolusiElement);
+          }
+          alatPolusiElement.style.display = "block";
+          
+          // Hitung jarak ke alat polusi
           const polusiRect = alatPolusiElement.getBoundingClientRect();
           const polusiCenter = {
             x: polusiRect.left + polusiRect.width / 2,
@@ -1459,7 +1673,11 @@
           } else {
             polusiButton.classList.remove("visible");
           }
+        } else if (alatPolusiElement) {
+          alatPolusiElement.style.display = "none";
+          polusiButton.classList.remove("visible");
         }
+
         // --- End Modified ---
 
         // Collision detection (blok rintangan)
@@ -1526,6 +1744,8 @@
           }
           game.player.lastFrameTime = Date.now();
         }
+
+        updateInteractiveButtons();
       }
 
       // Menggambar background
@@ -1849,18 +2069,27 @@
       // --- Aksi Konversi Air ---
       const konversiButton = document.getElementById("konversiButton");
       function triggerShakeAnimation() {
+        const isConverterPlaced = localStorage.getItem("converterPlaced") === "true";
+        if (!isConverterPlaced) {
+          showActionPopup("Alat Konversi Air belum dipasang!");
+          return;
+        }
+
         const alatKonversi = document.getElementById("alatKonversi");
-        // Reset dan jalankan animasi shake
+        // Reset animasi terlebih dahulu
         alatKonversi.style.animation = "none";
-        void alatKonversi.offsetWidth;
+        void alatKonversi.offsetWidth; // Memicu reflow
+        // Jalankan animasi shake
         alatKonversi.style.animation = "shake 0.5s ease-in-out";
         setTimeout(() => {
           alatKonversi.style.animation = "";
         }, 500);
       }
+      
       konversiButton.addEventListener("click", function () {
-        if (localStorage.getItem("converterBought") !== "true") {
-          showActionPopup("Alat Konversi Air belum dibuat di Laboratorium.");
+        const isConverterPlaced = localStorage.getItem("converterPlaced") === "true";
+        if (!isConverterPlaced) {
+          showActionPopup("Alat Konversi Air belum dipasang!");
           return;
         }
 
@@ -1933,25 +2162,20 @@
       updateStatusBarUI();
 
       function updateToolButtons() {
-        // Update Tombol/Ikon Alat Konversi Air
-        const converterBought =
-          localStorage.getItem("converterBought") === "true";
         const konversiButton = document.getElementById("konversiButton");
-
-        // Jika terdapat tag <img> di dalam tombol, targetkan juga elemen tersebut
         const konversiImg = konversiButton.querySelector("img");
+        
+        const isConverterPlaced = localStorage.getItem("converterPlaced") === "true";
 
-        if (!converterBought) {
-          // Terapkan filter dan kursor pada tombol dan gambar SVG di dalamnya
+        if (!isConverterPlaced) {
           konversiButton.style.filter = "grayscale(100%) brightness(50%)";
           konversiButton.style.cursor = "not-allowed";
           if (konversiImg) {
             konversiImg.style.filter = "grayscale(100%) brightness(50%)";
             konversiImg.style.cursor = "not-allowed";
           }
-          konversiButton.disabled = true; // Opsional: nonaktifkan klik pada tombol
+          konversiButton.disabled = true;
         } else {
-          // Tampilkan secara normal ketika sudah dibuat
           konversiButton.style.filter = "";
           konversiButton.style.cursor = "pointer";
           if (konversiImg) {
@@ -1961,11 +2185,11 @@
           konversiButton.disabled = false;
         }
 
-        // Update Tombol Alat Penghilang Polusi
-        const pollutionBought =
-          localStorage.getItem("pollutionBought") === "true";
+        // Update untuk alat penghilang polusi
+        const isPollutionPlaced = localStorage.getItem("pollutionPlaced") === "true";
         const polusiButton = document.getElementById("polusiButton");
-        polusiButton.style.display = pollutionBought ? "block" : "none";
+        polusiButton.style.display = isPollutionPlaced ? "block" : "none";
+        updateInteractiveButtons(); // Panggil update tambahan
       }
 
       // Mengupdate kursor ketika mouse bergerak di dalam canvas
@@ -1974,22 +2198,35 @@
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
 
-        // Cek apakah mouse berada di dalam region alat Konversi Air
-        const convTool = game.tools.alatKonversi;
+        // Reset kursor ke default
+        canvas.style.cursor = "default";
+
+        // Cek apakah mouse berada di area alat yang sudah dipasang
+        const isConverterPlaced = localStorage.getItem("converterPlaced") === "true";
+        const konversiTool = game.tools.alatKonversi;
+        
         if (
-          mouseX >= convTool.x &&
-          mouseX <= convTool.x + convTool.width &&
-          mouseY >= convTool.y &&
-          mouseY <= convTool.y + convTool.height
+          isConverterPlaced &&
+          mouseX >= konversiTool.x &&
+          mouseX <= konversiTool.x + konversiTool.width &&
+          mouseY >= konversiTool.y &&
+          mouseY <= konversiTool.y + konversiTool.height
         ) {
-          const converterBought =
-            localStorage.getItem("converterBought") === "true";
-          canvas.style.cursor = converterBought ? "pointer" : "not-allowed";
-          return;
+          canvas.style.cursor = "pointer";
         }
 
-        // Kursor default jika mouse berada di luar region alat
-        canvas.style.cursor = "default";
+        const isPollutionPlaced = localStorage.getItem("pollutionPlaced") === "true";
+        const polusiTool = game.tools.alatPolusi;
+        
+        if (
+          isPollutionPlaced &&
+          mouseX >= polusiTool.x &&
+          mouseX <= polusiTool.x + polusiTool.width &&
+          mouseY >= polusiTool.y &&
+          mouseY <= polusiTool.y + polusiTool.height
+        ) {
+          canvas.style.cursor = "pointer";
+        }
       });
 
       // Menangani klik pada canvas untuk alat Konversi Air
@@ -1998,36 +2235,49 @@
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
 
-        // Cek apakah klik terjadi di dalam region alat Konversi Air
-        const convTool = game.tools.alatKonversi;
+        // Cek klik pada alat konversi yang sudah dipasang
+        const isConverterPlaced = localStorage.getItem("converterPlaced") === "true";
+        const konversiTool = game.tools.alatKonversi;
+        
         if (
-          mouseX >= convTool.x &&
-          mouseX <= convTool.x + convTool.width &&
-          mouseY >= convTool.y &&
-          mouseY <= convTool.y + convTool.height
+          isConverterPlaced &&
+          mouseX >= konversiTool.x &&
+          mouseX <= konversiTool.x + konversiTool.width &&
+          mouseY >= konversiTool.y &&
+          mouseY <= konversiTool.y + konversiTool.height
         ) {
-          if (localStorage.getItem("converterBought") !== "true") {
-            alert("Alat Konversi Air belum dibuat di Laboratorium.");
-            return;
-          }
-          // Jika sudah dibeli, mulai aksi konversi (contoh: animasi shaking)
           triggerShakeAnimation();
+        }
+
+        // Cek klik pada alat polusi yang sudah dipasang
+        const isPollutionPlaced = localStorage.getItem("pollutionPlaced") === "true";
+        const polusiTool = game.tools.alatPolusi;
+        
+        if (
+          isPollutionPlaced &&
+          mouseX >= polusiTool.x &&
+          mouseX <= polusiTool.x + polusiTool.width &&
+          mouseY >= polusiTool.y &&
+          mouseY <= polusiTool.y + polusiTool.height
+        ) {
+          // Trigger fungsi polusi
         }
       });
 
       // Fungsi untuk memulai animasi shake pada alat konversi
       function triggerShakeAnimation() {
-        const alatKonversi = document.getElementById("alatKonversi");
+        const isConverterPlaced = localStorage.getItem("converterPlaced") === "true";
+        if (!isConverterPlaced) {
+          showActionPopup("Alat Konversi Air belum dipasang!");
+          return;
+        }
 
+        const alatKonversi = document.getElementById("alatKonversi");
         // Reset animasi terlebih dahulu
         alatKonversi.style.animation = "none";
-        // Trigger reflow
-        void alatKonversi.offsetWidth;
-
-        // Jalankan animasi
+        void alatKonversi.offsetWidth; // Memicu reflow
+        // Jalankan animasi shake
         alatKonversi.style.animation = "shake 0.5s ease-in-out";
-
-        // Hapus animasi setelah selesai
         setTimeout(() => {
           alatKonversi.style.animation = "";
         }, 500);
@@ -2123,16 +2373,117 @@
       const alatKonversi = document.getElementById('alatKonversi');
       const alatPolusi = document.getElementById('alatPolusi');
 
-      // Cek status alat dari localStorage
-      if(localStorage.getItem('hasConverterTool') === 'true') {
+      // Cek apakah alat sudah dipasang berdasarkan localStorage
+      if(localStorage.getItem('converterPlaced') === 'true') {
         alatKonversi.style.display = 'block';
-        // Tambahkan logika interaksi alat di sini
+        // Posisi alat dapat disesuaikan ulang jika diperlukan
       }
 
-      if(localStorage.getItem('hasPollutionTool') === 'true') {
+      if(localStorage.getItem('pollutionPlaced') === 'true') {
         alatPolusi.style.display = 'block';
-        // Tambahkan logika interaksi alat di sini
+        // Posisi alat dapat disesuaikan ulang jika diperlukan
       }
+
+      // Inisialisasi posisi alat saat game dimuat
+      document.addEventListener('DOMContentLoaded', () => {
+        ['converter', 'pollution'].forEach(tool => {
+          const position = JSON.parse(localStorage.getItem(`${tool}Position`));
+          if(localStorage.getItem(`${tool}Placed`) === 'true' && position) {
+            const toolName = tool === 'converter' ? 'Konversi' : 'PenghilangPolusi';
+            const toolImage = document.createElement('img');
+            toolImage.className = 'alat-installed';
+            toolImage.src = `./assets/img/alat${toolName}.png`;
+            
+            toolImage.style.position = 'fixed';
+            toolImage.style.left = `${position.x}px`;
+            toolImage.style.top = `${position.y}px`;
+            toolImage.style.width = `${position.width}px`;
+            toolImage.style.height = `${position.height}px`;
+            toolImage.style.pointerEvents = 'none'; // Nonaktifkan interaksi mouse
+            
+            document.body.appendChild(toolImage);
+          }
+        });
+        
+        // Update tombol interaksi saat halaman dimuat
+        updateInteractiveButtons();
+        updateToolButtons(); // Tambahkan ini
+      });
+
+      // Fungsi untuk mengupdate tombol interaksi
+      function updateInteractiveButtons() {
+        const konversiButton = document.getElementById("konversiButton");
+        const polusiButton = document.getElementById("polusiButton");
+        
+        // Tampilkan tombol hanya jika alat sudah dipasang
+        const isConverterPlaced = localStorage.getItem("converterPlaced") === "true";
+        const isPollutionPlaced = localStorage.getItem("pollutionPlaced") === "true";
+        
+        konversiButton.style.display = isConverterPlaced ? "block" : "none";
+        polusiButton.style.display = isPollutionPlaced ? "block" : "none";
+        
+        // Update posisi tombol jika alat terpasang
+        if (isConverterPlaced) {
+          const alatKonversi = document.getElementById("alatKonversi");
+          if (alatKonversi) {
+            const rect = alatKonversi.getBoundingClientRect();
+            const buttonWidth = konversiButton.offsetWidth;
+            konversiButton.style.left = `${rect.left + rect.width/2 - buttonWidth/2}px`;
+            konversiButton.style.top = `${rect.bottom + 20}px`;
+          }
+        }
+        
+        if (isPollutionPlaced) {
+          const alatPolusi = document.getElementById("alatPolusi");
+          if (alatPolusi) {
+            const rect = alatPolusi.getBoundingClientRect();
+            const buttonWidth = polusiButton.offsetWidth;
+            polusiButton.style.left = `${rect.left + rect.width/2 - buttonWidth/2}px`;
+            polusiButton.style.top = `${rect.bottom + 20}px`;
+          }
+        }
+      }
+
+      // Satu listener confirmPlacement yang final (duplikasi telah dihapus)
+      confirmPlacement.addEventListener('click', () => {
+        if (!currentTool || !targetArea) return;
+        
+        const rect = targetArea.getBoundingClientRect();
+        const toolName = currentTool === 'converter' ? 'Konversi' : 'PenghilangPolusi';
+        const toolId = currentTool === 'converter' ? 'alatKonversi' : 'alatPolusi';
+        let toolElement = document.getElementById(toolId);
+        
+        if (!toolElement) {
+          toolElement = document.createElement("img");
+          toolElement.id = toolId;
+          toolElement.className = 'alat-installed';
+          toolElement.src = `./assets/img/alat${toolName}.png`;
+          toolElement.style.pointerEvents = "none";
+          document.body.appendChild(toolElement);
+        }
+
+        // Update properti posisi
+        toolElement.style.position = 'fixed';
+        toolElement.style.left = `${rect.left}px`;
+        toolElement.style.top = `${rect.top}px`;
+        toolElement.style.width = `${rect.width}px`;
+        toolElement.style.height = `${rect.height}px`;
+
+        // Simpan status
+        localStorage.setItem(`${currentTool}Placed`, 'true');
+        localStorage.setItem(`${currentTool}Bought`, 'false');
+        
+        // Bersihkan UI
+        placementHint.style.display = 'none';
+        targetArea.classList.remove('show-placement');
+        currentTool = null;
+        targetArea = null;
+
+        updateInventory();
+        updateInteractiveButtons();
+        updateToolButtons(); // Tambahkan ini untuk update status tombol
+        showActionPopup("Alat berhasil dipasang!");
+      });
     </script>
     <script>
       function showActionPopup(message) {
@@ -2147,5 +2498,130 @@
       }
     </script>
     <div id="actionPopup"></div>
+
+    <script>
+      // Inventory System
+      const inventoryButton = document.getElementById('inventoryButton');
+      const inventoryModal = document.getElementById('inventoryModal');
+      const placementArea = document.getElementById('placementArea');
+      let placingTool = null;
+
+      // Tampilkan inventory
+      inventoryButton.addEventListener('click', () => {
+        updateInventory();
+        inventoryModal.classList.add('active');
+      });
+
+      // Update tampilan inventory
+      function updateInventory() {
+        // Update resource counts
+        document.querySelectorAll('[data-item="wood"] .item-count').forEach(el => {
+          el.textContent = localStorage.getItem('wood') || 0;
+        });
+        document.querySelectorAll('[data-item="plastic"] .item-count').forEach(el => {
+          el.textContent = localStorage.getItem('plastic') || 0;
+        });
+  
+        // Tampilkan item alat hanya jika alat masih dimiliki (bought === 'true')
+        // dan belum dipasang (placed !== 'true')
+        document.querySelector('[data-item="converter"]').style.display =
+          (localStorage.getItem('converterBought') === 'true' && localStorage.getItem('converterPlaced') !== 'true') ? 'flex' : 'none';
+        document.querySelector('[data-item="pollution"]').style.display =
+          (localStorage.getItem('pollutionBought') === 'true' && localStorage.getItem('pollutionPlaced') !== 'true') ? 'flex' : 'none';
+      }
+
+      // Handle tool placement
+      document.querySelectorAll('.use-button').forEach(button => {
+        button.addEventListener('click', (e) => {
+          const toolType = e.target.closest('.inventory-slot').dataset.item;
+          startPlacingTool(toolType);
+          inventoryModal.classList.remove('active');
+        });
+      });
+
+      function startPlacingTool(toolType) {
+        // Gunakan mekanisme baru: alat tidak langsung diposisikan dengan mouse,
+        // tapi ditempatkan menggunakan overlay placementHint pada area target.
+        currentTool = toolType;
+        targetArea = document.getElementById(
+          toolType === 'converter' ? 'tempatAlatKonversi' : 'tempatAlatPenghisap'
+        );
+        if (!targetArea) {
+          showActionPopup("Tempat pemasangan tidak ditemukan!");
+          return;
+        }
+        // Tampilkan area target dengan efek blinking melalui class .show-placement
+        targetArea.classList.add('show-placement');
+        // Posisi overlay placementHint sama persis dengan targetArea
+        const rect = targetArea.getBoundingClientRect();
+        placementHint.style.display = 'flex';
+        placementHint.style.position = 'fixed';
+        placementHint.style.left = `${rect.left}px`;
+        placementHint.style.top = `${rect.top}px`;
+        placementHint.style.width = `${rect.width}px`;
+        placementHint.style.height = `${rect.height}px`;
+      }
+
+      // Tutup inventory
+      document.getElementById('inventoryClose').addEventListener('click', () => {
+        inventoryModal.classList.remove('active');
+      });
+
+      confirmPlacement.addEventListener('click', () => {
+        if (!currentTool || !targetArea) return;
+        
+        // Dapatkan posisi dan ukuran targetArea terlebih dahulu
+        const rect = targetArea.getBoundingClientRect();
+        const toolName = currentTool === 'converter' ? 'Konversi' : 'PenghilangPolusi';
+        const toolId = currentTool === 'converter' ? 'alatKonversi' : 'alatPolusi';
+        let toolElement = document.getElementById(toolId);
+        
+        if (toolElement) {
+          // Jika elemen sudah ada, perbarui atribut dan styling-nya
+          // (asumsi elemen sudah memiliki id dan sudah dimuat sebelumnya)
+          toolElement.src = `./assets/img/alat${toolName}.png`;
+          toolElement.style.position = 'fixed';
+          toolElement.style.left = `${rect.left}px`;
+          toolElement.style.top = `${rect.top}px`;
+          toolElement.style.width = `${rect.width}px`;
+          toolElement.style.height = `${rect.height}px`;
+          toolElement.style.pointerEvents = 'none';
+          toolElement.style.zIndex = '999';
+        } else {
+          // Jika elemen belum ada, buat elemen baru dan pastikan diberi id untuk mencegah duplikasi
+          toolElement = new Image();
+          toolElement.id = toolId;
+          toolElement.className = 'alat-installed';
+          toolElement.src = `./assets/img/alat${toolName}.png`;
+          toolElement.style.position = 'fixed';
+          toolElement.style.left = `${rect.left}px`;
+          toolElement.style.top = `${rect.top}px`;
+          toolElement.style.width = `${rect.width}px`;
+          toolElement.style.height = `${rect.height}px`;
+          toolElement.style.pointerEvents = 'none';
+          toolElement.style.zIndex = '999';
+          document.body.appendChild(toolElement);
+        }
+        
+        // Simpan posisi alat dan update status
+        localStorage.setItem(`${currentTool}Position`, JSON.stringify({
+          x: rect.left,
+          y: rect.top,
+          width: rect.width,
+          height: rect.height
+        }));
+        localStorage.setItem(`${currentTool}Bought`, 'false');
+        localStorage.setItem(`${currentTool}Placed`, 'true');
+        updateInventory();
+        updateInteractiveButtons();
+        showActionPopup("Alat berhasil dipasang!");
+        
+        // Reset UI placement
+        placementHint.style.display = 'none';
+        targetArea.classList.remove('show-placement');
+        currentTool = null;
+        targetArea = null;
+      });
+    </script>
   </body>
 </html>
