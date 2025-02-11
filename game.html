@@ -440,6 +440,13 @@
         width: 11rem;
         height: 14%;
       }
+      #blokirKetikaAlatPenghisapMuncul {
+        top: 54%;
+        right: 51%;
+        width: 6rem;
+        height: 8%;
+        
+      }
 
       #tempatAlatKonversi {
         position: fixed;
@@ -569,7 +576,7 @@
 
       /* CSS untuk alat konversi */
       #alatKonversi {
-        left: 270px;
+        left: 300px;
         top: 600px;
         width: 130px;
         height: 130px;
@@ -1193,6 +1200,7 @@
     <div class="roadBlock" id="blockGrass2"></div>
     <div class="roadBlock" id="tempatAlatKonversi"></div>
     <div class="roadBlock" id="tempatAlatPenghisap"></div>
+    <div class="roadBlock" id="blokirKetikaAlatPenghisapMuncul"></div>
 <!-- Updated Markup untuk Status Bars UI -->
 <div class="status-container">
   <div class="status-column">
@@ -1801,8 +1809,9 @@
             treeCenter.x - cutButton.offsetWidth - buttonMargin
           }px`;
           plantButton.style.left = `${treeCenter.x + buttonMargin}px`;
+          // Perubahan: tombol akan lebih dekat ke pohon (offset vertikal dari +10 menjadi +10)
           cutButton.style.top = plantButton.style.top = `${
-            treeRect.top + treeRect.height + 20
+            treeRect.top + treeRect.height - 70
           }px`;
         } else {
           cutButton.classList.remove("visible");
@@ -1889,7 +1898,7 @@
             polusiButton.classList.add("visible");
             const buttonWidth = polusiButton.offsetWidth;
             polusiButton.style.left = `${polusiCenter.x - buttonWidth / 2}px`;
-            polusiButton.style.top = `${polusiRect.bottom + 20}px`;
+            polusiButton.style.top = `${polusiRect.bottom - 20}px`;
           } else {
             polusiButton.classList.remove("visible");
           }
@@ -2632,7 +2641,7 @@
           if (alatKonversi) {
             const rect = alatKonversi.getBoundingClientRect();
             const buttonWidth = konversiButton.offsetWidth;
-            konversiButton.style.left = `${rect.left + rect.width/2 - buttonWidth/2}px`;
+            konversiButton.style.left = `${rect.left + rect.width / 2 - buttonWidth / 2}px`;
             konversiButton.style.top = `${rect.bottom + 20}px`;
           }
         }
@@ -2642,10 +2651,20 @@
           if (alatPolusi) {
             const rect = alatPolusi.getBoundingClientRect();
             const buttonWidth = polusiButton.offsetWidth;
-            polusiButton.style.left = `${rect.left + rect.width/2 - buttonWidth/2}px`;
-            polusiButton.style.top = `${rect.bottom + 20}px`;
+            polusiButton.style.left = `${rect.left + rect.width / 2 - buttonWidth / 2}px`;
+            polusiButton.style.top = `${rect.bottom - 30}px`;
           }
         }
+        
+        // --------------------------
+        // Kode Baru: Tampilkan atau sembunyikan div blokirKetikaAlatPenghisapMuncul 
+        const blokirElement = document.getElementById("blokirKetikaAlatPenghisapMuncul");
+        if (isPollutionPlaced) {
+          blokirElement.style.display = "block";
+        } else {
+          blokirElement.style.display = "none";
+        }
+        // --------------------------
       }
 
       // Satu listener confirmPlacement yang final (duplikasi telah dihapus)
