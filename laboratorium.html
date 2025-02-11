@@ -50,16 +50,13 @@
       border-radius: 15px;
       text-transform: uppercase;
       letter-spacing: 2px;
-      position: static;
+      position: relative;
       overflow: hidden;
       cursor: pointer;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       animation: pulseGlow 2s infinite;
       box-shadow: 0 0 15px rgba(200, 0, 100, 0.5);
       text-decoration: none;
-      top: auto;
-      right: auto;
-      z-index: 2;
     }
 
     @keyframes pulseGlow {
@@ -307,10 +304,11 @@
       box-shadow: 0 0 20px rgba(255, 255, 255, 0.3), 0 0 10px rgba(0, 0, 0, 0.6);
       opacity: 0;
       visibility: hidden;
-      z-index: 70;
+      z-index: 1000;
       text-align: center;
       font-size: 1.2rem;
       transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      white-space: pre-line; /* Ini akan memungkinkan line break di dalam pesan */
     }
 
     #actionPopup.active {
@@ -588,122 +586,143 @@
   
   <!-- Script untuk sinkronisasi status & resource secara real-time -->
   <script>
-    function updateStatusBars() {
-      const nature = parseFloat(localStorage.getItem("natureStatus")) || 100;
-      const water = parseFloat(localStorage.getItem("waterStatus")) || 100;
-      const energy = parseFloat(localStorage.getItem("energyStatus")) || 100;
-      const toxic = parseFloat(localStorage.getItem("toxicStatus")) || 0;
-      const natureBar = document.querySelector('.nature .status-bar-fill');
-      const waterBar = document.querySelector('.water .status-bar-fill');
-      const energyBar = document.querySelector('.energy .status-bar-fill');
-      const toxicBar = document.querySelector('.toxic .status-bar-fill');
-      if(natureBar) natureBar.style.width = nature + '%';
-      if(waterBar) waterBar.style.width = water + '%';
-      if(energyBar) energyBar.style.width = energy + '%';
-      if(toxicBar) toxicBar.style.width = toxic + '%';
-    }
-    
-    function updateResources() {
-      const wood = parseInt(localStorage.getItem("wood")) || 0;
-      const plastic = parseInt(localStorage.getItem("plastic")) || 0;
-      const woodCount = document.getElementById('woodCount');
-      const plasticCount = document.getElementById('plasticCount');
-      if(woodCount) woodCount.textContent = 'X ' + wood;
-      if(plasticCount) plasticCount.textContent = 'X ' + plastic;
-    }
-    
-    function updateUI() {
-      updateStatusBars();
-      updateResources();
-    }
-    
-    document.addEventListener('DOMContentLoaded', updateUI);
-    window.addEventListener('storage', updateUI);
-    setInterval(updateUI, 1000);
-    
-    document.addEventListener('DOMContentLoaded', function() {
-      const exitButton = document.querySelector('.exit-btn');
-      exitButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        document.body.classList.add('fade-out');
-        setTimeout(function() {
-          window.location.href = exitButton.href;
-        }, 1000);
-      });
-    });
-    
     document.addEventListener('DOMContentLoaded', function() {
       // Fungsi untuk menampilkan popup
       function showActionPopup(message) {
         const popup = document.getElementById('actionPopup');
         if (!popup) return;
+        
         popup.textContent = message;
         popup.classList.add('active');
+        
         setTimeout(() => {
           popup.classList.remove('active');
         }, 3000);
       }
+
+      // Event listener untuk tombol Daur Ulang
+      const recycleButton = document.getElementById('recycleButton');
+      if (recycleButton) {
+        recycleButton.addEventListener('click', function() {
+          try {
+            // Cek toxic status terlebih dahulu
+            let toxicStatus = parseFloat(localStorage.getItem('toxicStatus')) || 0;
+            if (toxicStatus <= 0) {
+              showActionPopup("Tidak bisa daur ulang!\nToxic status sudah 0%");
+              return;
+            }
+
+            // Mengambil nilai energyStatus dari localStorage
+            let energyStatus = parseFloat(localStorage.getItem('energyStatus')) || 100;
+            
+            // Kurangi 8% energy, biarkan sampai 0%
+            energyStatus = Math.max(0, energyStatus - 8);
+            localStorage.setItem('energyStatus', energyStatus);
+
+            // Kurangi 5% toxic
+            toxicStatus = Math.max(0, toxicStatus - 5);
+            localStorage.setItem('toxicStatus', toxicStatus);
+
+            // Tambah 1 plastic
+            let plastic = parseInt(localStorage.getItem('plastic')) || 0;
+            plastic += 1;
+            localStorage.setItem('plastic', plastic);
+
+            // Perbarui tampilan status dan resource
+            updateUI();
+            
+            // Tampilkan popup dengan pesan bahwa status sudah diupdate
+            showActionPopup("Daur Ulang Berhasil!\nEnergy -8%, Toxic -5%, Plastik +1");
+          } catch (error) {
+            console.error("Terjadi kesalahan saat daur ulang:", error);
+            showActionPopup("Gagal melakukan daur ulang!");
+          }
+        });
+      }
+
+      // Fungsi untuk mengupdate semua status bar secara real-time
+      function updateStatusBars() {
+        // Ambil nilai-nilai dari localStorage
+        const nature = parseFloat(localStorage.getItem('natureStatus')) || 100;
+        const water  = parseFloat(localStorage.getItem('waterStatus'))  || 100;
+        const energy = parseFloat(localStorage.getItem('energyStatus')) || 100;
+        const toxic  = parseFloat(localStorage.getItem('toxicStatus'))  || 0;
+        
+        // Update bar untuk Nature, Water, Energy, dan Toxic
+        const natureBar = document.querySelector('.nature .status-bar-fill');
+        const waterBar  = document.querySelector('.water .status-bar-fill');
+        const energyBar = document.querySelector('.energy .status-bar-fill');
+        const toxicBar  = document.querySelector('.toxic .status-bar-fill');
+        
+        if(natureBar) natureBar.style.width = nature + '%';
+        if(waterBar)  waterBar.style.width  = water + '%';
+        if(energyBar) energyBar.style.width = energy + '%';
+        if(toxicBar)  toxicBar.style.width  = toxic + '%';
+
+        // Jika terdapat elemen untuk menampilkan nilai, perbarui pula text-nya
+        const natureValue = document.querySelector('.nature .status-value');
+        const waterValue  = document.querySelector('.water .status-value');
+        const energyValue = document.querySelector('.energy .status-value');
+        const toxicValue  = document.querySelector('.toxic .status-value');
+        
+        if(natureValue) natureValue.textContent = nature + '%';
+        if(waterValue)  waterValue.textContent  = water + '%';
+        if(energyValue) energyValue.textContent = energy + '%';
+        if(toxicValue)  toxicValue.textContent  = toxic + '%';
+      }
+      
+      function updateResources() {
+        const wood = parseInt(localStorage.getItem("wood")) || 0;
+        const plastic = parseInt(localStorage.getItem("plastic")) || 0;
+        const woodCount = document.getElementById('woodCount');
+        const plasticCount = document.getElementById('plasticCount');
+        if(woodCount) woodCount.textContent = 'X ' + wood;
+        if(plasticCount) plasticCount.textContent = 'X ' + plastic;
+      }
+      
+      function updateUI() {
+        updateStatusBars();
+        updateResources();
+      }
+      
+      // Update status bar secara berkala setiap 100ms
+      setInterval(updateStatusBars, 100);
+
+      // Listener untuk event 'storage' agar update antar-tab/halaman berjalan
+      window.addEventListener('storage', function(e) {
+        if (['natureStatus', 'waterStatus', 'energyStatus', 'toxicStatus'].includes(e.key)) {
+          updateStatusBars();
+        }
+      });
+
+      // Inisialisasi saat halaman dimuat
+      updateStatusBars();
 
       // Event listener untuk tombol Buat Alat
       const createToolBtn = document.getElementById('createToolBtn');
       const storePopup = document.getElementById('storePopup');
       const storeClose = document.getElementById('storeClose');
 
-      if (createToolBtn) {
+      if (createToolBtn && storePopup) {
         createToolBtn.addEventListener('click', function() {
-          if (storePopup) {
-            storePopup.style.display = 'flex';
-          }
+          storePopup.style.display = 'flex';
         });
       }
 
-      // Event listener untuk tombol tutup
-      if (storeClose) {
+      if (storeClose && storePopup) {
         storeClose.addEventListener('click', function() {
-          if (storePopup) {
+          storePopup.style.display = 'none';
+        });
+      }
+
+      // Menutup popup jika mengklik area di luar popup
+      if (storePopup) {
+        storePopup.addEventListener('click', function(e) {
+          if (e.target === storePopup) {
             storePopup.style.display = 'none';
           }
         });
       }
-
-      // Event listener untuk item-item di store
-      const converterItem = document.getElementById('converterItem');
-      const pollutionItem = document.getElementById('pollutionItem');
-
-      if (converterItem) {
-        converterItem.addEventListener('click', function() {
-          const wood = parseInt(localStorage.getItem('wood')) || 0;
-          if (wood >= 10) {
-            localStorage.setItem('wood', wood - 10);
-            // Tambahkan logika untuk menambah alat konversi ke inventory
-            showActionPopup('Berhasil membuat Alat Konversi Air! (-10 Kayu)');
-            updateResources();
-          } else {
-            showActionPopup('Bahan tidak cukup! Diperlukan 10 Kayu');
-          }
-        });
-      }
-
-      if (pollutionItem) {
-        pollutionItem.addEventListener('click', function() {
-          const plastic = parseInt(localStorage.getItem('plastic')) || 0;
-          if (plastic >= 5) {
-            localStorage.setItem('plastic', plastic - 5);
-            // Tambahkan logika untuk menambah alat penghilang polusi ke inventory
-            showActionPopup('Berhasil membuat Alat Penghilang Polusi! (-5 Plastik)');
-            updateResources();
-          } else {
-            showActionPopup('Bahan tidak cukup! Diperlukan 5 Plastik');
-          }
-        });
-      }
-
-      // Tutup modal jika user klik di luar container
-      window.addEventListener('click', function(event) {
-        if (event.target === storePopup) {
-          storePopup.style.display = 'none';
-        }
-      });
     });
   </script>
   
