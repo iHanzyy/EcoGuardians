@@ -812,7 +812,7 @@
             <p>Hydro Converter 3000</p>
             <div class="item-cost">
               <img src="./assets/img/kayu.svg" alt="Kayu">
-              <span>50</span>
+              <span>10</span>
             </div>
             <p class="item-desc">Mengubah air tercemar menjadi bersih!</p>
           </div>
@@ -912,7 +912,7 @@
               return;
             }
 
-            // Mengambil nilai energyStatus dari localStorage
+            // Ambil nilai energyStatus dari localStorage
             let energyStatus = parseFloat(localStorage.getItem('energyStatus')) || 100;
             
             // Kurangi 8% energy, biarkan sampai 0%
@@ -923,16 +923,17 @@
             toxicStatus = Math.max(0, toxicStatus - 5);
             localStorage.setItem('toxicStatus', toxicStatus);
 
-            // Tambah 1 plastic
+            // Tambah jumlah plastic secara acak antara 1 hingga 10
             let plastic = parseInt(localStorage.getItem('plastic')) || 0;
-            plastic += 1;
+            const randomPlastic = Math.floor(Math.random() * 10) + 1;
+            plastic += randomPlastic;
             localStorage.setItem('plastic', plastic);
 
             // Perbarui tampilan status dan resource
             updateUI();
             
             // Tampilkan popup dengan pesan bahwa status sudah diupdate
-            showActionPopup("Daur Ulang Berhasil!\nEnergy -8%, Toxic -5%, Plastik +1");
+            showActionPopup(`Daur Ulang Berhasil!\nEnergy -8%, Toxic -5%, Plastik +${randomPlastic}`);
           } catch (error) {
             console.error("Terjadi kesalahan saat daur ulang:", error);
             showActionPopup("Gagal melakukan daur ulang!");
@@ -1056,8 +1057,8 @@
                 return;
               }
               
-              if(wood >= 50) {
-                localStorage.setItem('wood', wood - 50);
+              if(wood >= 10) {
+                localStorage.setItem('wood', wood - 10);
                 localStorage.setItem('hasConverterTool', 'true');
                 showActionPopup("Hydro Converter 3000 berhasil dibuat! 🎉\nAlat ini sekarang tersedia di inventory game");
               } else {

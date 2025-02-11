@@ -1773,10 +1773,13 @@
         animatePlayerChop();
         animateTreeCut();
 
-        // Update status: Nature -10%, Energy -5% dan tambahkan 1 kayu
+        // Update status: Nature -10%, Energy -5%
         status.nature = Math.max(0, status.nature - 10);
         status.energy = Math.max(0, status.energy - 5);
-        resources.wood += 1;
+
+        // Tambahkan kayu secara acak antara 1 hingga 10
+        const randomWood = Math.floor(Math.random() * 10) + 1;
+        resources.wood += randomWood;
 
         updateResourceUI();
         updateStatusBarUI();
@@ -1787,7 +1790,7 @@
         cutButton.disabled = true;
         plantButton.disabled = false;
 
-        showActionPopup("Pohon ditebang! Nature -10%, Energy -5%, Wood +1.");
+        showActionPopup(`Pohon ditebang! Nature -10%, Energy -5%, Wood +${randomWood}.`);
 
         // Update progress quest
         updateQuestProgress();
