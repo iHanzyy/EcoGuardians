@@ -535,40 +535,6 @@
         opacity: 1;
       }
 
-    /* Resource Bar Styling (Anime) */
-    #resource-bar {
-      /* Jika diperlukan, tambahkan styling tambahan pada wrapper */
-    }
-    .resource-bar {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 0.5rem 1rem;
-      background: rgba(0,0,0,0.6);
-      border: 2px solid #FFD700; /* Warna emas untuk kesan anime */
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    }
-    .resource-icon-container {
-      background: rgba(255,255,255,0.2);
-      padding: 0.5rem;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .resource-icon {
-      width: 40px;
-      height: 40px;
-      display: block;
-    }
-    .resource-text {
-      margin-left: 0.5rem;
-      font-size: 1.2rem;
-      color: #fff;
-      font-weight: bold;
-    }
-
       .alat-dom-element {
         position: fixed;
         width: 250px;
@@ -990,42 +956,9 @@
 
     <!-- Game Icons -->
     <div id="icons">
-      <!-- Resource Bar: Wood & Plastic -->
-      <div class="resource-bar">
-        <!-- Bagian Plastik -->
-        <div class="resource-icon-container">
-          <img
-            class="resource-icon"
-            src="./assets/img/plastic.svg"
-            alt="Plastic Icon"
-          />
-          <div class="resource-text" id="plasticCount">X 0</div>
-        </div>
-        <!-- Bagian Kayu -->
-        <div class="resource-icon-container">
-          <img
-            class="resource-icon"
-            src="./assets/img/kayu.svg"
-            alt="Wood Icon"
-          />
-          <div class="resource-text" id="woodCount">X 0</div>
-        </div>
-      </div>
-
-      <img
-        src="./assets/img/guideButton.svg"
-        alt="Guide Button"
-        class="icon"
-        id="guideButton"
-      />
+      <img src="./assets/img/guideButton.svg" alt="Guide Button" class="icon" id="guideButton" />
       <img src="./assets/img/questButton.svg" alt="Quest Button" class="icon" />
-      <!-- Di dalam div#icons -->
-      <img 
-        src="./assets/img/tas.png" 
-        alt="Inventory" 
-        class="icon" 
-        id="inventoryButton"
-      />
+      <img src="./assets/img/tas.png" alt="Inventory" class="icon" id="inventoryButton" />
     </div>
 
     <!-- Popup Modal (Guide) -->
@@ -2018,7 +1951,6 @@
         const randomWood = Math.floor(Math.random() * 10) + 1;
         resources.wood += randomWood;
 
-        updateResourceUI();
         updateStatusBarUI();
         saveStatus();
         localStorage.setItem("wood", resources.wood);
@@ -2125,14 +2057,6 @@
         toxic: parseFloat(localStorage.getItem("toxicStatus")) || 0,
       };
 
-      // Fungsi untuk mengupdate tampilan angka resource
-      function updateResourceUI() {
-        document.getElementById("woodCount").textContent =
-          "X " + resources.wood;
-        document.getElementById("plasticCount").textContent =
-          "X " + resources.plastic;
-      }
-
       // Fungsi untuk mengupdate tampilan status bar
       function updateStatusBarUI() {
         updateStatusBar("nature", status.nature);
@@ -2158,7 +2082,6 @@
       }
 
       // Update UI awal
-      updateResourceUI();
       updateStatusBarUI();
 
       function updateToolButtons() {
