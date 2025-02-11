@@ -55,40 +55,54 @@
     }
     .keluar-btn {
       padding: 1rem 2rem;
-      font-size: 1.2rem;
+      font-size: 1.4rem;
       font-weight: bold;
-      color: #FF4B4B;
-      background: transparent;
-      border: 2px solid #FF4B4B;
-      border-radius: 8px;
+      color: #fff;
+      background-color: red;
+      border: none;
+      border-radius: 15px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      position: relative;
+      overflow: hidden;
       cursor: pointer;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: pulseGlow 2s infinite;
+      box-shadow: 0 0 15px rgba(200, 0, 100, 0.5);
       text-decoration: none;
-      position: relative;
     }
-    .keluar-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 15px rgba(255,75,75,0.7);
+
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: 0 0 15px rgba(200, 0, 100, 0.5);
+      }
+      50% {
+        box-shadow: 0 0 30px rgba(200, 0, 100, 0.8);
+      }
     }
-    .keluar-btn:active {
-      transform: scale(0.95);
-    }
+
     .keluar-btn::after {
       content: "";
       position: absolute;
       top: 0;
-      left: -100%;
-      width: 100%;
+      left: -75%;
+      width: 50%;
       height: 100%;
-      background: linear-gradient(120deg, transparent, rgba(255,75,75,0.4), transparent);
+      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.4), transparent);
       transform: skewX(-25deg);
     }
-    .keluar-btn:hover::after {
-      animation: shineExit 0.75s forwards;
+
+    .keluar-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
     }
-    @keyframes shineExit {
-      0% { left: -100%; }
-      100% { left: 100%; }
+
+    .keluar-btn:hover::after {
+      animation: slideShine 0.7s forwards;
+    }
+
+    .keluar-btn:active {
+      transform: scale(0.95);
     }
 
     /* Resource Bar Styling (Anime) */
@@ -125,7 +139,7 @@
       font-weight: bold;
     }
 
-    /* Tombol Makan - Anime Style dan Reposisi ke sebelah kiri (fixed di kiri bawah) */
+    /* Tombol Makan - Anime Style tanpa underline dan background merah polos */
     .button-container {
       position: fixed;
       bottom: 25rem;
@@ -134,19 +148,43 @@
     }
     .makan-btn {
       padding: 1rem 2rem;
-      background: linear-gradient(145deg, #ff6ec4, #7873f5);
-      border: none;
-      border-radius: 12px;
-      font-size: 1.2rem;
+      font-size: 1.4rem;
+      font-weight: bold;
       color: #fff;
+      background-color: #3fa840; /* menggunakan warna merah polos */
+      border: none;
+      border-radius: 15px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      position: relative;
+      overflow: hidden;
       cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: pulseGlow 2s infinite;
+      box-shadow: 0 0 15px rgba(200, 0, 100, 0.5);
+      text-decoration: none; /* memastikan tidak ada underline */
     }
+
+    .makan-btn::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -75%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      transform: skewX(-25deg);
+    }
+
     .makan-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+      transform: scale(1.1);
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
     }
+
+    .makan-btn:hover::after {
+      animation: slideShine 0.7s forwards;
+    }
+
     .makan-btn:active {
       transform: scale(0.95);
     }
@@ -277,11 +315,52 @@
       z-index: 2;
     }
 
+    /* Styling untuk popup anime-style dengan animasi */
+    #actionPopup {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(50, 50, 50, 0.8));
+      color: #fff;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3), 0 0 10px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      visibility: hidden;
+      z-index: 70;
+      text-align: center;
+      font-size: 1.2rem;
+      transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    }
+
+    #actionPopup.active {
+      visibility: visible;
+      animation: popupIn 0.5s ease-out forwards;
+    }
+
+    /* Animasi popup dengan efek bounce dan slide */
+    @keyframes popupIn {
+      0% {
+        transform: translate(-50%, 40px) scale(0.8);
+        opacity: 0;
+      }
+      50% {
+        transform: translate(-50%, -10px) scale(1.05);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, 0) scale(1);
+        opacity: 1;
+      }
+    }
+
   </style>
 </head>
 <body>
   <!-- Background Image -->
-  <img src="./assets/img/home.jpg" alt="Home" class="home-image">
+  <img src="./assets/img/home.png" alt="Home" class="home-image">
 
   <!-- Header: Resource Bar & Tombol Keluar -->
   <div class="header-bar">
@@ -355,8 +434,8 @@
 
   <!-- Scripts -->
   <script>
-    // Tombol Keluar fade-out transition
     document.addEventListener('DOMContentLoaded', function() {
+      // Tombol Keluar fade-out transition
       const exitButton = document.querySelector('.keluar-btn');
       exitButton.addEventListener('click', function(e) {
         e.preventDefault();
@@ -365,6 +444,38 @@
           window.location.href = exitButton.href;
         }, 1000);
       });
+
+      // Event listener untuk tombol Makan
+      const makanButton = document.querySelector('.makan-btn');
+      if (makanButton) {
+        makanButton.addEventListener('click', function() {
+          try {
+            // Mengambil nilai energyStatus dari localStorage, default 100 jika belum ada
+            let energyStatus = parseFloat(localStorage.getItem('energyStatus'));
+            if (isNaN(energyStatus)) energyStatus = 100;
+            // Tambah 15%, pastikan tidak melebihi maksimum 100%
+            energyStatus = Math.min(energyStatus + 15, 100);
+            localStorage.setItem('energyStatus', energyStatus);
+
+            // Mengambil nilai toxicStatus dari localStorage, default 0 jika belum ada
+            let toxicStatus = parseFloat(localStorage.getItem('toxicStatus'));
+            if (isNaN(toxicStatus)) toxicStatus = 0;
+            // Tambah 7%, pastikan tidak melebihi maksimum 100%
+            toxicStatus = Math.min(toxicStatus + 7, 100);
+            localStorage.setItem('toxicStatus', toxicStatus);
+
+            // Perbarui tampilan status dan resource
+            updateUI();
+            // Tampilkan popup dengan pesan bahwa status sudah diupdate
+            showActionPopup("Energy naik 15% dan Toxic naik 7%");
+          } catch (error) {
+            console.error("Terjadi kesalahan saat memperbarui status:", error);
+          }
+        });
+      }
+
+      // Inisialisasi UI saat halaman selesai dimuat
+      updateUI();
     });
   
     // Update status dan resource secara real-time
