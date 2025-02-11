@@ -996,23 +996,66 @@
       /* Quest Modal Specific Styles */
       /* -------------------------- */
       .quest-modal .modal-container {
-        background: linear-gradient(145deg, #1a1a2e, #16213e);
-        border: 2px solid #ff2079;
-        box-shadow: 0 0 30px rgba(255, 32, 121, 0.3);
+        background: linear-gradient(145deg, #2B3A42, #27303D); /* Gradasi gelap yang cool */
+        border: 2px solid #4e5d6c; /* Border dengan warna netral cool */
+        box-shadow: 0 0 30px rgba(78, 93, 108, 0.3); /* Shadow lembut untuk kesan depth */
+        border-radius: 10px;
+        padding: 20px 30px;
+        max-width: 600px;
+        width: 90%;
+        position: relative;
+        animation: questPopupEntrance 0.5s ease-out; /* Animasi pop-up ketika muncul */
       }
 
       .quest-modal .modal-container h2 {
-        color: #00fff9;
-        text-shadow: 0 0 10px rgba(0, 255, 249, 0.5);
+        color: #bdc3c7; /* Warna teks yang lembut dan elegan */
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Shadow halus untuk menambah dimensi */
       }
 
       .quest-modal .mission-item {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid #ff2079;
+        background: rgba(236, 240, 241, 0.1); /* Background lembut untuk setiap misi */
+        border: 1px solid #4e5d6c;
+        border-radius: 5px;
+        padding: 10px;
       }
 
       .quest-modal .mission-progress-bar {
-        background: linear-gradient(90deg, #ff2079 0%, #00fff9 100%);
+        background: linear-gradient(90deg, #48c9b0 0%, #3498db 100%); /* Gradasi cool antara teal dan biru */
+        transition: width 0.5s ease-in-out;
+      }
+
+      /* ----------------------------------------- */
+      /* Tambahan styling untuk tampilan quest UI  */
+      /* ----------------------------------------- */
+      @keyframes questPopupEntrance {
+        0% {
+          transform: scale(0.8);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      /* Ubah tampilan quest label agar tampak seperti banner informasi quest objective */
+      .quest-modal .quest-label {
+        padding: 5px 10px;
+        background: rgba(255, 255, 255, 0.1);
+        display: inline-block;
+        border-radius: 5px;
+        font-weight: bold;
+        letter-spacing: 1px;
+      }
+
+      /* Ubah tampilan judul misi agar lebih tegas dan modern */
+      .quest-modal .mission-title {
+        margin: 0;
+        font-size: 20px;
+        color: #ecf0f1; /* Warna terang untuk judul misi */
+        border-bottom: 1px solid #4e5d6c;
+        padding-bottom: 5px;
+        margin-bottom: 10px;
       }
 
       /* -------------------------- */
@@ -1315,9 +1358,10 @@
     <div class="modal-overlay quest-modal" id="questModalOverlay">
       <div class="modal-container">
         <button class="modal-close" id="questModalClose">&times;</button>
-        <h2 style="text-align: center; color: #00fff9; text-shadow: 0 0 10px rgba(0,255,249,0.5);">ACTIVE QUEST</h2>
+        <h2 style="text-align: center;">ACTIVE QUEST</h2>
         <div class="mission-content">
-          <div class="quest-label" style="color: #ff2079; margin-bottom: 15px;">✦ MISSION IN PROGRESS ✦</div>
+          <!-- Update warna label dengan tone yang lebih cool dan banner quest -->
+          <div class="quest-label" style="color: #95a5a6; margin-bottom: 15px;">✦ MISSION IN PROGRESS ✦</div>
           <!-- Misi: Buat Alat Konversi Air -->
           <div class="mission-item">
             <img
