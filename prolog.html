@@ -6,15 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prolog - ECOGUARDIANS</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+        /* Deklarasi font lokal */
+        @font-face {
+            font-family: 'Helvetica';
+            src: 
+                 url('./assets/font/Helvetica.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
 
         /* Global Reset & Body Styling */
         body, html {
             margin: 0;
             padding: 0;
             overflow: hidden;
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Helvetica', Bahnschrift, Impact, sans-serif;
             background: #000;
             height: 100vh;
             color: #fff;
@@ -180,31 +186,69 @@
         /* Styling Button dengan animasi popIn agar terasa hidup */
         .button {
             display: inline-block;
-            padding: 15px 30px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            font-family: 'Bangers', cursive;
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            font-family: 'Helvetica', Arial, sans-serif;
             color: #fff;
-            background: linear-gradient(45deg, #ff77ff, #ff5577);
-            border: none;
-            border-radius: 30px;
+            background: linear-gradient(145deg, #00c2a2, #008e76);
+            border: 3px solid #00ffd9;
+            border-radius: 15px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             text-decoration: none;
             text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            box-shadow: 0 0 15px rgba(255, 105, 180, 0.5);
-            animation: popIn 0.5s ease-out;
+            position: relative;
+            overflow: hidden;
+            text-shadow: 0 2px 3px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0, 255, 217, 0.3);
+            transform-style: preserve-3d;
+            animation: buttonEntrance 0.6s ease-out forwards;
         }
+
+        .button::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 25%,
+                rgba(255,255,255,0.1) 50%,
+                transparent 75%
+            );
+            transform: rotate(45deg);
+            animation: shine 5s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-150%) rotate(45deg); }
+            100% { transform: translateX(150%) rotate(45deg); }
+        }
+
         .button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px rgba(255, 105, 180, 0.8);
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 255, 217, 0.5);
+            background: linear-gradient(145deg, #00d8b2, #009e80);
         }
-        @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            80% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(1); }
+
+        .button:active {
+            transform: scale(0.98) translateY(1px);
+            box-shadow: 0 2px 10px rgba(0, 255, 217, 0.3);
+        }
+
+        /* Tambahkan animasi baru untuk efek masuk */
+        @keyframes buttonEntrance {
+            0% {
+                opacity: 0;
+                transform: translateY(20px) rotateX(-45deg);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) rotateX(0);
+            }
         }
 
         /* Tanda klik untuk interaksi pengguna */
@@ -310,6 +354,9 @@
         let isTransitioning = false;
         let isTyping = false;
     
+        // Tambahkan variabel flag untuk mencegah multiple click
+        let isProcessing = false;
+    
         // Preload gambar latar
         function preloadImages() {
             return Promise.all(scenes.map(scene => {
@@ -331,7 +378,11 @@
             
             try {
                 await preloadImages();
-                document.body.addEventListener('click', showNextPage);
+                document.body.addEventListener('click', () => {
+                    if (!isProcessing || isTyping) {
+                        showNextPage();
+                    }
+                });
                 overlay.classList.remove('active');
                 showScene(currentScene);
                 ambientSound.play().catch(error => console.error('Ambient audio play error:', error));
@@ -390,43 +441,63 @@
         }
         
         // Handler untuk lanjut ke halaman selanjutnya atau pindah scene
-        function showNextPage() {
-            const scene = scenes[currentScene];
-            const narrative = document.getElementById('narrative');
-            const textContent = narrative.querySelector('.text-content');
-            const clickHint = document.querySelector('.click-hint');
-    
-            if (isTyping) {
-                isTyping = false;
-                return;
-            }
-    
-            if (currentPage < scene.pages.length - 1) {
-                currentPage++;
-                textContent.innerHTML = '';
-                typeWriter(textContent, scene.pages[currentPage], 30);
-            } else if (currentScene < scenes.length - 1) {
-                nextScene();
-            } else {
-                if (!document.querySelector('.button')) {
-                    const button = document.createElement('button');
-                    button.className = 'button';
-                    button.textContent = 'MULAI SURVIVE';
-                    button.onclick = startGame;
-                    narrative.appendChild(button);
-    
-                    if (clickHint) {
-                        clickHint.style.display = 'none';
-                    }
+        async function showNextPage() {
+            if (isProcessing && !isTyping) return;
+            isProcessing = true;
+            
+            try {
+                const scene = scenes[currentScene];
+                const narrative = document.getElementById('narrative');
+                const textContent = narrative.querySelector('.text-content');
+                const clickHint = document.querySelector('.click-hint');
+
+                // Handle skip typing
+                if (isTyping) {
+                    isTyping = false;
+                    return;
                 }
+
+                // Recalculate state
+                const isLastScene = currentScene === scenes.length - 1;
+                const isLastPage = currentPage === scene.pages.length - 1;
+
+                if (currentPage < scene.pages.length - 1) {
+                    currentPage++;
+                    textContent.innerHTML = '';
+                    await typeWriter(textContent, scene.pages[currentPage], 30);
+                    
+                    // Update state setelah mengetik
+                    if (isLastScene && currentPage === scene.pages.length - 1) {
+                        showStartButton(narrative, clickHint);
+                    }
+                } else if (currentScene < scenes.length - 1) {
+                    await nextScene();
+                } else if (isLastScene && isLastPage) {
+                    showStartButton(narrative, clickHint);
+                }
+            } finally {
+                isProcessing = false;
             }
         }
     
-        // Pindah ke scene berikutnya
-        function nextScene() {
+        // Fungsi terpisah untuk menampilkan button
+        function showStartButton(narrative, clickHint) {
+            if (!document.querySelector('.button')) {
+                const button = document.createElement('button');
+                button.className = 'button';
+                button.textContent = 'MULAI SURVIVE';
+                button.onclick = startGame;
+                narrative.appendChild(button);
+                if (clickHint) clickHint.style.display = 'none';
+            }
+        }
+    
+        // Update fungsi nextScene untuk return Promise
+        async function nextScene() {
             if (currentScene < scenes.length - 1) {
                 currentScene++;
-                showScene(currentScene);
+                currentPage = -1; // Reset page index
+                await showScene(currentScene);
             }
         }
     
