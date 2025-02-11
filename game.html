@@ -456,15 +456,15 @@
       
       #tempatAlatPenghisap {
         position: fixed;
-        bottom: 37%;
-        left: 42%;
-        width: 7rem;
-        height: 23%;
+        left: 580px;       /* Sesuai dengan posisi x yang didefinisikan */
+        top: 300px;        /* Sesuai dengan posisi y yang didefinisikan */
+        width: 250px;      /* Lebar 250px sesuai dengan game.tools.alatPolusi.width */
+        height: 250px;     /* Tinggi 250px sesuai dengan game.tools.alatPolusi.height */
         pointer-events: none;
         border: 3px dashed #00ff00;
         background: rgba(0, 255, 0, 0.1);
         animation: pulseBorder 1.5s infinite;
-        display: none; /* Awalnya disembunyikan */
+        display: none;     /* Awalnya disembunyikan */
       }
 
       /* Tambahkan class untuk menampilkan area target */
@@ -2652,17 +2652,49 @@
       confirmPlacement.addEventListener('click', () => {
         if (!currentTool || !targetArea) return;
         
-        const rect = targetArea.getBoundingClientRect();
+        // Jika alat yang dipasang adalah polusi, gunakan ukuran dari game.tools.alatPolusi
+        // Jika bukan, ambil ukuran dari targetArea secara default
+        let rect;
+        if (currentTool === 'pollution') {
+          rect = {
+            left: game.tools.alatPolusi.x,
+            top: game.tools.alatPolusi.y,
+            width: game.tools.alatPolusi.width,
+            height: game.tools.alatPolusi.height,
+          };
+        } else {
+          rect = targetArea.getBoundingClientRect();
+        }
+        
+        const toolName = currentTool === 'converter' ? 'Konversi' : 'PenghilangPolusi';
         const toolId = currentTool === 'converter' ? 'alatKonversi' : 'alatPolusi';
-        const toolElement = document.getElementById(toolId);
+        let toolElement = document.getElementById(toolId);
         
         if (toolElement) {
-          // Update properti elemen yang sudah ada
-          toolElement.style.display = 'block';
+          // Jika elemen sudah ada, perbarui atribut dan styling-nya
+          // (asumsi elemen sudah memiliki id dan sudah dimuat sebelumnya)
+          toolElement.src = `./assets/img/alat${toolName}.png`;
+          toolElement.style.position = 'fixed';
           toolElement.style.left = `${rect.left}px`;
           toolElement.style.top = `${rect.top}px`;
           toolElement.style.width = `${rect.width}px`;
           toolElement.style.height = `${rect.height}px`;
+          toolElement.style.pointerEvents = 'none';
+          toolElement.style.zIndex = '999';
+        } else {
+          // Jika elemen belum ada, buat elemen baru dan pastikan diberi id untuk mencegah duplikasi
+          toolElement = new Image();
+          toolElement.id = toolId;
+          toolElement.className = 'alat-installed';
+          toolElement.src = `./assets/img/alat${toolName}.png`;
+          toolElement.style.position = 'fixed';
+          toolElement.style.left = `${rect.left}px`;
+          toolElement.style.top = `${rect.top}px`;
+          toolElement.style.width = `${rect.width}px`;
+          toolElement.style.height = `${rect.height}px`;
+          toolElement.style.pointerEvents = "none";
+          toolElement.style.zIndex = '999';
+          document.body.appendChild(toolElement);
         }
         
         // Simpan posisi alat dan update status
@@ -2675,7 +2707,6 @@
         localStorage.setItem(`${currentTool}Placed`, 'true');
         updateInventory();
         updateInteractiveButtons();
-        updateToolButtons();
         showActionPopup("Alat berhasil dipasang!");
         
         // Reset UI placement
