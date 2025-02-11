@@ -347,26 +347,31 @@
     }
 
     .store-container {
-      background: linear-gradient(135deg, #fff, #f0f0f0);
-      padding: 30px;
+      background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
+      border: 2px solid #00ff88;
       border-radius: 15px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-      max-width: 600px;
-      width: 90%;
+      padding: 1.5rem;
+      width: 95%;
+      max-width: 450px;
       position: relative;
+      transform: scale(0.8);
+      opacity: 0;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+      box-sizing: border-box;
     }
 
     .store-container h2 {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       color: white;
-      font-size: 24px;
+      font-size: 20px;
     }
 
     .store-items {
       display: grid;
-      gap: 25px;
-      padding: 20px;
+      gap: 15px;
+      padding: 10px;
     }
 
     .store-item {
@@ -374,7 +379,7 @@
       background: linear-gradient(145deg, #1a1a2e, #16213e);
       border: 2px solid #00ff88;
       border-radius: 15px;
-      padding: 1.5rem;
+      padding: 1rem;
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       overflow: hidden;
       cursor: pointer;
@@ -411,8 +416,8 @@
     }
 
     .store-item-img {
-      width: 100px;
-      height: 100px;
+      width: 80px;
+      height: 80px;
       object-fit: contain;
       border: 3px solid #00ff88;
       border-radius: 15px;
@@ -449,9 +454,9 @@
 
     .item-desc {
       color: #8c8c8c;
-      font-size: 0.95em;
-      line-height: 1.4;
-      padding: 10px;
+      font-size: 0.85em;
+      line-height: 1.3;
+      padding: 8px;
       background: rgba(0, 0, 0, 0.3);
       border-radius: 8px;
       position: relative;
@@ -597,9 +602,9 @@
       background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
       border: 2px solid #00ff88;
       border-radius: 15px;
-      padding: 2rem;
-      width: 90%;
-      max-width: 600px;
+      padding: 1.5rem;
+      width: 95%;
+      max-width: 450px;
       position: relative;
       transform: scale(0.8);
       opacity: 0;
@@ -767,6 +772,87 @@
     .store-item.owned::after {
       opacity: 1;
     }
+
+    /* Tambahkan styling untuk item terkunci */
+    .store-item.locked {
+      position: relative;
+      filter: grayscale(1);
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .store-item.locked::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1;
+      border-radius: 10px;
+    }
+
+    .store-item.locked::before {
+      content: "🔒 TERKUNCI";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ff0000;
+      font-size: 1.5em;
+      text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+      z-index: 2;
+      animation: lockPulse 1.5s infinite;
+      text-align: center;
+    }
+
+    @keyframes lockPulse {
+      0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 0.8;
+      }
+    }
+
+    .store-item.locked .item-desc {
+      color: #ff4444 !important;
+      position: relative;
+    }
+
+    .store-item.locked .item-desc::after {
+      content: "Prerequisite: Hydro Converter 3000";
+      display: block;
+      color: #ff9999;
+      font-size: 0.8em;
+      margin-top: 5px;
+    }
+
+    .store-item.locked .item-cost span {
+      color: #666 !important;
+      text-decoration: line-through;
+    }
+
+    .store-item.locked .store-item-img {
+      filter: brightness(0.5);
+    }
+
+    /* Animasi partikel terkunci */
+    @keyframes lockedShine {
+      0% {
+        background-position: -100% 0;
+      }
+      100% {
+        background-position: 200% 0;
+      }
+    }
+
+    .store-item.locked:hover::before {
+      animation: lockPulse 0.8s infinite;
+    }
   </style>
 </head>
 <body>
@@ -804,7 +890,7 @@
   <div id="storePopup" class="modal-overlay store">
     <div class="store-container">
       <button class="modal-close" id="storeClose">&times;</button>
-      <h2>Workshop Alat ECO</h2>
+      <h2>WORKSHOP ALAT ECO</h2>
       <div class="store-items">
         <div class="store-item" id="converterItem">
           <img src="./assets/img/alatKonversi.png" alt="Alat Konversi Air" class="store-item-img">
@@ -812,7 +898,7 @@
             <p>Hydro Converter 3000</p>
             <div class="item-cost">
               <img src="./assets/img/kayu.svg" alt="Kayu">
-              <span>10</span>
+              <span>35</span>
             </div>
             <p class="item-desc">Mengubah air tercemar menjadi bersih!</p>
           </div>
@@ -823,13 +909,13 @@
             <p>Polusion Buster 2.0</p>
             <div class="item-cost">
               <img src="./assets/img/kayu.svg" alt="Kayu">
-              <span>70</span>
+              <span>100</span>
             </div>
             <div class="item-cost">
               <img src="./assets/img/plastic.svg" alt="Plastik">
-              <span>30</span>
+              <span>80</span>
             </div>
-            <p class="item-desc">Menetralisir polusi di lingkungan!</p>
+            <p class="item-desc">Menetralisir polusi di lingkungan! </p>
           </div>
         </div>
       </div>
@@ -908,7 +994,7 @@
             // Cek toxic status terlebih dahulu
             let toxicStatus = parseFloat(localStorage.getItem('toxicStatus')) || 0;
             if (toxicStatus <= 0) {
-              showActionPopup("Tidak bisa daur ulang!\nToxic status sudah 0%");
+              showActionPopup("Tidak bisa daur ulang!\n Kamu tidak memiliki limbah untuk di daur ulang!");
               return;
             }
 
@@ -933,7 +1019,7 @@
             updateUI();
             
             // Tampilkan popup dengan pesan bahwa status sudah diupdate
-            showActionPopup(`Daur Ulang Berhasil!\nEnergy -8%, Toxic -5%, Plastik +${randomPlastic}`);
+            showActionPopup(`Daur Ulang Berhasil!\nEnergy meningkat sebanyak -8%, Limbah berkurang sebanyak -5% \n Menciptakan Plastik sebanyak +${randomPlastic}`);
           } catch (error) {
             console.error("Terjadi kesalahan saat daur ulang:", error);
             showActionPopup("Gagal melakukan daur ulang!");
@@ -988,6 +1074,14 @@
         
         // Update status kepemilikan alat
         document.querySelectorAll('.store-item').forEach(item => {
+          const isConverterOwned = localStorage.getItem('converterBought') === 'true';
+          
+          if(item.id === 'pollutionItem' && !isConverterOwned) {
+            item.classList.add('locked');
+          } else {
+            item.classList.remove('locked');
+          }
+
           if((item.id === 'converterItem' && localStorage.getItem('converterBought') === 'true') ||
              (item.id === 'pollutionItem' && localStorage.getItem('pollutionBought') === 'true')) {
             item.classList.add('owned');
@@ -1057,8 +1151,8 @@
                 return;
               }
               
-              if(wood >= 10) {
-                localStorage.setItem('wood', wood - 10);
+              if(wood >= 35) {
+                localStorage.setItem('wood', wood - 35);
                 localStorage.setItem('converterBought', 'true');
                 localStorage.setItem('converterPlaced', 'false');
                 showActionPopup("Hydro Converter 3000 berhasil dibuat! 🎉\nAlat ini sekarang tersedia di inventory game");
@@ -1067,7 +1161,7 @@
                 const event = new Event('storage');
                 window.dispatchEvent(event);
               } else {
-                showActionPopup("Kayu tidak cukup!\nDibutuhkan 50 kayu");
+                showActionPopup("Kayu tidak cukup!\nDibutuhkan 35 kayu");
                 return;
               }
             }
@@ -1077,9 +1171,15 @@
                 return;
               }
               
-              if(wood >= 70 && plastic >= 30) {
-                localStorage.setItem('wood', wood - 70);
-                localStorage.setItem('plastic', plastic - 30);
+              // Tambahkan pengecekan Hydro Converter
+              if(localStorage.getItem('converterBought') !== 'true') {
+                showActionPopup("Anda harus membuat Hydro Converter 3000 terlebih dahulu!\nSebelum bisa membuat Polusion Buster 2.0");
+                return;
+              }
+
+              if(wood >= 100 && plastic >= 80) {
+                localStorage.setItem('wood', wood - 100);
+                localStorage.setItem('plastic', plastic - 80);
                 localStorage.setItem('pollutionBought', 'true');
                 localStorage.setItem('pollutionPlaced', 'false');
                 showActionPopup("Polusion Buster 2.0 berhasil dibuat! 🎉\nAlat ini sekarang tersedia di inventory game");
@@ -1088,7 +1188,7 @@
                 const event = new Event('storage');
                 window.dispatchEvent(event);
               } else {
-                showActionPopup("Resource tidak cukup!\nDibutuhkan 70 kayu dan 30 plastik");
+                showActionPopup("Resource tidak cukup untuk membuat alat ini!\nDibutuhkan 100 kayu dan 80 plastik");
                 return;
               }
             }
