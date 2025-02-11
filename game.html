@@ -2663,32 +2663,39 @@
         const toolId = currentTool === 'converter' ? 'alatKonversi' : 'alatPolusi';
         let toolElement = document.getElementById(toolId);
         
-        if (!toolElement) {
-          toolElement = document.createElement("img");
+        if (toolElement) {
+          // Jika elemen sudah ada, perbarui atribut dan styling-nya
+          toolElement.src = `./assets/img/alat${toolName}.png`;
+          toolElement.style.position = 'fixed';
+          toolElement.style.left = `${rect.left}px`;
+          toolElement.style.top = `${rect.top}px`;
+          toolElement.style.width = `${rect.width}px`;
+          toolElement.style.height = `${rect.height}px`;
+          toolElement.style.pointerEvents = "none";
+          toolElement.style.zIndex = '999';
+        } else {
+          toolElement = new Image();
           toolElement.id = toolId;
           toolElement.className = 'alat-installed';
           toolElement.src = `./assets/img/alat${toolName}.png`;
+          toolElement.style.position = 'fixed';
+          toolElement.style.left = `${rect.left}px`;
+          toolElement.style.top = `${rect.top}px`;
+          toolElement.style.width = `${rect.width}px`;
+          toolElement.style.height = `${rect.height}px`;
           toolElement.style.pointerEvents = "none";
+          toolElement.style.zIndex = '999';
           document.body.appendChild(toolElement);
         }
-
-        // Update properti posisi
-        toolElement.style.position = 'fixed';
-        toolElement.style.left = `${rect.left}px`;
-        toolElement.style.top = `${rect.top}px`;
-        toolElement.style.width = `${rect.width}px`;
-        toolElement.style.height = `${rect.height}px`;
-
-        // Simpan status
-        localStorage.setItem(`${currentTool}Placed`, 'true');
-        localStorage.setItem(`${currentTool}Bought`, 'false');
         
-        // Bersihkan UI
-        placementHint.style.display = 'none';
-        targetArea.classList.remove('show-placement');
-        currentTool = null;
-        targetArea = null;
-
+        // Simpan posisi alat dan update status
+        localStorage.setItem(`${currentTool}Position`, JSON.stringify({
+          x: rect.left,
+          y: rect.top,
+          width: rect.width,
+          height: rect.height
+        }));
+        localStorage.setItem(`${currentTool}Placed`, 'true');
         updateInventory();
         updateInteractiveButtons();
         updateToolButtons(); // Tambahkan ini untuk update status tombol
@@ -2820,7 +2827,6 @@
           width: rect.width,
           height: rect.height
         }));
-        localStorage.setItem(`${currentTool}Bought`, 'false');
         localStorage.setItem(`${currentTool}Placed`, 'true');
         updateInventory();
         updateInteractiveButtons();
