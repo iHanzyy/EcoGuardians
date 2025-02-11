@@ -7,7 +7,9 @@
     <title>Prolog - ECOGUARDIANS</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
 
+        /* Global Reset & Body Styling */
         body, html {
             margin: 0;
             padding: 0;
@@ -18,18 +20,107 @@
             color: #fff;
         }
 
+        /* Container Scene untuk latar belakang & overlay cinematic */
         .scene-container {
             position: absolute;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-size: cover;
-            background-position: center;
-            transition: transform 20s ease-in-out;
             z-index: 1;
         }
+        /* Pseudo-element untuk efek vignetting dan flicker ala movie */
+        .scene-container::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.6));
+            pointer-events: none;
+            z-index: 2;
+            animation: cinematicFlicker 5s infinite alternate;
+        }
 
+        /* Wrapper background dengan efek cinematic zoom */
+        .background-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            z-index: 0;
+            animation: cinematicZoom 20s infinite alternate;
+        }
+        /* Ketika transitisi scene dijalankan, tambahkan animasi transisi */
+        .background-wrapper.scene-transition {
+            animation: sceneTransition 0.8s ease-out, cinematicZoom 20s infinite alternate;
+        }
+
+        /* Animasi cinematic zoom: perlahan memperbesar dan mengecil */
+        @keyframes cinematicZoom {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        /* Animasi cinematic flicker overlay */
+        @keyframes cinematicFlicker {
+            0% { opacity: 0.5; }
+            50% { opacity: 0.6; }
+            100% { opacity: 0.5; }
+        }
+        
+        /* Transisi latar menggunakan efek blur & scale seperti film */
+        .scene-transition {
+            animation: sceneTransition 0.8s ease-out;
+        }
+        @keyframes sceneTransition {
+            0% {
+                transform: scale(1.1) rotate(2deg);
+                filter: blur(4px);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                filter: blur(0);
+                opacity: 1;
+            }
+        }
+
+        /* Cinematic Letterbox Bars ala Movie */
+        .cinematic-bar {
+            position: fixed;
+            left: 0;
+            width: 100%;
+            height: 8vh;
+            background: rgba(0, 0, 0, 0.9);
+            pointer-events: none;
+            z-index: 3;
+            animation: slideBar 1s ease-out forwards;
+        }
+        .cinematic-bar.top {
+            top: 0;
+            animation-name: slideDown;
+        }
+        .cinematic-bar.bottom {
+            bottom: 0;
+            animation-name: slideUp;
+        }
+        @keyframes slideDown {
+            0% { top: -8vh; }
+            50% { top: 0; }
+            100% { top: 0; }
+        }
+        @keyframes slideUp {
+            0% { bottom: -8vh; }
+            50% { bottom: 0; }
+            100% { bottom: 0; }
+        }
+
+        /* Styling narasi dengan efek neon dan animasi fadeIn */
         .narrative {
             position: absolute;
             bottom: 50px;
@@ -42,10 +133,30 @@
             border: 2px solid rgba(0, 255, 255, 0.3);
             border-radius: 15px;
             backdrop-filter: blur(10px);
-            z-index: 2;
+            z-index: 4;
             box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            animation: neonBorder 5s linear infinite, fadeIn 1s ease;
+        }
+        @keyframes neonBorder {
+            0% {
+                border-color: rgba(0, 255, 255, 0.3);
+                box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            }
+            50% {
+                border-color: rgba(255, 105, 180, 0.5);
+                box-shadow: 0 0 30px rgba(255, 105, 180, 0.7);
+            }
+            100% {
+                border-color: rgba(0, 255, 255, 0.3);
+                box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
 
+        /* Tampilan teks narasi dengan efek mesin ketik dan slideIn */
         .text-content {
             font-size: 1.2rem;
             line-height: 1.8;
@@ -53,15 +164,28 @@
             margin-bottom: 20px;
             color: #fff;
             text-shadow: 0 0 5px rgba(0, 255, 255, 0.7);
+            animation: slideIn 0.6s ease forwards;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
+        /* Styling Button dengan animasi popIn agar terasa hidup */
         .button {
             display: inline-block;
             padding: 15px 30px;
             font-size: 1.2rem;
             font-weight: bold;
+            font-family: 'Bangers', cursive;
             color: #fff;
-            background: linear-gradient(45deg, #00a8cc, #0077be);
+            background: linear-gradient(45deg, #ff77ff, #ff5577);
             border: none;
             border-radius: 30px;
             cursor: pointer;
@@ -70,14 +194,20 @@
             text-align: center;
             text-transform: uppercase;
             letter-spacing: 2px;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            box-shadow: 0 0 15px rgba(255, 105, 180, 0.5);
+            animation: popIn 0.5s ease-out;
         }
-
         .button:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 25px rgba(0, 255, 255, 0.8);
+            box-shadow: 0 0 25px rgba(255, 105, 180, 0.8);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            80% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); }
         }
 
+        /* Tanda klik untuk interaksi pengguna */
         .click-hint {
             position: absolute;
             bottom: 20px;
@@ -86,15 +216,15 @@
             font-size: 1rem;
             color: rgba(255, 255, 255, 0.6);
             animation: pulse 2s infinite;
-            z-index: 2;
+            z-index: 4;
         }
-
         @keyframes pulse {
             0% { opacity: 0.4; }
             50% { opacity: 1; }
             100% { opacity: 0.4; }
         }
 
+        /* Overlay untuk memberikan transisi gelap saat pergantian scene */
         .overlay {
             position: fixed;
             top: 0;
@@ -105,31 +235,57 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.5s ease;
-            z-index: 3;
+            z-index: 5;
         }
-
         .overlay.active {
             opacity: 1;
             pointer-events: auto;
         }
 
+        /* Efek partikel dengan animasi bergerak ke bawah */
         .particle {
             position: absolute;
-            background: rgba(0, 255, 255, 0.5);
             border-radius: 50%;
             pointer-events: none;
+            opacity: 0.8;
+            animation: floatDown 3s linear forwards;
+        }
+        @keyframes floatDown {
+            from {
+                transform: translateY(0) scale(1);
+            }
+            to {
+                transform: translateY(50px) scale(0.5);
+                opacity: 0;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Audio untuk efek mesin ketik dan musik latar ambient -->
     <audio id="typeSound" src="./assets/audio/typingSound.mp3"></audio>
     <audio id="ambientSound" src="./assets/audio/ambient.mp3" loop></audio>
-    <div class="scene-container" id="scene-container"></div>
+
+    <!-- Container latar belakang scene dengan cinematic background -->
+    <div class="scene-container" id="scene-container">
+        <div class="background-wrapper" id="background-wrapper"></div>
+    </div>
+
+    <!-- Container narasi untuk prolog cerita -->
     <div class="narrative" id="narrative"></div>
+
+    <!-- Teks petunjuk klik untuk melanjutkan -->
     <div class="click-hint">Klik untuk melanjutkan...</div>
+
+    <!-- Overlay untuk transisi halus -->
     <div class="overlay" id="overlay"></div>
 
+    <!-- Cinematic Letterbox Bars -->
+    <div class="cinematic-bar top"></div>
+    <div class="cinematic-bar bottom"></div>
+
     <script>
+        // Daftar scene dengan latar dan narasi ala game
         const scenes = [
             {
                 background: 'url("./assets/img/prolog1Bg.jpg")',
@@ -142,7 +298,7 @@
             {
                 background: 'url("./assets/img/prolog2Bg.jpg")',
                 pages: [
-                    `Sebagai engineer handal di kota Seijul, Jira mencoba menciptakan alat untuk menyelamatkan kota seijul dari kehancuran lingkungan.\n\nPara Penduduk kota seijul telah berhasil di evakuasi dan sementara mengungsi di shelter.`,
+                    `Sebagai engineer handal di kota Seijul, Jira mencoba menciptakan alat untuk menyelamatkan kota dari kehancuran lingkungan.\n\nPara penduduk kota Seijul telah berhasil dievakuasi dan sementara mengungsi di shelter.`,
                     `Tetapi shelter tidak bisa menampung terlalu lama karena bahan persediaannya tidak tercukupi.\n\nAnda hanya memiliki waktu selama 3 hari untuk menciptakan alat tersebut.`,
                     `Setiap keputusan anda akan mempengaruhi nasib jutaan penduduk dan ekosistem yang tersisa.`
                 ]
@@ -154,6 +310,7 @@
         let isTransitioning = false;
         let isTyping = false;
     
+        // Preload gambar latar
         function preloadImages() {
             return Promise.all(scenes.map(scene => {
                 return new Promise((resolve, reject) => {
@@ -165,7 +322,6 @@
             }));
         }
     
-        const sceneContainer = document.getElementById("scene-container");
         const typeSound = document.getElementById('typeSound');
         const ambientSound = document.getElementById('ambientSound');
 
@@ -183,7 +339,8 @@
                 console.error('Error loading images:', error);
             }
         });
-
+    
+        // Efek mesin ketik untuk narasi dengan sound
         async function typeWriter(element, text, speed = 30) {
             isTyping = true;
             element.innerHTML = '';
@@ -200,22 +357,25 @@
             isTyping = false;
         }
     
+        // Tampilkan scene dengan transisi latar dan animasi narasi
         async function showScene(index) {
             if (isTransitioning) return;
-        
             isTransitioning = true;
         
             const scene = scenes[index];
-            const container = document.getElementById('scene-container');
+            const bgWrapper = document.getElementById('background-wrapper');
             const narrative = document.getElementById('narrative');
             const overlay = document.getElementById('overlay');
         
             overlay.classList.add('active');
-        
             await new Promise(resolve => setTimeout(resolve, 500));
         
-            container.style.backgroundImage = scene.background;
-            container.style.transform = 'scale(1.1)';
+            // Update background image pada background-wrapper
+            bgWrapper.style.backgroundImage = scene.background;
+            bgWrapper.classList.add('scene-transition');
+            bgWrapper.addEventListener('animationend', () => {
+                bgWrapper.classList.remove('scene-transition');
+            }, {once: true});
             currentPage = 0;
         
             narrative.innerHTML = '<div class="text-content"></div>';
@@ -224,24 +384,23 @@
             await new Promise(resolve => setTimeout(resolve, 500));
         
             overlay.classList.remove('active');
-            container.style.transform = 'scale(1)';
             await typeWriter(textContent, scene.pages[currentPage], 30);
         
             isTransitioning = false;
         }
         
-    
+        // Handler untuk lanjut ke halaman selanjutnya atau pindah scene
         function showNextPage() {
             const scene = scenes[currentScene];
             const narrative = document.getElementById('narrative');
             const textContent = narrative.querySelector('.text-content');
             const clickHint = document.querySelector('.click-hint');
-
+    
             if (isTyping) {
                 isTyping = false;
                 return;
             }
-
+    
             if (currentPage < scene.pages.length - 1) {
                 currentPage++;
                 textContent.innerHTML = '';
@@ -255,7 +414,7 @@
                     button.textContent = 'MULAI SURVIVE';
                     button.onclick = startGame;
                     narrative.appendChild(button);
-
+    
                     if (clickHint) {
                         clickHint.style.display = 'none';
                     }
@@ -263,6 +422,7 @@
             }
         }
     
+        // Pindah ke scene berikutnya
         function nextScene() {
             if (currentScene < scenes.length - 1) {
                 currentScene++;
@@ -270,15 +430,18 @@
             }
         }
     
+        // Mulai game dengan transisi overlay, kemudian pindah ke game.html
         function startGame() {
             const overlay = document.getElementById('overlay');
             overlay.classList.add('active');
+            // Simpan status bahwa prolog telah ditampilkan pada localStorage (opsional)
+            localStorage.setItem('prologSeen', true);
             setTimeout(() => {
                 window.location.href = 'game.html';
             }, 1000);
         }
-
-        // Particle effect
+    
+        // Efek partikel dengan animasi melayang dan warna pastel ala anime
         function createParticle() {
             const particle = document.createElement('div');
             particle.className = 'particle';
@@ -287,13 +450,22 @@
             particle.style.height = `${size}px`;
             particle.style.left = `${Math.random() * 100}vw`;
             particle.style.top = `${Math.random() * 100}vh`;
+    
+            const particleColors = [
+                "rgba(255, 105, 180, 0.7)", // Hot Pink
+                "rgba(135, 206, 235, 0.7)", // Sky Blue
+                "rgba(255, 182, 193, 0.7)", // Light Pink
+                "rgba(221, 160, 221, 0.7)", // Plum
+                "rgba(144, 238, 144, 0.7)"  // Light Green
+            ];
+            particle.style.background = particleColors[Math.floor(Math.random() * particleColors.length)];
             document.body.appendChild(particle);
-
+    
             setTimeout(() => {
                 particle.remove();
-            }, 5000);
+            }, 3000);
         }
-
+    
         setInterval(createParticle, 200);
     </script>
 </body>
