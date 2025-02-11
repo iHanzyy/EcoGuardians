@@ -744,6 +744,29 @@
         transform: translate(var(--x), var(--y)) scale(0);
       }
     }
+
+    span {
+      color: white;
+    }
+
+    .store-item::after {
+      content: 'DIMILIKI';
+      position: absolute;
+      bottom: -5px;
+      right: -5px;
+      background: #00ff88;
+      color: #000;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 0.8em;
+      font-weight: bold;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .store-item.owned::after {
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
@@ -789,7 +812,7 @@
             <p>Hydro Converter 3000</p>
             <div class="item-cost">
               <img src="./assets/img/kayu.svg" alt="Kayu">
-              <span>10</span>
+              <span>50</span>
             </div>
             <p class="item-desc">Mengubah air tercemar menjadi bersih!</p>
           </div>
@@ -799,8 +822,12 @@
           <div>
             <p>Polusion Buster 2.0</p>
             <div class="item-cost">
+              <img src="./assets/img/kayu.svg" alt="Kayu">
+              <span>70</span>
+            </div>
+            <div class="item-cost">
               <img src="./assets/img/plastic.svg" alt="Plastik">
-              <span>5</span>
+              <span>30</span>
             </div>
             <p class="item-desc">Menetralisir polusi di lingkungan!</p>
           </div>
@@ -957,6 +984,20 @@
       function updateUI() {
         updateStatusBars();
         updateResources();
+        
+        // Update status kepemilikan alat
+        document.querySelectorAll('.store-item').forEach(item => {
+          if((item.id === 'converterItem' && localStorage.getItem('hasConverterTool') === 'true') ||
+             (item.id === 'pollutionItem' && localStorage.getItem('hasPollutionTool') === 'true')) {
+            item.classList.add('owned');
+            item.style.opacity = '0.7';
+            item.style.cursor = 'not-allowed';
+          } else {
+            item.classList.remove('owned');
+            item.style.opacity = '1';
+            item.style.cursor = 'pointer';
+          }
+        });
       }
       
       // Memperbarui secara realtime dengan interval setiap 100ms
@@ -999,9 +1040,54 @@
       // Handle pembelian item
       document.querySelectorAll('.store-item').forEach(item => {
         item.addEventListener('click', function() {
-          // Logika pembelian alat
-          showActionPopup("Alat berhasil dibuat! 🎉");
-          storePopup.classList.remove('active');
+          try {
+            // Cek apakah alat sudah dimiliki
+            if(this.classList.contains('owned')) {
+              showActionPopup("Alat ini sudah dimiliki!\nTidak bisa dibuat ulang");
+              return;
+            }
+
+            const wood = parseInt(localStorage.getItem('wood')) || 0;
+            const plastic = parseInt(localStorage.getItem('plastic')) || 0;
+            
+            if(this.id === 'converterItem') {
+              if(localStorage.getItem('hasConverterTool') === 'true') {
+                showActionPopup("Hydro Converter 3000 sudah dimiliki!");
+                return;
+              }
+              
+              if(wood >= 50) {
+                localStorage.setItem('wood', wood - 50);
+                localStorage.setItem('hasConverterTool', 'true');
+                showActionPopup("Hydro Converter 3000 berhasil dibuat! 🎉\nAlat ini sekarang tersedia di inventory game");
+              } else {
+                showActionPopup("Kayu tidak cukup!\nDibutuhkan 50 kayu");
+                return;
+              }
+            }
+            else if(this.id === 'pollutionItem') {
+              if(localStorage.getItem('hasPollutionTool') === 'true') {
+                showActionPopup("Polusion Buster 2.0 sudah dimiliki!");
+                return;
+              }
+              
+              if(wood >= 70 && plastic >= 30) {
+                localStorage.setItem('wood', wood - 70);
+                localStorage.setItem('plastic', plastic - 30);
+                localStorage.setItem('hasPollutionTool', 'true'); 
+                showActionPopup("Polusion Buster 2.0 berhasil dibuat! 🎉\nAlat ini sekarang tersedia di inventory game");
+              } else {
+                showActionPopup("Resource tidak cukup!\nDibutuhkan 70 kayu dan 30 plastik");
+                return;
+              }
+            }
+            
+            updateUI();
+            storePopup.classList.remove('active');
+          } catch (error) {
+            console.error("Error membuat alat:", error);
+            showActionPopup("Gagal membuat alat!");
+          }
         });
       });
 

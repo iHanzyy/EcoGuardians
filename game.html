@@ -611,6 +611,153 @@
         opacity: 1;
         visibility: visible;
       }
+
+      /* -------------------------- */
+      /* Anime-style Modal Updates  */
+      /* -------------------------- */
+      .modal-container {
+        background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+        border: 2px solid #00fff9;
+        border-radius: 15px;
+        box-shadow: 0 0 30px rgba(0, 255, 249, 0.3);
+        transform-style: preserve-3d;
+        perspective: 1000px;
+        overflow: visible;
+      }
+
+      .modal-container::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, 
+          transparent 20%, 
+          #00fff9 40%, 
+          transparent 60%);
+        z-index: -1;
+        animation: borderGlow 3s linear infinite;
+      }
+
+      .modal-close {
+        font-family: 'Arial Rounded MT Bold', sans-serif;
+        text-shadow: 0 0 10px rgba(0, 255, 249, 0.5);
+        transition: all 0.3s ease;
+      }
+
+      .modal-close:hover {
+        transform: rotate(90deg) scale(1.2);
+        color: #ff2079;
+        text-shadow: 0 0 20px rgba(255, 32, 121, 0.8);
+      }
+
+      .nav-arrow {
+        background: rgba(0, 255, 249, 0.3);
+        border: 2px solid #00fff9;
+        box-shadow: 0 0 15px rgba(0, 255, 249, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .nav-arrow:hover {
+        background: rgba(0, 255, 249, 0.6);
+        transform: scale(1.1) rotate(15deg);
+      }
+
+      .slide {
+        transform: translateZ(0);
+        transition: transform 0.5s ease, opacity 0.5s ease;
+      }
+
+      .slide img {
+        border: 2px solid #00fff9;
+        border-radius: 10px;
+        box-shadow: 0 0 30px rgba(0, 255, 249, 0.3);
+        transform: perspective(500px) rotateX(5deg);
+      }
+
+      .mission-item {
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid #00fff9;
+        border-radius: 10px;
+        padding: 15px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .mission-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 255, 249, 0.3);
+      }
+
+      .mission-progress {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid #00fff9;
+      }
+
+      .mission-progress-bar {
+        background: linear-gradient(90deg, 
+          #00fff9 0%, 
+          #ff2079 100%);
+        box-shadow: 0 0 10px rgba(0, 255, 249, 0.5);
+        position: relative;
+      }
+
+      .mission-progress-bar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, 
+          transparent 0%, 
+          rgba(255,255,255,0.2) 50%, 
+          transparent 100%);
+        animation: progressGlow 2s infinite;
+      }
+
+      /* Animations */
+      @keyframes borderGlow {
+        0% { background-position: -100% 0; }
+        100% { background-position: 200% 0; }
+      }
+
+      @keyframes progressGlow {
+        0% { opacity: 0; }
+        50% { opacity: 1; }
+        100% { opacity: 0; }
+      }
+
+      @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+      }
+
+      .mission-icon {
+        animation: float 3s ease-in-out infinite;
+        transform-origin: center bottom;
+        border: 2px solid #00fff9;
+        border-radius: 10px;
+        padding: 5px;
+        background: rgba(0, 0, 0, 0.3);
+      }
+
+      .modal-container {
+        animation: modalEntrance 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      @keyframes modalEntrance {
+        0% {
+          transform: scale(0.8) rotateX(-30deg);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1) rotateX(0);
+          opacity: 1;
+        }
+      }
     </style>
   </head>
   <body>
@@ -769,8 +916,9 @@
     <div class="modal-overlay" id="questModalOverlay">
       <div class="modal-container">
         <button class="modal-close" id="questModalClose">&times;</button>
-        <h2 style="text-align: center; color: #fff">Misi</h2>
+        <h2 style="text-align: center; color: #00fff9; text-shadow: 0 0 10px rgba(0,255,249,0.5);">ACTIVE QUEST</h2>
         <div class="mission-content">
+          <div class="quest-label" style="color: #ff2079; margin-bottom: 15px;">✦ MISSION IN PROGRESS ✦</div>
           <!-- Misi: Buat Alat Konversi Air -->
           <div class="mission-item">
             <img
@@ -806,8 +954,7 @@
             </div>
           </div>
         </div>
-        <button class="nav-arrow nav-prev" id="prevBtn">&#10094;</button>
-        <button class="nav-arrow nav-next" id="nextBtn">&#10095;</button>
+        <div class="quest-particle" style="position: absolute; width: 100%; height: 100%; pointer-events: none;"></div>
       </div>
     </div>
 
@@ -1951,6 +2098,21 @@
 
       // Panggil fungsi checkGameOver secara periodik setiap 500ms
       setInterval(checkGameOver, 500);
+
+      // Di dalam DOMContentLoaded atau initialization function
+      const alatKonversi = document.getElementById('alatKonversi');
+      const alatPolusi = document.getElementById('alatPolusi');
+
+      // Cek status alat dari localStorage
+      if(localStorage.getItem('hasConverterTool') === 'true') {
+        alatKonversi.style.display = 'block';
+        // Tambahkan logika interaksi alat di sini
+      }
+
+      if(localStorage.getItem('hasPollutionTool') === 'true') {
+        alatPolusi.style.display = 'block';
+        // Tambahkan logika interaksi alat di sini
+      }
     </script>
     <script>
       function showActionPopup(message) {
