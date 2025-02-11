@@ -2269,8 +2269,8 @@
         game.currentTreeImage = game.assets.tree;
         localStorage.setItem("treeIsCut", "false");
 
-        // Update status: Nature +20%, Water -10%
-        status.nature = Math.min(100, status.nature + 20);
+        // Update status: Nature +7%, Water -10%
+        status.nature = Math.min(100, status.nature + 7);
         status.water = Math.max(0, status.water - 10);
 
         updateStatusBarUI();
@@ -2280,7 +2280,7 @@
         cutButton.disabled = false;
         plantButton.disabled = true;
 
-        showActionPopup("Pohon ditanam! Nature +20%, Air -10%.");
+        showActionPopup("Pohon ditanam! Nature +7%, Air -10%.");
 
         updateQuestProgress();
       });
@@ -2598,26 +2598,20 @@
       document.addEventListener('DOMContentLoaded', () => {
         ['converter', 'pollution'].forEach(tool => {
           const position = JSON.parse(localStorage.getItem(`${tool}Position`));
-          if(localStorage.getItem(`${tool}Placed`) === 'true' && position) {
-            const toolName = tool === 'converter' ? 'Konversi' : 'PenghilangPolusi';
-            const toolImage = document.createElement('img');
-            toolImage.className = 'alat-installed';
-            toolImage.src = `./assets/img/alat${toolName}.png`;
-            
-            toolImage.style.position = 'fixed';
-            toolImage.style.left = `${position.x}px`;
-            toolImage.style.top = `${position.y}px`;
-            toolImage.style.width = `${position.width}px`;
-            toolImage.style.height = `${position.height}px`;
-            toolImage.style.pointerEvents = 'none'; // Nonaktifkan interaksi mouse
-            
-            document.body.appendChild(toolImage);
+          const toolElement = document.getElementById(`alat${tool === 'converter' ? 'Konversi' : 'Polusi'}`);
+          
+          if(localStorage.getItem(`${tool}Placed`) === 'true' && position && toolElement) {
+            toolElement.style.display = 'block';
+            toolElement.style.left = `${position.x}px`;
+            toolElement.style.top = `${position.y}px`;
+            toolElement.style.width = `${position.width}px`;
+            toolElement.style.height = `${position.height}px`;
           }
         });
         
         // Update tombol interaksi saat halaman dimuat
         updateInteractiveButtons();
-        updateToolButtons(); // Tambahkan ini
+        updateToolButtons();
       });
 
       // Fungsi untuk mengupdate tombol interaksi
@@ -2659,33 +2653,16 @@
         if (!currentTool || !targetArea) return;
         
         const rect = targetArea.getBoundingClientRect();
-        const toolName = currentTool === 'converter' ? 'Konversi' : 'PenghilangPolusi';
         const toolId = currentTool === 'converter' ? 'alatKonversi' : 'alatPolusi';
-        let toolElement = document.getElementById(toolId);
+        const toolElement = document.getElementById(toolId);
         
         if (toolElement) {
-          // Jika elemen sudah ada, perbarui atribut dan styling-nya
-          toolElement.src = `./assets/img/alat${toolName}.png`;
-          toolElement.style.position = 'fixed';
+          // Update properti elemen yang sudah ada
+          toolElement.style.display = 'block';
           toolElement.style.left = `${rect.left}px`;
           toolElement.style.top = `${rect.top}px`;
           toolElement.style.width = `${rect.width}px`;
           toolElement.style.height = `${rect.height}px`;
-          toolElement.style.pointerEvents = "none";
-          toolElement.style.zIndex = '999';
-        } else {
-          toolElement = new Image();
-          toolElement.id = toolId;
-          toolElement.className = 'alat-installed';
-          toolElement.src = `./assets/img/alat${toolName}.png`;
-          toolElement.style.position = 'fixed';
-          toolElement.style.left = `${rect.left}px`;
-          toolElement.style.top = `${rect.top}px`;
-          toolElement.style.width = `${rect.width}px`;
-          toolElement.style.height = `${rect.height}px`;
-          toolElement.style.pointerEvents = "none";
-          toolElement.style.zIndex = '999';
-          document.body.appendChild(toolElement);
         }
         
         // Simpan posisi alat dan update status
@@ -2698,8 +2675,14 @@
         localStorage.setItem(`${currentTool}Placed`, 'true');
         updateInventory();
         updateInteractiveButtons();
-        updateToolButtons(); // Tambahkan ini untuk update status tombol
+        updateToolButtons();
         showActionPopup("Alat berhasil dipasang!");
+        
+        // Reset UI placement
+        placementHint.style.display = 'none';
+        targetArea.classList.remove('show-placement');
+        currentTool = null;
+        targetArea = null;
       });
     </script>
     <script>
@@ -2815,7 +2798,7 @@
           toolElement.style.top = `${rect.top}px`;
           toolElement.style.width = `${rect.width}px`;
           toolElement.style.height = `${rect.height}px`;
-          toolElement.style.pointerEvents = 'none';
+          toolElement.style.pointerEvents = "none";
           toolElement.style.zIndex = '999';
           document.body.appendChild(toolElement);
         }
