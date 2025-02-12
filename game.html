@@ -3032,11 +3032,18 @@
           currentFrame = game.assets.jiraStay;
         } else {
           switch (game.player.direction) {
+            case "up":
+              // Pastikan frame "up" tersedia sebelum menggunakannya
+              currentFrame = game.assets.upFrames[game.player.currentFrame % game.assets.upFrames.length] || game.assets.jiraStay;
+              break;
+            case "down":
+              currentFrame = game.assets.downFrames[game.player.currentFrame % 2] || game.assets.jiraStay;
+              break;
             case "left":
-              currentFrame = game.assets.leftFrames[game.player.currentFrame];
+              currentFrame = game.assets.leftFrames[game.player.currentFrame % 3] || game.assets.jiraStay;
               break;
             case "right":
-              currentFrame = game.assets.rightFrames[game.player.currentFrame];
+              currentFrame = game.assets.rightFrames[game.player.currentFrame % 3] || game.assets.jiraStay;
               break;
             case "down-left":
               currentFrame = game.assets.downLeftFrame;
@@ -3050,20 +3057,17 @@
             case "up-right":
               currentFrame = game.assets.upRightFrame;
               break;
-            case "up":
-              currentFrame = game.assets.upFrames[game.player.currentFrame];
-              break;
-            case "down":
-              currentFrame = game.assets.downFrames[game.player.currentFrame % 2];
-              break;
             default:
               currentFrame = game.assets.jiraStay;
           }
         }
+
+        // Tambahkan pengecekan frame sebelum menggambar
         if (!currentFrame || !currentFrame.complete || currentFrame.naturalHeight === 0) {
-          console.error("Gambar tidak ditemukan untuk arah:", game.player.direction);
-          return;
+          // Jika frame tidak tersedia, gunakan frame default (jiraStay)
+          currentFrame = game.assets.jiraStay;
         }
+
         const drawWidth = game.player.isChopping ? game.player.chopWidth : game.player.width;
         const drawHeight = game.player.isChopping ? game.player.chopHeight : game.player.height;
         ctx.drawImage(currentFrame, game.player.x, game.player.y, drawWidth, drawHeight);
