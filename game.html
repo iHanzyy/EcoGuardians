@@ -2112,6 +2112,15 @@
     <audio id="clickSound">
       <source src="./assets/audio/click.wav" type="audio/wav">
     </audio>
+    <audio id="tebangSound">
+      <source src="./assets/audio/tebang.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="tanamSound">
+      <source src="./assets/audio/tanam.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="konversiSound">
+      <source src="./assets/audio/konversiAir.mp3" type="audio/mpeg">
+    </audio>
 
     <!-- Loading Screen -->
     <div id="loadingScreen">Loading...</div>
@@ -3234,6 +3243,11 @@
         )
           return;
 
+        // Mainkan sound effect tebang
+        const tebangSound = document.getElementById("tebangSound");
+        tebangSound.currentTime = 0;
+        tebangSound.play().catch(error => console.log("Tebang sound failed to play:", error));
+
         game.player.isChopping = true;
         animatePlayerChop();
         animateTreeCut();
@@ -3268,6 +3282,10 @@
       // --- Aksi Tanam (Plant) ---
       const plantButton = document.getElementById("plantButton");
       plantButton.addEventListener("click", () => {
+        // Mainkan sound effect tanam
+        const tanamSound = document.getElementById("tanamSound");
+        tanamSound.currentTime = 0;
+        tanamSound.play().catch(error => console.log("Tanam sound failed to play:", error));
 
         game.tree.isCut = false;
         game.currentTreeImage = game.assets.tree;
@@ -3315,6 +3333,11 @@
           showActionPopup("Alat Konversi Air belum dipasang!");
           return;
         }
+
+        // Mainkan sound effect konversi air
+        const konversiSound = document.getElementById("konversiSound");
+        konversiSound.currentTime = 0;
+        konversiSound.play().catch(error => console.log("Konversi sound failed to play:", error));
 
         // Update status: Water +8%, Energy -8%
         status.water = Math.min(100, status.water + 8);

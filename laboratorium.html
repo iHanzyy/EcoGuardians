@@ -1131,6 +1131,9 @@
         }
       });
 
+      // Tambahkan instance Audio untuk sfx buat alat
+      const buatAlatSFX = new Audio('./assets/audio/buatAlat.wav');
+
       // Event listener untuk tombol Buat Alat
       const createToolBtn = document.getElementById('createToolBtn');
       const storePopup = document.getElementById('storePopup');
@@ -1138,6 +1141,14 @@
 
       if (createToolBtn) {
         createToolBtn.addEventListener('click', () => {
+          // Putar SFX buat alat
+          try {
+            buatAlatSFX.currentTime = 0; // Reset waktu putar
+            buatAlatSFX.play().catch(err => console.error("Error playing buatAlat SFX:", err));
+          } catch (error) {
+            console.error("Error with buatAlat SFX:", error);
+          }
+
           storePopup.classList.add('active');
           document.body.style.overflow = 'hidden'; // Prevent background scroll
         });
