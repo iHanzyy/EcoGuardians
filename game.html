@@ -2256,6 +2256,11 @@
       <source src="./assets/audio/konversiAir.mp3" type="audio/mpeg" />
     </audio>
 
+    <!-- Tambahkan setelah audio backgroundMusic -->
+    <audio id="stepSound">
+      <source src="./assets/audio/step.mp3" type="audio/mpeg" />
+    </audio>
+
     <!-- Loading Screen -->
     <div id="loadingScreen">Loading...</div>
     <!-- Game Canvas -->
@@ -2708,6 +2713,8 @@
           isMoving: false,
           isChopping: false, // Flag untuk animasi penebangan pada karakter
           chopAnimationStartTime: 0, // Waktu mulai animasi chop
+          stepInterval: 500, // Interval suara langkah (ms)
+          lastStepTime: 0,
         },
         assets: {
           jiraStay: new Image(),
@@ -3226,6 +3233,17 @@
             game.player.currentFrame = (game.player.currentFrame + 1) % 2; // Gunakan modulo 2 untuk 2 frame
           }
           game.player.lastFrameTime = Date.now();
+        }
+
+        // Putar suara langkah saat bergerak
+        if (game.player.isMoving && Date.now() - game.player.lastStepTime > game.player.stepInterval) {
+          const stepSound = document.getElementById("stepSound");
+          stepSound.currentTime = 0;
+          stepSound.play().catch(error => console.log("Step sound error:", error));
+          game.player.lastStepTime = Date.now();
+          
+          // Sesuaikan interval berdasarkan kecepatan
+          game.player.stepInterval = Math.max(200, 500 - (Math.abs(game.player.velocityX) + Math.abs(game.player.velocityY)) * 50);
         }
 
         updateInteractiveButtons();
@@ -4329,6 +4347,11 @@
         backgroundMusic.currentTime = musicTime;
         // Coba autoplay
         tryAutoplay();
+
+        const stepSound = document.getElementById("stepSound");
+        stepSound.volume = 0.3; // Atur volume yang sesuai
+        // Hapus line berikut
+        // stepSound.muted = isMuted;
       }
 
       // Event listener untuk tombol sound
@@ -4345,6 +4368,8 @@
         }
 
         localStorage.setItem("isMuted", isMuted);
+        // Hapus line berikut
+        // document.getElementById("stepSound").muted = isMuted;
       });
 
       // Simpan posisi waktu pemutaran setiap 1 detik
