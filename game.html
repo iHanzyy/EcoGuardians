@@ -2246,6 +2246,23 @@
                 </div>
               </div>
             </div>
+            <!-- Slide 6 -->
+            <div class="slide">
+              <h3 class="slide-title">Alat Konversi Air</h3>
+              <div class="slide-scrollable-content">
+                <div class="slide-image-container">
+                  <img src="./assets/gif/tutorialKonversiAir.gif" alt="Tutorial Alat Konversi Air" />
+                </div>
+                <div class="slide-content">
+                  <p>
+                    <span class="action-text">Di alat ini kamu bisa:</span><br>
+                    • Kamu bisa mendapatkan air bersih dengan cara konversi air.<br>
+                    • Konversi air kotor dari sungai menjadi air bersih dengan alat Hydro Converter 3000.<br>
+                    • Menggunakan Hydro Converter 3000 akan menambah status air bersih kamu tetapi akan mengurangi energi kamu
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <button class="nav-arrow nav-prev" id="prevBtn">&#10094;</button>
@@ -3486,7 +3503,7 @@
         // Jika kedua alat sudah dibuat dan belum pernah diberitahukan, tampilkan pesan kemenangan
         if (converterBought && pollutionBought && !winNotified) {
           showActionPopup(
-            "Selamat! Kamu telah menciptakan kedua alat canggih dan memenangkan game ini!"
+            "Selamat! Kamu telah menciptakan kedua alat canggih dan memenangkan game ini! Cek Inventory untuk memasang alat Polusion Buster 2.0!"
           );
           winNotified = true;
         }
@@ -3824,6 +3841,34 @@
         targetArea.classList.remove('show-placement');
         currentTool = null;
         targetArea = null;
+      });
+    </script>
+    <script>
+      window.addEventListener("load", function() {
+        const guideModal = document.getElementById("modalOverlay");
+        const guideCloseBtn = document.getElementById("modalClose");
+        const guideButton = document.getElementById("guideButton");
+
+        // Tampilkan popup guide untuk pemain baru secara otomatis
+        if (!localStorage.getItem("guideSeen")) {
+          guideModal.style.display = "flex"; // Gunakan flex seperti modal lainnya
+          guideModal.classList.add("active");
+        }
+
+        // Event listener untuk menutup popup guide
+        guideCloseBtn.addEventListener("click", function() {
+          guideModal.classList.remove("active");
+          setTimeout(() => {
+            guideModal.style.display = "none";
+          }, 300);
+          localStorage.setItem("guideSeen", "true");
+        });
+
+        // Event listener untuk membuka kembali popup guide ketika tombol guide ditekan
+        guideButton.addEventListener("click", function() {
+          guideModal.style.display = "flex"; // Gunakan flex seperti modal lainnya
+          guideModal.classList.add("active");
+        });
       });
     </script>
   </body>
