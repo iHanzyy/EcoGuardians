@@ -251,14 +251,14 @@
     }
 
     .popup {
-      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-      border: 3px solid #ff557f;
+      background: linear-gradient(135deg, #14aa02, #55c800);
+      border: 3px solid #14aa02;
       border-radius: 15px;
       padding: 20px;
       max-width: 600px;
       width: 90%;
       position: relative;
-      box-shadow: 0 0 20px rgba(255, 85, 127, 0.6);
+      box-shadow: 0 0 20px rgba(20,170,2,0.6);
       animation: animePopupEnter 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), float 3s ease-in-out infinite;
     }
 
@@ -269,12 +269,12 @@
       left: -3px;
       right: -3px;
       bottom: -3px;
-      background: linear-gradient(45deg, #ff9a9e, #fad0c4, #ff557f);
+      background: linear-gradient(45deg, #14aa02, #55c800, #14aa02);
       z-index: -1;
       filter: blur(5px);
       opacity: 0.8;
       border-radius: 18px;
-      animation: gradientShift 6s ease infinite;
+      /* animation: gradientShift 6s ease infinite; */
     }
 
     @keyframes animePopupEnter {
@@ -296,15 +296,6 @@
       0% { transform: translateY(0); }
       50% { transform: translateY(-10px); }
       100% { transform: translateY(0); }
-    }
-
-    @keyframes gradientShift {
-      0% {
-        filter: hue-rotate(0deg);
-      }
-      100% {
-        filter: hue-rotate(360deg);
-      }
     }
 
     .popup h2 {
@@ -335,12 +326,12 @@
     .team-member {
       background: linear-gradient(135deg, #141414, #2a2a2a);
       border: 4px solid transparent;
-      border-image: linear-gradient(45deg, rgb(64,191,1), rgba(64,191,1,0.6)) 1;
+      border-image: linear-gradient(45deg, #14aa02, #55c800) 1;
       border-radius: 10px;
       padding: 15px;
       width: 250px;
       text-align: center;
-      box-shadow: 0 0 10px rgba(64,191,1,0.8);
+      box-shadow: 0 0 10px rgba(20,170,2,0.8);
       animation: popIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
@@ -358,7 +349,7 @@
 
     .team-member:hover {
       transform: scale(1.05) rotate(1deg);
-      box-shadow: 0 0 20px rgba(64,191,1,1);
+      box-shadow: 0 0 20px rgba(20,170,2,1);
     }
 
     .team-member img {
@@ -371,7 +362,7 @@
 
     .team-member img:hover {
       transform: scale(1.1);
-      box-shadow: 0 0 15px rgba(64,191,1,0.6);
+      box-shadow: 0 0 15px rgba(20,170,2,0.6);
     }
 
     .team-member p {
@@ -386,7 +377,7 @@
     }
 
     .team-member a {
-      color: rgb(64,191,1);
+      color: #14aa02;
       text-decoration: none;
       position: relative;
       transition: color 0.3s ease;
@@ -399,14 +390,14 @@
       bottom: -2px;
       width: 100%;
       height: 2px;
-      background: rgb(64,191,1);
+      background: #14aa02;
       transform: scaleX(0);
       transform-origin: left;
       transition: transform 0.3s ease;
     }
 
     .team-member a:hover {
-      color: rgb(64,191,1);
+      color: #14aa02;
     }
 
     .team-member a:hover::after {
