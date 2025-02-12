@@ -462,38 +462,44 @@
   <!-- Scripts -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Tombol Keluar fade-out transition
+      // Tombol Keluar (menggunakan elemen <a>) dengan anti-spam click
       const exitButton = document.querySelector('.keluar-btn');
       exitButton.addEventListener('click', function(e) {
         e.preventDefault();
+        // Jika sudah diklik sebelumnya, hentikan eksekusi
+        if (exitButton.dataset.clicked === "true") return;
+        exitButton.dataset.clicked = "true";
         document.body.classList.add('fade-out');
         setTimeout(function() {
           window.location.href = exitButton.href;
         }, 1000);
       });
 
-      // Event listener untuk tombol Makan
+      // Event listener untuk tombol Makan dengan anti-spam click
       const makanButton = document.querySelector('.makan-btn');
       if (makanButton) {
         makanButton.addEventListener('click', function() {
+          if (makanButton.dataset.clicked === "true") return;
+          makanButton.dataset.clicked = "true";
+          // Reset flag setelah 1 detik agar tombol bisa diklik kembali
+          setTimeout(() => {
+            makanButton.dataset.clicked = "false";
+          }, 1000);
           try {
-            // Mengambil nilai energyStatus dari localStorage, default 100 jika belum ada
+            // Update Energy
             let energyStatus = parseFloat(localStorage.getItem('energyStatus'));
             if (isNaN(energyStatus)) energyStatus = 100;
-            // Tambah 15%, pastikan tidak melebihi maksimum 100%
             energyStatus = Math.min(energyStatus + 15, 100);
             localStorage.setItem('energyStatus', energyStatus);
 
-            // Mengambil nilai toxicStatus dari localStorage, default 0 jika belum ada
+            // Update Toxic
             let toxicStatus = parseFloat(localStorage.getItem('toxicStatus'));
             if (isNaN(toxicStatus)) toxicStatus = 0;
-            // Tambah 7%, pastikan tidak melebihi maksimum 100%
             toxicStatus = Math.min(toxicStatus + 7, 100);
             localStorage.setItem('toxicStatus', toxicStatus);
 
-            // Perbarui tampilan status dan resource
+            // Perbarui UI dan tampilkan popup
             updateUI();
-            // Tampilkan popup dengan pesan bahwa status sudah diupdate
             showActionPopup("Energy meningkat sebanyak 15% dan Limbah meningkat sebanyak 7%");
           } catch (error) {
             console.error("Terjadi kesalahan saat memperbarui status:", error);

@@ -1247,6 +1247,17 @@
           setTimeout(() => particle.remove(), 400);
         }
       }
+
+      // Prevent spam click pada seluruh tombol dengan menonaktifkannya sementara
+      document.querySelectorAll('button').forEach(function(button) {
+        button.addEventListener('click', function() {
+          // Jika tombol telah diklik, nonaktifkan (disabled) selama 1 detik
+          button.disabled = true;
+          setTimeout(function() {
+            button.disabled = false;
+          }, 1000); // cooldown 1000ms (1 detik)
+        });
+      });
     });
   </script>
   

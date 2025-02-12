@@ -3988,5 +3988,28 @@
         localStorage.setItem('musicTime', backgroundMusic.currentTime);
       });
     </script>
+
+    <!-- Fungsi untuk mencegah spam klik pada seluruh tombol -->
+    <script>
+      function preventButtonSpam() {
+        const spamDelay = 500; // Delay 500 milidetik
+        // Ambil semua elemen <button> dalam halaman
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach((button) => {
+          button.addEventListener('click', function() {
+            // Jika tombol belum dinonaktifkan, nonaktifkan sementara
+            if (!button.disabled) {
+              button.disabled = true;
+              setTimeout(() => {
+                button.disabled = false;
+              }, spamDelay);
+            }
+          });
+        });
+      }
+
+      // Panggil fungsi preventButtonSpam untuk mengaktifkan proteksi pada tombol
+      preventButtonSpam();
+    </script>
   </body>
 </html>
