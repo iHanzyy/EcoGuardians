@@ -2108,6 +2108,11 @@
       <source src="./assets/audio/backsoundInGame.mp3" type="audio/mpeg">
     </audio>
 
+    <!-- Tambahkan audio untuk click sound -->
+    <audio id="clickSound">
+      <source src="./assets/audio/click.wav" type="audio/wav">
+    </audio>
+
     <!-- Loading Screen -->
     <div id="loadingScreen">Loading...</div>
     <!-- Game Canvas -->
@@ -4003,9 +4008,53 @@
           });
         });
       }
-
       // Panggil fungsi preventButtonSpam untuk mengaktifkan proteksi pada tombol
       preventButtonSpam();
+    </script>
+
+    <script>
+      // Tambahkan fungsi untuk memainkan sound effect
+      function playClickSound() {
+        const clickSound = document.getElementById('clickSound');
+        clickSound.currentTime = 0; // Reset audio ke awal
+        clickSound.play().catch(error => console.log("Click sound failed to play:", error));
+      }
+
+      // Tambahkan event listener untuk semua button
+      function addClickSoundToButtons() {
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(button => {
+          button.addEventListener('click', playClickSound);
+        });
+
+        // Tambahkan juga ke elemen dengan class icon (untuk button-button gambar)
+        const iconButtons = document.querySelectorAll('.icon');
+        iconButtons.forEach(icon => {
+          icon.addEventListener('click', playClickSound);
+        });
+      }
+
+      // Panggil fungsi saat dokumen dimuat
+      document.addEventListener('DOMContentLoaded', addClickSoundToButtons);
+
+      // Tambahkan ke fungsi preventButtonSpam yang sudah ada
+      function preventButtonSpam() {
+        const spamDelay = 500;
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach((button) => {
+          button.addEventListener('click', function() {
+            if (!button.disabled) {
+              button.disabled = true;
+              playClickSound(); // Tambahkan sound effect di sini juga
+              setTimeout(() => {
+                button.disabled = false;
+              }, spamDelay);
+            }
+          });
+        });
+      }
+
+      // ... existing code ...
     </script>
   </body>
 </html>

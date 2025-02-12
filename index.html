@@ -535,12 +535,27 @@
   </div>
 
   <script>
+    // Audio untuk efek klik
+    const clickSFX = new Audio('./assets/audio/click.wav');
+
+    // Fungsi untuk memutar SFX klik
+    function playClickSFX() {
+      try {
+        // Reset waktu putar agar dapat diputar berulang kali
+        clickSFX.currentTime = 0;
+        clickSFX.play();
+      } catch (error) {
+        console.error("Error playing click sound effect:", error);
+      }
+    }
+
     // Mulai tampilan start screen dan pindah ke konten utama
     const startScreen = document.getElementById("startScreen");
     const mainContent = document.getElementById("mainContent");
     const bgMusic = document.getElementById("bgMusic");
 
     startScreen.addEventListener("click", function () {
+      playClickSFX();
       // Mulai mainkan audio
       bgMusic.play();
 
@@ -572,12 +587,14 @@
     const closePopup = document.getElementById("closePopup");
 
     aboutButton.addEventListener("click", function (e) {
+      playClickSFX();
       e.preventDefault();
       aboutPopup.classList.add("active");
       muteToggle.classList.add("disabled");
     });
 
     closePopup.addEventListener("click", function () {
+      playClickSFX();
       aboutPopup.classList.remove("active");
       muteToggle.classList.remove("disabled");
     });
@@ -585,6 +602,7 @@
     // Tutup popup jika klik di luar area popup
     aboutPopup.addEventListener("click", function (e) {
       if (e.target === aboutPopup) {
+        playClickSFX();
         aboutPopup.classList.remove("active");
         muteToggle.classList.remove("disabled");
       }
@@ -593,6 +611,7 @@
     // Redirect ke prolog.html ketika tombol Play ditekan
     const playButton = document.querySelector(".button.play");
     playButton.addEventListener("click", function(e) {
+      playClickSFX();
       e.preventDefault();
       window.location.href = "prolog.html";
     });
@@ -602,6 +621,7 @@
     let isMuted = false;
 
     muteToggle.addEventListener("click", function () {
+      playClickSFX();
       isMuted = !isMuted;
       bgMusic.muted = isMuted;
       muteIcon.src = isMuted ? "./assets/img/muteLogo.svg" : "./assets/img/unmuteLogo.svg";

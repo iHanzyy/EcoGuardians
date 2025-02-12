@@ -1342,6 +1342,24 @@
     window.addEventListener('beforeunload', () => {
       localStorage.setItem('musicTime', backgroundMusic.currentTime);
     });
+    // Buat instance Audio untuk sfx klik
+const clickSFX = new Audio('./assets/audio/click.wav');
+
+// Fungsi untuk memutar sfx klik
+function playClickSFX() {
+  try {
+    // Reset waktu putar agar sfx dapat diputar berulang kali
+    clickSFX.currentTime = 0;
+    clickSFX.play();
+  } catch (error) {
+    console.error("Error playing click sound effect:", error);
+  }
+}
+
+// Tambahkan event listener ke seluruh elemen button di halaman
+document.querySelectorAll('button').forEach(button => {
+  button.addEventListener('click', playClickSFX);
+});
   </script>
 </body>
 </html>

@@ -302,27 +302,46 @@
         const endingData = endings[endingType];
         const endingImage = document.getElementById("endingImage");
         const endingText = document.getElementById("endingText");
-        const tryAgainBtn = document.getElementById("tryAgainButton");
         const contentWrapper = document.querySelector(".content-wrapper");
         const backgroundMusic = document.getElementById("backgroundMusic");
+        
+        // Tambahkan audio untuk efek typing
+        const typeSound = new Audio('./assets/audio/typingSound.mp3');
+        typeSound.volume = 0.5;
 
+        // Fungsi untuk memainkan sound effect
+        function playClickSound() {
+            const clickSound = new Audio('./assets/audio/click.wav');
+            clickSound.volume = 0.5;
+            return clickSound.play();
+        }
+
+        // Modifikasi fungsi typeWriter untuk menambahkan sound effect
         function typeWriter(text, i = 0) {
             if (i < text.length) {
                 endingText.textContent += text.charAt(i);
+                // Mainkan sound effect untuk setiap karakter
+                typeSound.currentTime = 0;
+                typeSound.play().catch(error => console.error('Audio play error:', error));
                 i++;
                 setTimeout(() => typeWriter(text, i), 30);
             } else {
                 endingText.classList.add('fade-in');
                 setTimeout(() => {
                     const buttonGroup = document.getElementById('buttonGroup');
+                    buttonGroup.innerHTML = ''; // Clear existing buttons
                     
                     if (endingType === "good") {
                         const newGameBtn = document.createElement('button');
                         newGameBtn.className = 'try-again-button new-game-button';
                         newGameBtn.textContent = 'Main Lagi';
                         newGameBtn.onclick = () => {
-                            localStorage.clear();
-                            window.location.href = "index.html";
+                            playClickSound().then(() => {
+                                setTimeout(() => {
+                                    localStorage.clear();
+                                    window.location.href = "index.html";
+                                }, 200);
+                            });
                         };
                         buttonGroup.appendChild(newGameBtn);
                         newGameBtn.style.display = 'inline-block';
@@ -334,8 +353,12 @@
                         tryAgainBtn.className = 'try-again-button';
                         tryAgainBtn.textContent = 'Coba Lagi';
                         tryAgainBtn.onclick = () => {
-                            localStorage.clear();
-                            window.location.href = "index.html";
+                            playClickSound().then(() => {
+                                setTimeout(() => {
+                                    localStorage.clear();
+                                    window.location.href = "index.html";
+                                }, 200);
+                            });
                         };
                         
                         buttonGroup.appendChild(tryAgainBtn);
@@ -343,12 +366,7 @@
                         tryAgainBtn.classList.add('fade-in', 'glow');
                         
                         tryAgainBtn.addEventListener('mouseenter', createButtonParticles);
-                        tryAgainBtn.addEventListener('click', () => {
-                            tryAgainBtn.classList.add('clicked');
-                            setTimeout(() => tryAgainBtn.classList.remove('clicked'), 500);
-                        });
                     }
-
                 }, 1000);
             }
         }
@@ -418,30 +436,8 @@
             backgroundMusic.currentTime = 0;
         });
 
-        // Modifikasi event listener untuk tombol
-        document.addEventListener('DOMContentLoaded', () => {
-            const buttonGroup = document.getElementById('buttonGroup');
-            
-            if (buttonGroup) {
-                buttonGroup.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('try-again-button')) {
-                        backgroundMusic.pause();
-                        localStorage.clear();
-                        window.location.href = "index.html";
-                    }
-                });
-            }
-        });
-
-        tryAgainBtn.addEventListener('mouseenter', () => {
-            tryAgainBtn.style.transform = 'scale(1.1) rotate(3deg)';
-            tryAgainBtn.style.boxShadow = '0 0 25px rgba(0,255,255,0.8)';
-        });
-
-        tryAgainBtn.addEventListener('mouseleave', () => {
-            tryAgainBtn.style.transform = 'scale(1) rotate(0deg)';
-            tryAgainBtn.style.boxShadow = '0 0 15px rgba(0,255,255,0.5)';
-        });
+        // Hapus event listener yang tumpang tindih
+        document.removeEventListener('DOMContentLoaded', () => {});
 
         function createButtonParticles(event) {
             const button = event.currentTarget;
@@ -467,14 +463,6 @@
                 particles.forEach(p => p.remove());
             }, 1000);
         }
-
-        document.querySelectorAll('.try-again-button').forEach(button => {
-            button.addEventListener('mouseenter', createButtonParticles);
-            button.addEventListener('click', () => {
-                button.classList.add('clicked');
-                setTimeout(() => button.classList.remove('clicked'), 500);
-            });
-        });
     </script>
 </body>
 </html>
