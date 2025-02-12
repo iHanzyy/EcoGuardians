@@ -837,19 +837,19 @@
 
       .use-button {
         position: absolute;
-        bottom: 10px;
+        bottom: 35px; /* Pindahkan 10px lebih bawah */
         left: 50%;
         transform: translateX(-50%);
-        padding: 5px 15px;
-        background: #00fff9;
-        color: #1a1a2e;
+        padding: 8px 20px;
+        background: #4a7023;
+        color: #f5e7d6;
         border: none;
-        border-radius: 5px;
+        border-radius: 15px;
         cursor: pointer;
         opacity: 0;
         transition: opacity 0.3s ease, transform 0.2s ease;
         white-space: nowrap;
-        font-size: 12px;
+        font-size: 13px;
         width: auto;
         max-width: 90%;
         box-sizing: border-box;
@@ -993,32 +993,91 @@
       /* Quest Modal Specific Styles */
       /* -------------------------- */
       .quest-modal .modal-container {
-        background: linear-gradient(145deg, #2B3A42, #27303D); /* Gradasi gelap yang cool */
-        border: 2px solid #4e5d6c; /* Border dengan warna netral cool */
-        box-shadow: 0 0 30px rgba(78, 93, 108, 0.3); /* Shadow lembut untuk kesan depth */
+        background: #fdf3e3; /* Warna kertas atau parchment */
+        border: 4px solid #9e735f; /* Border dengan nuansa kayu */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         border-radius: 10px;
         padding: 20px 30px;
-        max-width: 600px;
+        max-width: 500px;
         width: 90%;
         position: relative;
-        animation: questPopupEntrance 0.5s ease-out; /* Animasi pop-up ketika muncul */
+        animation: questPopupEntrance 0.5s ease-out;
       }
 
-      .quest-modal .modal-container h2 {
-        color: #f3f8f9; /* Warna teks yang lembut dan elegan */
-        text-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Shadow halus untuk menambah dimensi */
+      .quest-modal .quest-header {
+        text-align: center;
+        font-family: 'Georgia', serif;
+        font-size: 28px;
+        color: white;
+        margin-bottom: 15px;
+        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.6);
+      }
+
+      .quest-modal .quest-label {
+        padding: 6px 12px;
+        background: #d4a373;
+        color: #fff;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
       }
 
       .quest-modal .mission-item {
-        background: rgba(236, 240, 241, 0.1); /* Background lembut untuk setiap misi */
-        border: 1px solid #4e5d6c;
+        background: #fff8e1;
+        border: 1px solid #d4a373;
         border-radius: 5px;
         padding: 10px;
+        margin-bottom: 10px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .quest-modal .mission-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .quest-modal .mission-icon {
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+      }
+
+      .quest-modal .mission-details {
+        flex: 1;
+      }
+
+      .quest-modal .mission-title {
+        font-family: 'Georgia', serif;
+        font-size: 20px;
+        color: #5c3a21;
+        margin: 0 0 5px 0;
+        border-bottom: 1px solid #d4a373;
+        padding-bottom: 5px;
+      }
+
+      .quest-modal .mission-progress {
+        width: 100%;
+        height: 12px;
+        background: #e0cfc3;
+        border-radius: 6px;
+        overflow: hidden;
+        margin-top: 5px;
       }
 
       .quest-modal .mission-progress-bar {
-        background: linear-gradient(90deg, #48c9b0 0%, #3498db 100%); /* Gradasi cool antara teal dan biru */
+        height: 100%;
+        width: 0;
+        background: #9e735f;
         transition: width 0.5s ease-in-out;
+      }
+
+      /* Optional: Sembunyikan partikel quest jika tidak diinginkan */
+      .quest-modal .quest-particle {
+        display: none;
       }
 
       /* ----------------------------------------- */
@@ -1038,7 +1097,7 @@
       /* Ubah tampilan quest label agar tampak seperti banner informasi quest objective */
       .quest-modal .quest-label {
         padding: 5px 10px;
-        background: rgba(255, 255, 255, 0.1);
+        background: #754E1A;
         display: inline-block;
         border-radius: 5px;
         font-weight: bold;
@@ -1048,8 +1107,8 @@
       /* Ubah tampilan judul misi agar lebih tegas dan modern */
       .quest-modal .mission-title {
         margin: 0;
-        font-size: 20px;
-        color: #ecf0f1; /* Warna terang untuk judul misi */
+        font-size: 15px;
+        color: #000; /* Warna terang untuk judul misi */
         border-bottom: 1px solid #4e5d6c;
         padding-bottom: 5px;
         margin-bottom: 10px;
@@ -1235,6 +1294,117 @@
         padding: 10px;
         cursor: pointer;
       }
+
+      /* Updated Inventory Styles */
+      .inventory-modal .modal-container {
+        background: #2d1b0f url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhYWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==');
+        border: 4px solid #5a432e;
+        border-radius: 12px;
+        box-shadow: 0 0 30px rgba(0,0,0,0.5),
+                    inset 0 0 10px rgba(255,255,255,0.1);
+        max-width: 600px;
+        padding: 25px;
+        font-family: 'Courier New', monospace;
+      }
+
+      .inventory-modal h2 {
+        color: #f5e7d6;
+        text-shadow: 2px 2px #3a2a1a;
+        font-size: 28px;
+        text-align: center;
+        margin-bottom: 25px;
+        letter-spacing: 2px;
+      }
+
+      .inventory-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 15px;
+        padding: 15px;
+        background: rgba(0,0,0,0.3);
+        border-radius: 8px;
+      }
+
+      .inventory-slot {
+        position: relative;
+        background: rgba(90, 67, 46, 0.8);
+        border: 2px solid #3a2a1a;
+        border-radius: 8px;
+        padding: 12px;
+        aspect-ratio: 1;
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+
+      .inventory-slot:hover {
+        background: #5a432e;
+        transform: scale(1.05);
+        box-shadow: 0 0 10px rgba(255,215,0,0.5);
+      }
+
+      .inventory-slot img {
+        width: 80%;
+        height: auto;
+        filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+      }
+
+      .item-name {
+        position: absolute;
+        bottom: 5px;
+        left: 0;
+        right: 0;
+        color: #f5e7d6;
+        font-size: 12px;
+        text-align: center;
+        text-shadow: 1px 1px #3a2a1a;
+        padding: 2px;
+        background: rgba(58, 42, 26, 0.8);
+        border-radius: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .item-count {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: #3a2a1a;
+        color: #f5e7d6;
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: bold;
+        min-width: 25px;
+        text-align: center;
+        border: 1px solid #5a432e;
+      }
+
+      .use-button {
+        position: absolute;
+        bottom: 35px; /* Pindahkan 10px lebih bawah */
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 8px 20px;
+        background: #4a7023;
+        color: #f5e7d6;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.3s ease, transform 0.2s ease;
+        white-space: nowrap;
+        font-size: 13px;
+        width: auto;
+        max-width: 90%;
+        box-sizing: border-box;
+      }
+
+      .use-button:hover {
+        background: #5a8833;
+        transform: translateX(-50%) scale(1.05);
+        box-shadow: 0 0 10px rgba(74, 112, 35, 0.6);
+      }
     </style>
   </head>
   <body>
@@ -1370,10 +1540,11 @@
     <div class="modal-overlay quest-modal" id="questModalOverlay">
       <div class="modal-container">
         <button class="modal-close" id="questModalClose">&times;</button>
-        <h2 style="text-align: center;">ACTIVE QUEST</h2>
+        <!-- Ubah header dan tambahkan class quest-header -->
+        <h2 class="quest-header">Missions</h2>
         <div class="mission-content">
-          <!-- Update warna label dengan tone yang lebih cool dan banner quest -->
-          <div class="quest-label" style="color: #f3f8f9; margin-bottom: 15px;">✦ MISSION IN PROGRESS ✦</div>
+          <!-- Hapus style inline dan update label -->
+          <div class="quest-label">Today's Tasks</div>
           <!-- Misi: Buat Alat Konversi Air -->
           <div class="mission-item">
             <img
@@ -1409,7 +1580,8 @@
             </div>
           </div>
         </div>
-        <div class="quest-particle" style="position: absolute; width: 100%; height: 100%; pointer-events: none;"></div>
+        <!-- Jika tidak diperlukan efek partikel, Anda bisa menyembunyikannya secara default -->
+        <div class="quest-particle"></div>
       </div>
     </div>
 
@@ -1441,25 +1613,32 @@
     <div class="modal-overlay inventory-modal" id="inventoryModal">
       <div class="modal-container">
         <button class="modal-close" id="inventoryClose">&times;</button>
-        <h2 style="text-align: center; color: #00fff9">INVENTORY</h2>
+        <h2>INVENTORY - ECO BAG</h2>
         <div class="inventory-grid">
           <!-- Slot Item -->
           <div class="inventory-slot" data-item="wood">
             <img src="./assets/img/kayu.svg" alt="Kayu">
             <span class="item-count">0</span>
+            <span class="item-name">Kayu</span>
           </div>
           <div class="inventory-slot" data-item="plastic">
             <img src="./assets/img/plastic.svg" alt="Plastik">
             <span class="item-count">0</span>
+            <span class="item-name">Plastik</span>
           </div>
           <div class="inventory-slot tool-slot" data-item="converter">
             <img src="./assets/img/alatKonversi.png" alt="Alat Konversi">
+            <span class="item-name">Hydro Converter 3000</span>
             <button class="use-button">USE</button>
           </div>
           <div class="inventory-slot tool-slot" data-item="pollution">
             <img src="./assets/img/alatPenghilangPolusi.png" alt="Alat Polusi">
+            <span class="item-name">Polusi Buster 2.0</span>
             <button class="use-button">USE</button>
           </div>
+          <!-- Tambahkan slot kosong untuk tampilan grid -->
+          <div class="inventory-slot empty-slot"></div>
+          <div class="inventory-slot empty-slot"></div>
         </div>
       </div>
     </div>
