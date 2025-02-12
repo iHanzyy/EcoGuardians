@@ -165,6 +165,7 @@
         /* Tampilan teks narasi dengan efek mesin ketik dan slideIn */
         .text-content {
             font-size: 1.2rem;
+            white-space: pre-wrap;
             line-height: 1.8;
             text-align: justify;
             margin-bottom: 20px;
@@ -185,7 +186,8 @@
 
         /* Styling Button dengan animasi popIn agar terasa hidup */
         .button {
-            display: inline-block;
+            display: block;
+            margin: 20px auto;
             padding: 15px 40px;
             font-size: 1.3rem;
             font-weight: 600;
@@ -334,17 +336,17 @@
             {
                 background: 'url("./assets/img/prolog1Bg.jpg")',
                 pages: [
-                    `Tahun 2099, kota Seijul menghadapi krisis ekologi yang belum pernah terjadi sebelumnya...\n\nKota Seijul dijuluki sebagai kota industri terbesar di Bumi karena sebagai pusat produksi kertas.`,
-                    `Hal ini menyebabkan kota Seijul menghasilkan limbah air dan juga polusi dari uap yang dihasilkan dari aktivitas industri.\n\nKarena terlalu berfokus pada industri, penduduk kota Seijul mengabaikan lingkungan disekitarnya.`,
+                    `Tahun 2099, kota Seijul menghadapi krisis ekologi yang belum pernah terjadi sebelumnya...\nKota Seijul dijuluki sebagai kota industri terbesar di Bumi karena sebagai pusat produksi kertas.`,
+                    `Hal ini menyebabkan kota Seijul menghasilkan limbah air dan juga polusi dari uap yang dihasilkan dari aktivitas industri.\nKarena terlalu berfokus pada industri, penduduk kota Seijul mengabaikan lingkungan disekitarnya.`,
                     `Sampai pada akhirnya....\n\nBencana tiba... \n\nPolusi yang menutupi kota, sungai tercemar oleh limbah air, ekosistem lingkungan di Kota Seijul menjadi rusak.`
                 ]
             },
             {
                 background: 'url("./assets/img/prolog2Bg.jpg")',
                 pages: [
-                    `Sebagai engineer handal di kota Seijul, Jira mencoba menciptakan alat untuk menyelamatkan kota dari kehancuran lingkungan.\n\nPara penduduk kota Seijul telah berhasil dievakuasi dan sementara mengungsi di shelter.`,
-                    `Tetapi shelter tidak bisa menampung terlalu lama karena bahan persediaannya tidak tercukupi.\n\nAnda hanya memiliki waktu selama 3 hari untuk menciptakan alat tersebut.`,
-                    `Setiap keputusan anda akan mempengaruhi nasib jutaan penduduk dan ekosistem yang tersisa.`
+                    `Sebagai engineer handal di kota Seijul, Jira mencoba menciptakan alat untuk menyelamatkan kota dari kehancuran lingkungan.\nPara penduduk kota Seijul telah berhasil dievakuasi dan sementara mengungsi di shelter.`,
+                    `Tetapi shelter tidak bisa menampung terlalu lama karena bahan persediaannya tidak tercukupi.\nAnda hanya memiliki waktu selama 1 hari untuk menciptakan alat tersebut.`,
+                    `Setiap keputusan Anda akan mempengaruhi nasib jutaan penduduk dan ekosistem yang tersisa, menentukan harapan atau kehancuran bagi Kota Seijul. AYO SELAMATKAN KOTA!`
                 ]
             }
         ];
