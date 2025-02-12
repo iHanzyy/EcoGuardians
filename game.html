@@ -2103,8 +2103,8 @@
     </style>
   </head>
   <body>
-    <!-- Tambahkan setelah tag <body> dan sebelum loading screen -->
-    <audio id="backgroundMusic" loop>
+    <!-- Tambahkan setelah tag <body> -->
+    <audio id="backgroundMusic" loop autoplay>
       <source src="./assets/audio/backsoundInGame.mp3" type="audio/mpeg">
     </audio>
 
@@ -3901,13 +3901,29 @@
       const backgroundMusic = document.getElementById('backgroundMusic');
       const soundControl = document.getElementById('soundControl');
       let isMuted = localStorage.getItem('isMuted') === 'true';
+      let musicTime = parseFloat(localStorage.getItem('musicTime')) || 0;
 
       // Set volume awal
-      backgroundMusic.volume = 0.5; // Set volume ke 50%
+      backgroundMusic.volume = 0.5;
+      
+      // Coba autoplay dengan promise
+      async function tryAutoplay() {
+        try {
+          await backgroundMusic.play();
+        } catch (error) {
+          console.log("Autoplay failed, waiting for user interaction:", error);
+          // Fallback ke click event jika autoplay gagal
+          document.addEventListener('click', function startAudio() {
+            backgroundMusic.play().catch(function(error) {
+              console.log("Audio play failed:", error);
+            });
+            document.removeEventListener('click', startAudio);
+          });
+        }
+      }
 
       // Fungsi untuk memulai musik
       function initializeAudio() {
-        // Cek status mute dari localStorage
         if (isMuted) {
           backgroundMusic.muted = true;
           soundControl.classList.add('muted');
@@ -3917,6 +3933,11 @@
           soundControl.classList.remove('muted');
           soundControl.src = './assets/img/unmuteLogo.svg';
         }
+        
+        // Set waktu pemutaran dari localStorage
+        backgroundMusic.currentTime = musicTime;
+        // Coba autoplay
+        tryAutoplay();
       }
 
       // Event listener untuk tombol sound
@@ -3924,7 +3945,6 @@
         isMuted = !isMuted;
         backgroundMusic.muted = isMuted;
         
-        // Update tampilan icon
         if (isMuted) {
           soundControl.classList.add('muted');
           soundControl.src = './assets/img/muteLogo.svg';
@@ -3933,9 +3953,15 @@
           soundControl.src = './assets/img/unmuteLogo.svg';
         }
         
-        // Simpan preferensi ke localStorage
         localStorage.setItem('isMuted', isMuted);
       });
+
+      // Simpan posisi waktu pemutaran setiap 1 detik
+      setInterval(() => {
+        if (!backgroundMusic.paused) {
+          localStorage.setItem('musicTime', backgroundMusic.currentTime);
+        }
+      }, 1000);
 
       // Mulai musik ketika user berinteraksi dengan halaman
       document.addEventListener('click', function startAudio() {
@@ -3955,6 +3981,11 @@
             console.log("Audio play failed:", error);
           });
         }
+      });
+
+      // Tambahkan event listener sebelum unload untuk menyimpan waktu terakhir
+      window.addEventListener('beforeunload', () => {
+        localStorage.setItem('musicTime', backgroundMusic.currentTime);
       });
     </script>
   </body>

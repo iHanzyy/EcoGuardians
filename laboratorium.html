@@ -859,6 +859,25 @@
     .store-item.locked:hover::before {
       animation: lockPulse 0.8s infinite;
     }
+
+    #soundControl {
+      width: 50px;
+      height: 48px;
+      cursor: pointer;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    #soundControl:hover {
+      transform: scale(0.9);
+    }
+
+    #soundControl:active {
+      transform: scale(0.8);
+    }
+
+    #soundControl.muted {
+      opacity: 0.5;
+    }
   </style>
 </head>
 <body>
@@ -879,6 +898,7 @@
         </div>
       </div>
     </div>
+    <img src="./assets/img/unmuteLogo.svg" alt="Sound Control" class="icon" id="soundControl" />
     <a href="game.html" class="exit-btn">Keluar</a>
   </div>
   
@@ -1231,5 +1251,86 @@
   </script>
   
   <div id="actionPopup"></div>
+
+  <!-- Tambahkan audio element -->
+  <audio id="backgroundMusic" loop autoplay>
+    <source src="./assets/audio/backsoundInGame.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Tambahkan script audio control -->
+  <script>
+    // Copy script audio control dari game.html ke sini
+    const backgroundMusic = document.getElementById('backgroundMusic');
+    const soundControl = document.getElementById('soundControl');
+    let isMuted = localStorage.getItem('isMuted') === 'true';
+    let musicTime = parseFloat(localStorage.getItem('musicTime')) || 0;
+
+    // Set volume awal
+    backgroundMusic.volume = 0.5;
+
+    // Fungsi untuk memulai musik
+    function initializeAudio() {
+      if (isMuted) {
+        backgroundMusic.muted = true;
+        soundControl.classList.add('muted');
+        soundControl.src = './assets/img/muteLogo.svg';
+      } else {
+        backgroundMusic.muted = false;
+        soundControl.classList.remove('muted');
+        soundControl.src = './assets/img/unmuteLogo.svg';
+      }
+      
+      // Set waktu pemutaran dari localStorage
+      backgroundMusic.currentTime = musicTime;
+    }
+
+    // Event listener untuk tombol sound
+    soundControl.addEventListener('click', () => {
+      isMuted = !isMuted;
+      backgroundMusic.muted = isMuted;
+      
+      if (isMuted) {
+        soundControl.classList.add('muted');
+        soundControl.src = './assets/img/muteLogo.svg';
+      } else {
+        soundControl.classList.remove('muted');
+        soundControl.src = './assets/img/unmuteLogo.svg';
+      }
+      
+      localStorage.setItem('isMuted', isMuted);
+    });
+
+    // Simpan posisi waktu pemutaran setiap 1 detik
+    setInterval(() => {
+      if (!backgroundMusic.paused) {
+        localStorage.setItem('musicTime', backgroundMusic.currentTime);
+      }
+    }, 1000);
+
+    // Mulai musik ketika user berinteraksi dengan halaman
+    document.addEventListener('click', function startAudio() {
+      backgroundMusic.play().catch(function(error) {
+        console.log("Audio play failed:", error);
+      });
+      document.removeEventListener('click', startAudio);
+    });
+
+    // Initialize audio saat halaman dimuat
+    window.addEventListener('load', initializeAudio);
+
+    // Tambahkan event listener untuk memastikan musik tetap bermain saat tab tidak aktif
+    document.addEventListener("visibilitychange", function() {
+      if (!document.hidden && !isMuted) {
+        backgroundMusic.play().catch(function(error) {
+          console.log("Audio play failed:", error);
+        });
+      }
+    });
+
+    // Tambahkan event listener sebelum unload untuk menyimpan waktu terakhir
+    window.addEventListener('beforeunload', () => {
+      localStorage.setItem('musicTime', backgroundMusic.currentTime);
+    });
+  </script>
 </body>
 </html>
