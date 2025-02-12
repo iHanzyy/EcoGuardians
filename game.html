@@ -3263,10 +3263,6 @@
       // --- Aksi Tanam (Plant) ---
       const plantButton = document.getElementById("plantButton");
       plantButton.addEventListener("click", () => {
-        if (!game.tree.isCut || status.water < 10) {
-          showActionPopup("Air tidak cukup untuk menanam pohon!");
-          return;
-        }
 
         game.tree.isCut = false;
         game.currentTreeImage = game.assets.tree;
