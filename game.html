@@ -2081,9 +2081,33 @@
           font-size: 18px;
         }
       }
+
+      #soundControl {
+        width: 50px;
+        height: 48px;
+        cursor: pointer;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+      }
+
+      #soundControl:hover {
+        transform: scale(0.9);
+      }
+
+      #soundControl:active {
+        transform: scale(0.8);
+      }
+
+      #soundControl.muted {
+        opacity: 0.5;
+      }
     </style>
   </head>
   <body>
+    <!-- Tambahkan setelah tag <body> dan sebelum loading screen -->
+    <audio id="backgroundMusic" loop>
+      <source src="./assets/audio/backsoundInGame.mp3" type="audio/mpeg">
+    </audio>
+
     <!-- Loading Screen -->
     <div id="loadingScreen">Loading...</div>
     <!-- Game Canvas -->
@@ -2155,6 +2179,7 @@
       <img src="./assets/img/guideButton.svg" alt="Guide Button" class="icon" id="guideButton" />
       <img src="./assets/img/questButton.svg" alt="Quest Button" class="icon" />
       <img src="./assets/img/tas.png" alt="Inventory" class="icon" id="inventoryButton" />
+      <img src="./assets/img/unmuteLogo.svg" alt="Sound Control" class="icon" id="soundControl" />
     </div>
 
     <!-- Popup Modal (Guide) -->
@@ -3869,6 +3894,67 @@
           guideModal.style.display = "flex"; // Gunakan flex seperti modal lainnya
           guideModal.classList.add("active");
         });
+      });
+    </script>
+    <script>
+      // Audio Control System
+      const backgroundMusic = document.getElementById('backgroundMusic');
+      const soundControl = document.getElementById('soundControl');
+      let isMuted = localStorage.getItem('isMuted') === 'true';
+
+      // Set volume awal
+      backgroundMusic.volume = 0.5; // Set volume ke 50%
+
+      // Fungsi untuk memulai musik
+      function initializeAudio() {
+        // Cek status mute dari localStorage
+        if (isMuted) {
+          backgroundMusic.muted = true;
+          soundControl.classList.add('muted');
+          soundControl.src = './assets/img/muteLogo.svg';
+        } else {
+          backgroundMusic.muted = false;
+          soundControl.classList.remove('muted');
+          soundControl.src = './assets/img/unmuteLogo.svg';
+        }
+      }
+
+      // Event listener untuk tombol sound
+      soundControl.addEventListener('click', () => {
+        isMuted = !isMuted;
+        backgroundMusic.muted = isMuted;
+        
+        // Update tampilan icon
+        if (isMuted) {
+          soundControl.classList.add('muted');
+          soundControl.src = './assets/img/muteLogo.svg';
+        } else {
+          soundControl.classList.remove('muted');
+          soundControl.src = './assets/img/unmuteLogo.svg';
+        }
+        
+        // Simpan preferensi ke localStorage
+        localStorage.setItem('isMuted', isMuted);
+      });
+
+      // Mulai musik ketika user berinteraksi dengan halaman
+      document.addEventListener('click', function startAudio() {
+        backgroundMusic.play().catch(function(error) {
+          console.log("Audio play failed:", error);
+        });
+        document.removeEventListener('click', startAudio);
+      });
+
+      // Initialize audio saat halaman dimuat
+      window.addEventListener('load', initializeAudio);
+
+      // Tambahkan event listener untuk memastikan musik tetap bermain saat tab tidak aktif
+      document.addEventListener("visibilitychange", function() {
+        if (!document.hidden && !isMuted) {
+          backgroundMusic.play().catch(function(error) {
+            console.log("Audio play failed:", error);
+          });
+        }
       });
     </script>
   </body>
