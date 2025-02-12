@@ -1,463 +1,520 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <link rel="icon" href="./assets/img/logoEcoG.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ending - ECOGUARDIANS</title>
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+      body,
+      html {
+        height: 100%;
+        font-family: sans-serif;
+        overflow: hidden;
+        background-color: #000;
+      }
+
+      .ending-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        min-height: 100vh;
+        color: #fff;
+        perspective: 1000px;
+        background: linear-gradient(45deg, #000000, #1a1a2e);
+      }
+
+      .ending-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        transition: opacity 2s ease-in-out, transform 10s ease-in-out;
+        transform: scale(1.1);
+        filter: saturate(1.2) contrast(0.9);
+        animation: background-pulse 8s infinite;
+      }
+
+      .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0.3) 0%,
+          rgba(0, 0, 0, 0.7) 100%
+        );
+      }
+
+      .content-wrapper {
+        position: relative;
+        z-index: 10;
+        text-align: center;
+        padding: 2rem;
+        background: rgba(0, 0, 0, 0.8);
+        border: 2px solid rgba(0, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+        border-radius: 15px 15px 0 0;
+        box-shadow: 0 -5px 20px rgba(0, 255, 255, 0.2);
+        width: 100%;
+        max-width: 800px;
+        opacity: 0;
+        transform: translateY(100%) rotateX(45deg);
+        transition: all 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .ending-text {
+        font-size: 1.4rem;
+        position: relative;
+        padding: 20px;
+        background: linear-gradient(
+          to right,
+          rgba(0, 168, 204, 0.1),
+          transparent
+        );
+        border-left: 3px solid #00a8cc;
+        animation: text-glow 3s infinite;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        white-space: pre-line;
+      }
+
+      .try-again-button {
+        position: relative;
+        padding: 16px 32px;
+        font-size: 1.2rem;
+        letter-spacing: 1px;
+        border-radius: 15px;
+        border: none;
+        background: linear-gradient(
+          145deg,
+          rgba(0, 168, 204, 1) 0%,
+          rgba(0, 119, 190, 1) 50%,
+          rgba(0, 168, 204, 1) 100%
+        );
+        box-shadow: 0 4px 15px rgba(0, 255, 255, 0.3);
+        overflow: hidden;
+        transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        transform-style: preserve-3d;
+      }
+
+      .try-again-button:hover {
+        transform: translateY(-3px) scale(1.05) rotate(2deg);
+        box-shadow: 0 8px 25px rgba(0, 255, 255, 0.6);
+        filter: brightness(1.2);
+      }
+
+      .try-again-button::before,
+      .try-again-button::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 15px;
+        z-index: -1;
+      }
+
+      .try-again-button::before {
+        background: linear-gradient(
+          45deg,
+          transparent 20%,
+          rgba(255, 255, 255, 0.1) 45%,
+          transparent 80%
+        );
+        animation: buttonShine 4s infinite linear;
+      }
+
+      .try-again-button::after {
+        background: radial-gradient(
+          circle at 50% 120%,
+          rgba(255, 255, 255, 0.15) 0%,
+          transparent 60%
+        );
+      }
+
+      .new-game-button {
+        background: linear-gradient(
+          145deg,
+          rgba(76, 175, 80, 1) 0%,
+          rgba(69, 160, 73, 1) 50%,
+          rgba(76, 175, 80, 1) 100%
+        );
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+      }
+
+      .new-game-button::before {
+        background: linear-gradient(
+          45deg,
+          transparent 20%,
+          rgba(255, 255, 255, 0.15) 45%,
+          transparent 80%
+        );
+      }
+
+      @keyframes buttonShine {
+        0% {
+          transform: translateX(-150%) skew(-20deg);
         }
-
-        body, html {
-            height: 100%;
-            font-family: sans-serif;
-            overflow: hidden;
-            background-color: #000;
+        100% {
+          transform: translateX(150%) skew(-20deg);
         }
+      }
 
-        .ending-container {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            align-items: center;
-            min-height: 100vh;
-            color: #fff;
-            perspective: 1000px;
-            background: linear-gradient(45deg, #000000, #1a1a2e);
+      @keyframes buttonPulse {
+        0% {
+          transform: scale(1);
         }
-
-        .ending-image {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0;
-            transition: opacity 2s ease-in-out, transform 10s ease-in-out;
-            transform: scale(1.1);
-            filter: saturate(1.2) contrast(0.9);
-            animation: background-pulse 8s infinite;
+        50% {
+          transform: scale(1.05);
         }
-
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%);
+        100% {
+          transform: scale(1);
         }
+      }
 
-        .content-wrapper {
-            position: relative;
-            z-index: 10;
-            text-align: center;
-            padding: 2rem;
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid rgba(0, 255, 255, 0.3);
-            backdrop-filter: blur(10px);
-            border-radius: 15px 15px 0 0;
-            box-shadow: 0 -5px 20px rgba(0, 255, 255, 0.2);
-            width: 100%;
-            max-width: 800px;
-            opacity: 0;
-            transform: translateY(100%) rotateX(45deg);
-            transition: all 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
+      .button-particle {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        pointer-events: none;
+        animation: particleFloat 1s ease-out forwards;
+      }
+
+      @keyframes particleFloat {
+        0% {
+          opacity: 1;
+          transform: translate(0, 0);
         }
+        100% {
+          opacity: 0;
+          transform: translate(calc(var(--dx) * 50px), calc(var(--dy) * -50px));
+        }
+      }
 
+      @keyframes glowing {
+        0% {
+          box-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+        }
+        50% {
+          box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+        }
+        100% {
+          box-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+        }
+      }
+
+      .glow {
+        animation: glowing 2s infinite;
+      }
+
+      @media (max-width: 768px) {
         .ending-text {
-            font-size: 1.4rem;
-            position: relative;
-            padding: 20px;
-            background: linear-gradient(to right, rgba(0,168,204,0.1), transparent);
-            border-left: 3px solid #00a8cc;
-            animation: text-glow 3s infinite;
-            line-height: 1.6;
-            margin-bottom: 2rem;
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-            white-space: pre-line;
+          font-size: 1rem;
         }
-
         .try-again-button {
-            position: relative;
-            padding: 16px 32px;
-            font-size: 1.2rem;
-            letter-spacing: 1px;
-            border-radius: 15px;
-            border: none;
-            background: linear-gradient(145deg, 
-                rgba(0,168,204,1) 0%, 
-                rgba(0,119,190,1) 50%, 
-                rgba(0,168,204,1) 100%);
-            box-shadow: 0 4px 15px rgba(0,255,255,0.3);
-            overflow: hidden;
-            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-            transform-style: preserve-3d;
+          font-size: 0.9rem;
+          padding: 10px 20px;
         }
+      }
 
-        .try-again-button:hover {
-            transform: translateY(-3px) scale(1.05) rotate(2deg);
-            box-shadow: 0 8px 25px rgba(0,255,255,0.6);
-            filter: brightness(1.2);
+      @keyframes float {
+        0% {
+          transform: translateY(0px) rotate(0deg);
         }
+        50% {
+          transform: translateY(-20px) rotate(5deg);
+        }
+        100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+      }
 
-        .try-again-button::before,
-        .try-again-button::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: 15px;
-            z-index: -1;
+      @keyframes text-glow {
+        0% {
+          text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
         }
+        50% {
+          text-shadow: 0 0 20px rgba(0, 255, 255, 0.8),
+            0 0 30px rgba(0, 255, 255, 0.6);
+        }
+        100% {
+          text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+      }
 
-        .try-again-button::before {
-            background: linear-gradient(45deg,
-                transparent 20%,
-                rgba(255,255,255,0.1) 45%,
-                transparent 80%);
-            animation: buttonShine 4s infinite linear;
+      @keyframes background-pulse {
+        0% {
+          opacity: 0.3;
         }
+        50% {
+          opacity: 0.6;
+        }
+        100% {
+          opacity: 0.3;
+        }
+      }
 
-        .try-again-button::after {
-            background: radial-gradient(circle at 50% 120%,
-                rgba(255,255,255,0.15) 0%,
-                transparent 60%);
-        }
+      .particles {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
 
-        .new-game-button {
-            background: linear-gradient(145deg, 
-                rgba(76,175,80,1) 0%, 
-                rgba(69,160,73,1) 50%, 
-                rgba(76,175,80,1) 100%);
-            box-shadow: 0 4px 15px rgba(76,175,80,0.3);
-        }
+      .particle {
+        position: absolute;
+        background: rgba(0, 168, 204, 0.5);
+        border-radius: 50%;
+        animation: float 6s infinite ease-in-out;
+      }
 
-        .new-game-button::before {
-            background: linear-gradient(45deg,
-                transparent 20%,
-                rgba(255,255,255,0.15) 45%,
-                transparent 80%);
-        }
-
-        @keyframes buttonShine {
-            0% { transform: translateX(-150%) skew(-20deg); }
-            100% { transform: translateX(150%) skew(-20deg); }
-        }
-
-        @keyframes buttonPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        .button-particle {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background: rgba(255,255,255,0.5);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: particleFloat 1s ease-out forwards;
-        }
-
-        @keyframes particleFloat {
-            0% {
-                opacity: 1;
-                transform: translate(0, 0);
-            }
-            100% {
-                opacity: 0;
-                transform: translate(
-                    calc(var(--dx) * 50px), 
-                    calc(var(--dy) * -50px)
-                );
-            }
-        }
-
-        @keyframes glowing {
-            0% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.5); }
-            50% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.8); }
-            100% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.5); }
-        }
-
-        .glow {
-            animation: glowing 2s infinite;
-        }
-
-        @media (max-width: 768px) {
-            .ending-text {
-                font-size: 1rem;
-            }
-            .try-again-button {
-                font-size: 0.9rem;
-                padding: 10px 20px;
-            }
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
-            100% { transform: translateY(0px) rotate(0deg); }
-        }
-        
-        @keyframes text-glow {
-            0% { text-shadow: 0 0 10px rgba(0,255,255,0.5); }
-            50% { text-shadow: 0 0 20px rgba(0,255,255,0.8), 0 0 30px rgba(0,255,255,0.6); }
-            100% { text-shadow: 0 0 10px rgba(0,255,255,0.5); }
-        }
-
-        @keyframes background-pulse {
-            0% { opacity: 0.3; }
-            50% { opacity: 0.6; }
-            100% { opacity: 0.3; }
-        }
-
-        .particles {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-
-        .particle {
-            position: absolute;
-            background: rgba(0,168,204,0.5);
-            border-radius: 50%;
-            animation: float 6s infinite ease-in-out;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 1.5rem;
-            margin-top: 2rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
+      .button-group {
+        display: flex;
+        gap: 1.5rem;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="ending-container">
-        <audio id="backgroundMusic" loop>
-            <source src="" type="audio/mpeg">
-            Your browser does not support the audio element.
-        </audio>
-        <div class="particles" id="particles"></div>
-        <img id="endingImage" class="ending-image" src="/placeholder.svg" alt="Ending">
-        <div class="overlay"></div>
-        <div class="content-wrapper">
-            <div id="endingText" class="ending-text"></div>
-            <div class="button-group" id="buttonGroup"></div>
-        </div>
+      <audio id="backgroundMusic" loop>
+        <source src="" type="audio/mpeg" />
+        Your browser does not support the audio element.
+      </audio>
+      <div class="particles" id="particles"></div>
+      <img
+        id="endingImage"
+        class="ending-image"
+        src="/placeholder.svg"
+        alt="Ending"
+      />
+      <div class="overlay"></div>
+      <div class="content-wrapper">
+        <div id="endingText" class="ending-text"></div>
+        <div class="button-group" id="buttonGroup"></div>
+      </div>
     </div>
     <script>
-        const endings = {
-            good: {
-                image: "./assets/img/goodEnding.jpg",
-                text: "SELAMAT KAMU BERHASIL MENYELAMATKAN KOTA SEIJUL!!! \n\nJira telah menyelamatkan kota dari bencana krisis ekologi. Kota Seijul kini pulih kembali dan Masyarakat Seijul pun bisa kembali menjalani kehidupan seperti biasa.",
-            },
-            badTree: {
-                image: "./assets/img/badPohon.jpg",
-                text: "OH TIDAK OKSIGEN HABIS! \n\nJira gagal menjaga ekosistem pohon yang menyebabkan oksigen menipis dan polusi merajalela, hingga kota tenggelam dalam kegelapan.",
-            },
-            badWater: {
-                image: "./assets/img/badAir.jpg",
-                text: "OH TIDAK PERSEDIAAN AIR BERSIH HABIS! \n\nJira gagal merawat ekosistem air yang menyebabkan kekurangan pasokan air bersih membuat tanaman layu, dan dehidrasi perlahan merenggut nyawanya.",
-            },
-            badEnergy: {
-                image: "./assets/img/badEnergi.jpg",
-                text: "OH TIDAK JIRA KEHABISAN ENERGI! \n\nJira tak mampu menjaga energi tubuhnya yang menyebabkan kelelahan ekstrem menghancurkan semangat, hingga akhirnya ia tak mampu bertahan.",
-            },
-            badToxic: {
-                image: "./assets/img/badLimbah.jpg",
-                text: "OH TIDAK LINGKUNGAN TERCEMAR! \n\nJira gagal mengendalikan limbah yang menumpuk yang menyebabkan Lingkungan tercemar menyelimuti kota, dan racun mematikan mengakhiri perjuangannya.",
-            },
-        };
+      const endings = {
+        good: {
+          image: "./assets/img/goodEnding.jpg",
+          text: "SELAMAT KAMU BERHASIL MENYELAMATKAN KOTA SEIJUL!!! \n\nJira telah menyelamatkan kota dari bencana krisis ekologi. Kota Seijul kini pulih kembali dan Masyarakat Seijul pun bisa kembali menjalani kehidupan seperti biasa.",
+        },
+        badTree: {
+          image: "./assets/img/badPohon.jpg",
+          text: "OH TIDAK OKSIGEN HABIS! \n\nJira gagal menjaga ekosistem pohon yang menyebabkan oksigen menipis dan polusi merajalela, hingga kota tenggelam dalam kegelapan.",
+        },
+        badWater: {
+          image: "./assets/img/badAir.jpg",
+          text: "OH TIDAK PERSEDIAAN AIR BERSIH HABIS! \n\nJira gagal merawat ekosistem air yang menyebabkan kekurangan pasokan air bersih membuat tanaman layu, dan dehidrasi perlahan merenggut nyawanya.",
+        },
+        badEnergy: {
+          image: "./assets/img/badEnergi.jpg",
+          text: "OH TIDAK JIRA KEHABISAN ENERGI! \n\nJira tak mampu menjaga energi tubuhnya yang menyebabkan kelelahan ekstrem menghancurkan semangat, hingga akhirnya ia tak mampu bertahan.",
+        },
+        badToxic: {
+          image: "./assets/img/badLimbah.jpg",
+          text: "OH TIDAK LINGKUNGAN TERCEMAR! \n\nJira gagal mengendalikan limbah yang menumpuk yang menyebabkan Lingkungan tercemar menyelimuti kota, dan racun mematikan mengakhiri perjuangannya.",
+        },
+      };
 
-        let endingType = localStorage.getItem("endingType") || "good";
-        if (!endings[endingType]) endingType = "good";
+      let endingType = localStorage.getItem("endingType") || "good";
+      if (!endings[endingType]) endingType = "good";
 
-        const endingData = endings[endingType];
-        const endingImage = document.getElementById("endingImage");
-        const endingText = document.getElementById("endingText");
-        const contentWrapper = document.querySelector(".content-wrapper");
-        const backgroundMusic = document.getElementById("backgroundMusic");
-        
-        // Tambahkan audio untuk efek typing
-        const typeSound = new Audio('./assets/audio/typingSound.mp3');
-        typeSound.volume = 0.5;
+      const endingData = endings[endingType];
+      const endingImage = document.getElementById("endingImage");
+      const endingText = document.getElementById("endingText");
+      const contentWrapper = document.querySelector(".content-wrapper");
+      const backgroundMusic = document.getElementById("backgroundMusic");
 
-        // Fungsi untuk memainkan sound effect
-        function playClickSound() {
-            const clickSound = new Audio('./assets/audio/click.wav');
-            clickSound.volume = 0.5;
-            return clickSound.play();
-        }
+      // Tambahkan audio untuk efek typing
+      const typeSound = new Audio("./assets/audio/typingSound.mp3");
+      typeSound.volume = 0.5;
 
-        // Modifikasi fungsi typeWriter untuk menambahkan sound effect
-        function typeWriter(text, i = 0) {
-            if (i < text.length) {
-                endingText.textContent += text.charAt(i);
-                // Mainkan sound effect untuk setiap karakter
-                typeSound.currentTime = 0;
-                typeSound.play().catch(error => console.error('Audio play error:', error));
-                i++;
-                setTimeout(() => typeWriter(text, i), 30);
-            } else {
-                endingText.classList.add('fade-in');
-                setTimeout(() => {
-                    const buttonGroup = document.getElementById('buttonGroup');
-                    buttonGroup.innerHTML = ''; // Clear existing buttons
-                    
-                    if (endingType === "good") {
-                        const newGameBtn = document.createElement('button');
-                        newGameBtn.className = 'try-again-button new-game-button';
-                        newGameBtn.textContent = 'Main Lagi';
-                        newGameBtn.onclick = () => {
-                            playClickSound().then(() => {
-                                setTimeout(() => {
-                                    localStorage.clear();
-                                    window.location.href = "index.html";
-                                }, 200);
-                            });
-                        };
-                        buttonGroup.appendChild(newGameBtn);
-                        newGameBtn.style.display = 'inline-block';
-                        newGameBtn.classList.add('fade-in', 'glow');
-                    }
+      // Fungsi untuk memainkan sound effect
+      function playClickSound() {
+        const clickSound = new Audio("./assets/audio/click.wav");
+        clickSound.volume = 0.5;
+        return clickSound.play();
+      }
 
-                    if (endingType !== "good") {
-                        const tryAgainBtn = document.createElement('button');
-                        tryAgainBtn.className = 'try-again-button';
-                        tryAgainBtn.textContent = 'Coba Lagi';
-                        tryAgainBtn.onclick = () => {
-                            playClickSound().then(() => {
-                                setTimeout(() => {
-                                    localStorage.clear();
-                                    window.location.href = "index.html";
-                                }, 200);
-                            });
-                        };
-                        
-                        buttonGroup.appendChild(tryAgainBtn);
-                        tryAgainBtn.style.display = 'inline-block';
-                        tryAgainBtn.classList.add('fade-in', 'glow');
-                        
-                        tryAgainBtn.addEventListener('mouseenter', createButtonParticles);
-                    }
-                }, 1000);
+      // Modifikasi fungsi typeWriter untuk menambahkan sound effect
+      function typeWriter(text, i = 0) {
+        if (i < text.length) {
+          endingText.textContent += text.charAt(i);
+          // Mainkan sound effect untuk setiap karakter
+          typeSound.currentTime = 0;
+          typeSound
+            .play()
+            .catch((error) => console.error("Audio play error:", error));
+          i++;
+          setTimeout(() => typeWriter(text, i), 30);
+        } else {
+          endingText.classList.add("fade-in");
+          setTimeout(() => {
+            const buttonGroup = document.getElementById("buttonGroup");
+            buttonGroup.innerHTML = ""; // Clear existing buttons
+
+            if (endingType === "good") {
+              const newGameBtn = document.createElement("button");
+              newGameBtn.className = "try-again-button new-game-button";
+              newGameBtn.textContent = "Main Lagi";
+              newGameBtn.onclick = () => {
+                playClickSound().then(() => {
+                  setTimeout(() => {
+                    localStorage.clear();
+                    window.location.href = "index.html";
+                  }, 200);
+                });
+              };
+              buttonGroup.appendChild(newGameBtn);
+              newGameBtn.style.display = "inline-block";
+              newGameBtn.classList.add("fade-in", "glow");
             }
-        }
 
-        function createParticles() {
-            const particles = document.getElementById('particles');
-            for(let i = 0; i < 50; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.cssText = `
+            if (endingType !== "good") {
+              const tryAgainBtn = document.createElement("button");
+              tryAgainBtn.className = "try-again-button";
+              tryAgainBtn.textContent = "Coba Lagi";
+              tryAgainBtn.onclick = () => {
+                playClickSound().then(() => {
+                  setTimeout(() => {
+                    localStorage.clear();
+                    window.location.href = "index.html";
+                  }, 200);
+                });
+              };
+
+              buttonGroup.appendChild(tryAgainBtn);
+              tryAgainBtn.style.display = "inline-block";
+              tryAgainBtn.classList.add("fade-in", "glow");
+
+              tryAgainBtn.addEventListener("mouseenter", createButtonParticles);
+            }
+          }, 1000);
+        }
+      }
+
+      function createParticles() {
+        const particles = document.getElementById("particles");
+        for (let i = 0; i < 50; i++) {
+          const particle = document.createElement("div");
+          particle.className = "particle";
+          particle.style.cssText = `
                     left: ${Math.random() * 100}%;
                     top: ${Math.random() * 100}%;
                     width: ${Math.random() * 5 + 2}px;
                     height: ${Math.random() * 5 + 2}px;
                     animation-delay: ${Math.random() * 5}s;
                 `;
-                particles.appendChild(particle);
-            }
+          particles.appendChild(particle);
         }
+      }
 
-        // Fungsi untuk memainkan musik sesuai dengan ending
-        function playBackgroundMusic() {
-            const musicPath = endingType === "good" 
-                ? "./assets/audio/goodEnding.mp3" 
-                : "./assets/audio/badEnding.wav";
-            
-            backgroundMusic.src = musicPath;
-            
-            // Memastikan volume tidak terlalu keras
-            backgroundMusic.volume = 0.5;
-            
-            // Mencoba memutar musik dengan promise
-            const playPromise = backgroundMusic.play();
-            
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    console.log("Autoplay prevented:", error);
-                });
-            }
+      // Fungsi untuk memainkan musik sesuai dengan ending
+      function playBackgroundMusic() {
+        const musicPath =
+          endingType === "good"
+            ? "./assets/audio/goodEnding.mp3"
+            : "./assets/audio/badEnding.wav";
+
+        backgroundMusic.src = musicPath;
+
+        // Memastikan volume tidak terlalu keras
+        backgroundMusic.volume = 0.5;
+
+        // Mencoba memutar musik dengan promise
+        const playPromise = backgroundMusic.play();
+
+        if (playPromise !== undefined) {
+          playPromise.catch((error) => {
+            console.log("Autoplay prevented:", error);
+          });
         }
+      }
 
-        window.addEventListener('load', () => {
-            createParticles();
-            endingImage.src = endingData.image;
-            
-            // Memutar musik saat halaman dimuat
-            playBackgroundMusic();
-            
+      window.addEventListener("load", () => {
+        createParticles();
+        endingImage.src = endingData.image;
+
+        // Memutar musik saat halaman dimuat
+        playBackgroundMusic();
+
+        setTimeout(() => {
+          endingImage.classList.add("fade-in");
+          endingImage.style.transform = "scale(1)";
+          setTimeout(() => {
+            contentWrapper.style.transform = "translateY(0)";
+            contentWrapper.style.opacity = "1";
             setTimeout(() => {
-                endingImage.classList.add('fade-in');
-                endingImage.style.transform = 'scale(1)';
-                setTimeout(() => {
-                    contentWrapper.style.transform = 'translateY(0)';
-                    contentWrapper.style.opacity = '1';
-                    setTimeout(() => {
-                        endingText.style.opacity = '1';
-                        endingText.style.transform = 'translateY(0)';
-                        typeWriter(endingData.text);
-                    }, 500);
-                }, 1000);
+              endingText.style.opacity = "1";
+              endingText.style.transform = "translateY(0)";
+              typeWriter(endingData.text);
             }, 500);
-        });
+          }, 1000);
+        }, 500);
+      });
 
-        // Menambahkan fungsi untuk menghentikan musik saat pindah halaman
-        window.addEventListener('beforeunload', () => {
-            backgroundMusic.pause();
-            backgroundMusic.currentTime = 0;
-        });
+      // Menambahkan fungsi untuk menghentikan musik saat pindah halaman
+      window.addEventListener("beforeunload", () => {
+        backgroundMusic.pause();
+        backgroundMusic.currentTime = 0;
+      });
 
-        // Hapus event listener yang tumpang tindih
-        document.removeEventListener('DOMContentLoaded', () => {});
+      // Hapus event listener yang tumpang tindih
+      document.removeEventListener("DOMContentLoaded", () => {});
 
-        function createButtonParticles(event) {
-            const button = event.currentTarget;
-            const rect = button.getBoundingClientRect();
-            const particles = [];
-            
-            for(let i = 0; i < 8; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'button-particle';
-                
-                const angle = (Math.PI * 2 * i) / 8;
-                particle.style.setProperty('--dx', Math.cos(angle));
-                particle.style.setProperty('--dy', Math.sin(angle));
-                
-                particle.style.left = `${event.clientX - rect.left}px`;
-                particle.style.top = `${event.clientY - rect.top}px`;
-                
-                button.appendChild(particle);
-                particles.push(particle);
-            }
-            
-            setTimeout(() => {
-                particles.forEach(p => p.remove());
-            }, 1000);
+      function createButtonParticles(event) {
+        const button = event.currentTarget;
+        const rect = button.getBoundingClientRect();
+        const particles = [];
+
+        for (let i = 0; i < 8; i++) {
+          const particle = document.createElement("div");
+          particle.className = "button-particle";
+
+          const angle = (Math.PI * 2 * i) / 8;
+          particle.style.setProperty("--dx", Math.cos(angle));
+          particle.style.setProperty("--dy", Math.sin(angle));
+
+          particle.style.left = `${event.clientX - rect.left}px`;
+          particle.style.top = `${event.clientY - rect.top}px`;
+
+          button.appendChild(particle);
+          particles.push(particle);
         }
-    </script>
-</body>
-</html>
 
+        setTimeout(() => {
+          particles.forEach((p) => p.remove());
+        }, 1000);
+      }
+    </script>
+  </body>
+</html>

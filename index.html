@@ -1,684 +1,741 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <link rel="icon" href="./assets/img/logoEcoG.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lobby - ECOGUARDIANS</title>
-  <style>
-    /* General reset */
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="./assets/img/logoEcoG.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lobby - ECOGUARDIANS</title>
+    <style>
+      /* General reset */
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: sans-serif;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #000;
-      overflow: hidden;
-      transition: background 1s ease;
-      position: relative; /* Penting agar child dengan position absolute mengacu ke body */
-    }
-
-    /* Kontainer burung yang selalu berada di belakang */
-    #birdContainer {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: -1;
-    }
-
-    /* Tampilan Start Screen */
-    .start-screen {
-      position: relative;
-      color: #fff;
-      font-size: 2.5rem;
-      text-align: center;
-      cursor: pointer;
-      padding: 40px 60px;
-      background: linear-gradient(130deg, rgba(64,191,1,0.7), rgba(64,191,1,0.3));
-      border: 3px solid rgba(64,191,1,0.8);
-      border-radius: 20px;
-      text-transform: uppercase;
-      font-weight: bold;
-      letter-spacing: 4px;
-      overflow: hidden;
-      box-shadow: 0 0 30px rgba(64,191,1,0.8);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      animation: glowPulse 2s infinite alternate;
-    }
-
-    /* Animasi pulsating dan scale kecil */
-    @keyframes glowPulse {
-      0% {
-        box-shadow: 0 0 20px rgba(64,191,1,0.6);
-        transform: scale(0.98);
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       }
-      100% {
-        box-shadow: 0 0 40px rgba(64,191,1,1);
-        transform: scale(1);
+
+      body {
+        font-family: sans-serif;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #000;
+        overflow: hidden;
+        transition: background 1s ease;
+        position: relative; /* Penting agar child dengan position absolute mengacu ke body */
       }
-    }
 
-    .start-screen:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 50px rgba(64,191,1,1);
-    }
-
-    /* Efek animasi untuk teks dengan gradient dan flicker */
-    .start-text {
-      background: linear-gradient(90deg, #ffffff, #c0ffc0);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: textFlicker 1.5s infinite alternate;
-    }
-
-    @keyframes textFlicker {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
-    }
-
-    /* Pseudo-element untuk background dinamis dan rotasi */
-    .start-screen::before {
-      content: "";
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle at center, transparent 20%, rgba(64,191,1,0.2) 60%);
-      animation: rotateBG 6s linear infinite;
-      z-index: -1;
-    }
-
-    @keyframes rotateBG {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    /* Main Content Container */
-    .container {
-      display: none;
-      text-align: center;
-      position: relative;
-      width: 100%;
-      max-width: 800px;
-      margin: 0 auto;
-      opacity: 0;
-      transition: opacity 1s ease;
-    }
-
-    .content-wrapper {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 30px;
-      position: relative;
-      width: 100%;
-    }
-
-    .title {
-      width: 100%;
-      max-width: 770px;
-      height: auto;
-      aspect-ratio: 770 / 434;
-      background: url('./assets/img/logoEcoG.svg') no-repeat center center/contain;
-      animation: dropIn 1s ease-out forwards;
-      opacity: 0;
-      transform: translateY(-100vh);
-    }
-
-    @keyframes dropIn {
-      to {
-        opacity: 1;
-        transform: translateY(0);
+      /* Kontainer burung yang selalu berada di belakang */
+      #birdContainer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
       }
-    }
 
-    .buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-    }
-
-    .button {
-      display: flex;
-      width: 100%;
-      max-width: 220px;
-      height: 90px;
-      padding: 14px 33px;
-      justify-content: center;
-      align-items: center;
-      font-size: 1.7rem;
-      font-weight: bold;
-      color: white;
-      background: linear-gradient(109deg, #14aa02 24.9%, #55c800 70.98%);
-      border: 4px solid #000;
-      border-radius: 20px;
-      box-shadow: 0 6px 0px 0px #000;
-      text-decoration: none;
-      transition: all 0.2s ease;
-      position: relative;
-      overflow: hidden;
-      opacity: 0;
-      transform: translateX(-100vw);
-      font-family: 'Helvetica Bold', sans-serif;
-    }
-
-    .button::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 200%;
-      height: 100%;
-      background: linear-gradient(120deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.3));
-      transition: all 0.3s ease;
-      transform: skewX(-25deg);
-    }
-
-    .button:hover::before {
-      left: 100%;
-      transition: all 0.5s ease;
-    }
-
-    .button:hover {
-      transform: translateY(3px);
-      box-shadow: 0 3px 0px 0px #000;
-    }
-
-    .button:active {
-      transform: translateY(6px);
-      box-shadow: 0 0px 0px 0px #000;
-    }
-
-    .button:nth-child(1) {
-      animation: slideIn 0.5s ease-out 1s forwards;
-    }
-
-    .button:nth-child(2) {
-      animation: slideIn 0.5s ease-out 1.2s forwards;
-    }
-
-    @keyframes slideIn {
-      to {
-        opacity: 1;
-        transform: translateX(0);
+      /* Tampilan Start Screen */
+      .start-screen {
+        position: relative;
+        color: #fff;
+        font-size: 2.5rem;
+        text-align: center;
+        cursor: pointer;
+        padding: 40px 60px;
+        background: linear-gradient(
+          130deg,
+          rgba(64, 191, 1, 0.7),
+          rgba(64, 191, 1, 0.3)
+        );
+        border: 3px solid rgba(64, 191, 1, 0.8);
+        border-radius: 20px;
+        text-transform: uppercase;
+        font-weight: bold;
+        letter-spacing: 4px;
+        overflow: hidden;
+        box-shadow: 0 0 30px rgba(64, 191, 1, 0.8);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        animation: glowPulse 2s infinite alternate;
       }
-    }
 
-    /* ========================================= */
-    /* ============ POPUP ABOUT US (Anime Style) ============= */
-    /* ========================================= */
-    .popup-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s ease, visibility 0.3s ease;
-      z-index: 1000;
-    }
+      /* Animasi pulsating dan scale kecil */
+      @keyframes glowPulse {
+        0% {
+          box-shadow: 0 0 20px rgba(64, 191, 1, 0.6);
+          transform: scale(0.98);
+        }
+        100% {
+          box-shadow: 0 0 40px rgba(64, 191, 1, 1);
+          transform: scale(1);
+        }
+      }
 
-    .popup-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
+      .start-screen:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 50px rgba(64, 191, 1, 1);
+      }
 
-    .popup {
-      background: linear-gradient(135deg, #14aa02, #55c800);
-      border: 3px solid #14aa02;
-      border-radius: 15px;
-      padding: 20px;
-      max-width: 600px;
-      width: 90%;
-      position: relative;
-      box-shadow: 0 0 20px rgba(20,170,2,0.6);
-      animation: animePopupEnter 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), float 3s ease-in-out infinite;
-    }
+      /* Efek animasi untuk teks dengan gradient dan flicker */
+      .start-text {
+        background: linear-gradient(90deg, #ffffff, #c0ffc0);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: textFlicker 1.5s infinite alternate;
+      }
 
-    .popup::before {
-      content: "";
-      position: absolute;
-      top: -3px;
-      left: -3px;
-      right: -3px;
-      bottom: -3px;
-      background: linear-gradient(45deg, #14aa02, #55c800, #14aa02);
-      z-index: -1;
-      filter: blur(5px);
-      opacity: 0.8;
-      border-radius: 18px;
-      /* animation: gradientShift 6s ease infinite; */
-    }
+      @keyframes textFlicker {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
 
-    @keyframes animePopupEnter {
-      0% {
+      /* Pseudo-element untuk background dinamis dan rotasi */
+      .start-screen::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle at center,
+          transparent 20%,
+          rgba(64, 191, 1, 0.2) 60%
+        );
+        animation: rotateBG 6s linear infinite;
+        z-index: -1;
+      }
+
+      @keyframes rotateBG {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Main Content Container */
+      .container {
+        display: none;
+        text-align: center;
+        position: relative;
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
         opacity: 0;
-        transform: scale(0.5) rotate(-10deg);
+        transition: opacity 1s ease;
       }
-      50% {
-        opacity: 1;
-        transform: scale(1.05) rotate(2deg);
+
+      .content-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 30px;
+        position: relative;
+        width: 100%;
       }
-      100% {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
 
-    @keyframes float {
-      0% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-      100% { transform: translateY(0); }
-    }
-
-    .popup h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 2.2rem;
-      font-weight: bold;
-      background: white;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
-    }
-
-    /* ============ TEAM MEMBERS (Anime Game Style) dengan Dominan Warna rgb(64,191,1) ============= */
-    .team-members {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-      animation: teamMembersFadeIn 1s ease-out forwards;
-    }
-
-    @keyframes teamMembersFadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .team-member {
-      background: linear-gradient(135deg, #141414, #2a2a2a);
-      border: 4px solid transparent;
-      border-image: linear-gradient(45deg, #14aa02, #55c800) 1;
-      border-radius: 10px;
-      padding: 15px;
-      width: 250px;
-      text-align: center;
-      box-shadow: 0 0 10px rgba(20,170,2,0.8);
-      animation: popIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    @keyframes popIn {
-      from {
+      .title {
+        width: 100%;
+        max-width: 770px;
+        height: auto;
+        aspect-ratio: 770 / 434;
+        background: url("./assets/img/logoEcoG.svg") no-repeat center
+          center/contain;
+        animation: dropIn 1s ease-out forwards;
         opacity: 0;
-        transform: scale(0.5) rotate(-10deg);
+        transform: translateY(-100vh);
       }
-      to {
+
+      @keyframes dropIn {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+      }
+
+      .button {
+        display: flex;
+        width: 100%;
+        max-width: 220px;
+        height: 90px;
+        padding: 14px 33px;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.7rem;
+        font-weight: bold;
+        color: white;
+        background: linear-gradient(109deg, #14aa02 24.9%, #55c800 70.98%);
+        border: 4px solid #000;
+        border-radius: 20px;
+        box-shadow: 0 6px 0px 0px #000;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateX(-100vw);
+        font-family: "Helvetica Bold", sans-serif;
+      }
+
+      .button::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 200%;
+        height: 100%;
+        background: linear-gradient(
+          120deg,
+          rgba(255, 255, 255, 0.3),
+          rgba(255, 255, 255, 0.1),
+          rgba(255, 255, 255, 0.3)
+        );
+        transition: all 0.3s ease;
+        transform: skewX(-25deg);
+      }
+
+      .button:hover::before {
+        left: 100%;
+        transition: all 0.5s ease;
+      }
+
+      .button:hover {
+        transform: translateY(3px);
+        box-shadow: 0 3px 0px 0px #000;
+      }
+
+      .button:active {
+        transform: translateY(6px);
+        box-shadow: 0 0px 0px 0px #000;
+      }
+
+      .button:nth-child(1) {
+        animation: slideIn 0.5s ease-out 1s forwards;
+      }
+
+      .button:nth-child(2) {
+        animation: slideIn 0.5s ease-out 1.2s forwards;
+      }
+
+      @keyframes slideIn {
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      /* ========================================= */
+      /* ============ POPUP ABOUT US (Anime Style) ============= */
+      /* ========================================= */
+      .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        z-index: 1000;
+      }
+
+      .popup-overlay.active {
         opacity: 1;
-        transform: scale(1) rotate(0deg);
+        visibility: visible;
       }
-    }
 
-    .team-member:hover {
-      transform: scale(1.05) rotate(1deg);
-      box-shadow: 0 0 20px rgba(20,170,2,1);
-    }
+      .popup {
+        background: linear-gradient(135deg, #14aa02, #55c800);
+        border: 3px solid #14aa02;
+        border-radius: 15px;
+        padding: 20px;
+        max-width: 600px;
+        width: 90%;
+        position: relative;
+        box-shadow: 0 0 20px rgba(20, 170, 2, 0.6);
+        animation: animePopupEnter 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55),
+          float 3s ease-in-out infinite;
+      }
 
-    .team-member img {
-      width: 100%;
-      height: auto;
-      border-radius: 10px;
-      margin-bottom: 10px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
+      .popup::before {
+        content: "";
+        position: absolute;
+        top: -3px;
+        left: -3px;
+        right: -3px;
+        bottom: -3px;
+        background: linear-gradient(45deg, #14aa02, #55c800, #14aa02);
+        z-index: -1;
+        filter: blur(5px);
+        opacity: 0.8;
+        border-radius: 18px;
+        /* animation: gradientShift 6s ease infinite; */
+      }
 
-    .team-member img:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 15px rgba(20,170,2,0.6);
-    }
+      @keyframes animePopupEnter {
+        0% {
+          opacity: 0;
+          transform: scale(0.5) rotate(-10deg);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.05) rotate(2deg);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
 
-    .team-member p {
-      color: #ffffff;
-      margin: 5px 0;
-      animation: textFadeIn 1s ease-in-out forwards;
-    }
+      @keyframes float {
+        0% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+        100% {
+          transform: translateY(0);
+        }
+      }
 
-    @keyframes textFadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+      .popup h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 2.2rem;
+        font-weight: bold;
+        background: white;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+      }
 
-    .team-member a {
-      color: #14aa02;
-      text-decoration: none;
-      position: relative;
-      transition: color 0.3s ease;
-    }
+      /* ============ TEAM MEMBERS (Anime Game Style) dengan Dominan Warna rgb(64,191,1) ============= */
+      .team-members {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+        animation: teamMembersFadeIn 1s ease-out forwards;
+      }
 
-    .team-member a::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      bottom: -2px;
-      width: 100%;
-      height: 2px;
-      background: #14aa02;
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.3s ease;
-    }
+      @keyframes teamMembersFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-    .team-member a:hover {
-      color: #14aa02;
-    }
+      .team-member {
+        background: linear-gradient(135deg, #141414, #2a2a2a);
+        border: 4px solid transparent;
+        border-image: linear-gradient(45deg, #14aa02, #55c800) 1;
+        border-radius: 10px;
+        padding: 15px;
+        width: 250px;
+        text-align: center;
+        box-shadow: 0 0 10px rgba(20, 170, 2, 0.8);
+        animation: popIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
 
-    .team-member a:hover::after {
-      transform: scaleX(1);
-    }
+      @keyframes popIn {
+        from {
+          opacity: 0;
+          transform: scale(0.5) rotate(-10deg);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) rotate(0deg);
+        }
+      }
 
-    .close-button {
-      position: absolute;
-      top: -15px;
-      right: -15px;
-      background: #ff557f;
-      border: none;
-      border-radius: 50%;
-      width: 35px;
-      height: 35px;
-      font-size: 1.5rem;
-      color: #ffffff;
-      cursor: pointer;
-      transition: background 0.3s ease, transform 0.3s ease;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    }
+      .team-member:hover {
+        transform: scale(1.05) rotate(1deg);
+        box-shadow: 0 0 20px rgba(20, 170, 2, 1);
+      }
 
-    .close-button:hover {
-      background: #e04e70;
-      transform: scale(1.1);
-    }
+      .team-member img {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
 
-    .mute-toggle {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      width: 68px;
-      height: 64px;
-      cursor: pointer;
-      transition: transform 0.3s ease, opacity 0.3s ease;
-      z-index: 1001;
-      opacity: 0;
-      visibility: hidden;
-    }
+      .team-member img:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 15px rgba(20, 170, 2, 0.6);
+      }
 
-    .mute-toggle.visible {
-      opacity: 1;
-      visibility: visible;
-    }
+      .team-member p {
+        color: #ffffff;
+        margin: 5px 0;
+        animation: textFadeIn 1s ease-in-out forwards;
+      }
 
-    .mute-toggle:hover {
-      transform: scale(0.9);
-    }
+      @keyframes textFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-    .mute-toggle:active {
-      transform: scale(0.8);
-    }
+      .team-member a {
+        color: #14aa02;
+        text-decoration: none;
+        position: relative;
+        transition: color 0.3s ease;
+      }
 
-    .mute-toggle.disabled {
-      pointer-events: none;
-      opacity: 0.5;
-    }
-    /* ========================================= */
+      .team-member a::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -2px;
+        width: 100%;
+        height: 2px;
+        background: #14aa02;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s ease;
+      }
 
-    /* CSS untuk burung */
-    .bird {
-      position: absolute;
-      width: 60px; /* Ukuran default, bisa diubah secara dinamis via JS */
-      height: auto;
-      pointer-events: none;
-    }
+      .team-member a:hover {
+        color: #14aa02;
+      }
 
-    /* Keyframes untuk burung terbang dari kiri ke kanan */
-    @keyframes flyLR {
-      from { transform: translateX(0); }
-      to { transform: translateX(calc(100vw + 150px)); }
-    }
+      .team-member a:hover::after {
+        transform: scaleX(1);
+      }
 
-    /* Keyframes untuk burung terbang dari kanan ke kiri */
-    @keyframes flyRL {
-      from { transform: translateX(0) scaleX(-1); }
-      to { transform: translateX(calc(-100vw - 150px)) scaleX(-1); }
-    }
-  </style>
-</head>
-<body>
-  <audio id="bgMusic" loop>
-    <source src="./assets/audio/backsoundIndex.mp3" type="audio/mpeg" />
-  </audio>
+      .close-button {
+        position: absolute;
+        top: -15px;
+        right: -15px;
+        background: #ff557f;
+        border: none;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        font-size: 1.5rem;
+        color: #ffffff;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      }
 
-  <!-- Kontainer burung (selalu di belakang elemen UI) -->
-  <div id="birdContainer"></div>
+      .close-button:hover {
+        background: #e04e70;
+        transform: scale(1.1);
+      }
 
-  <div class="start-screen" id="startScreen">
-    <span class="start-text">▶ Tap to Start ◀</span>
-  </div>
+      .mute-toggle {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 68px;
+        height: 64px;
+        cursor: pointer;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+        z-index: 1001;
+        opacity: 0;
+        visibility: hidden;
+      }
 
-  <div class="container" id="mainContent">
-    <div class="content-wrapper">
-      <div class="title"></div>
-      <div class="buttons">
-        <!-- Tombol Play -->
-        <a href="#" class="button play">Play</a>
-        <!-- Tombol About Us -->
-        <a href="#" class="button" id="aboutButton">About Us</a>
+      .mute-toggle.visible {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .mute-toggle:hover {
+        transform: scale(0.9);
+      }
+
+      .mute-toggle:active {
+        transform: scale(0.8);
+      }
+
+      .mute-toggle.disabled {
+        pointer-events: none;
+        opacity: 0.5;
+      }
+      /* ========================================= */
+
+      /* CSS untuk burung */
+      .bird {
+        position: absolute;
+        width: 60px; /* Ukuran default, bisa diubah secara dinamis via JS */
+        height: auto;
+        pointer-events: none;
+      }
+
+      /* Keyframes untuk burung terbang dari kiri ke kanan */
+      @keyframes flyLR {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(calc(100vw + 150px));
+        }
+      }
+
+      /* Keyframes untuk burung terbang dari kanan ke kiri */
+      @keyframes flyRL {
+        from {
+          transform: translateX(0) scaleX(-1);
+        }
+        to {
+          transform: translateX(calc(-100vw - 150px)) scaleX(-1);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <audio id="bgMusic" loop>
+      <source src="./assets/audio/backsoundIndex.mp3" type="audio/mpeg" />
+    </audio>
+
+    <!-- Kontainer burung (selalu di belakang elemen UI) -->
+    <div id="birdContainer"></div>
+
+    <div class="start-screen" id="startScreen">
+      <span class="start-text">▶ Tap to Start ◀</span>
+    </div>
+
+    <div class="container" id="mainContent">
+      <div class="content-wrapper">
+        <div class="title"></div>
+        <div class="buttons">
+          <!-- Tombol Play -->
+          <a href="#" class="button play">Play</a>
+          <!-- Tombol About Us -->
+          <a href="#" class="button" id="aboutButton">About Us</a>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- POPUP ABOUT US -->
-  <div class="popup-overlay" id="aboutPopup">
-    <div class="popup">
-      <button class="close-button" id="closePopup">&times;</button>
-      <h2>About Us</h2>
-      <div class="team-members">
-        <div class="team-member">
-          <img src="./assets/img/jojo.jpg" alt="Mohammad Jonah Setiawan" />
-          <p><strong>Mohammad Jonah Setiawan</strong></p>
-          <p>SMKN 1 Cibinong</p>
-          <p>
-            Instagram:
-            <a href="https://instagram.com/mojostwn" target="_blank">@mojostwn</a>
-          </p>
-        </div>
-        <div class="team-member">
-          <img src="./assets/img/rafi.jpg" alt="Rafi Julian" />
-          <p><strong>Rafi Julian</strong></p>
-          <p>SMKN 1 Cibinong</p>
-          <p>
-            Instagram:
-            <a href="https://instagram.com/rjuliannnn_" target="_blank">@rjuliannnn_</a>
-          </p>
+    <!-- POPUP ABOUT US -->
+    <div class="popup-overlay" id="aboutPopup">
+      <div class="popup">
+        <button class="close-button" id="closePopup">&times;</button>
+        <h2>About Us</h2>
+        <div class="team-members">
+          <div class="team-member">
+            <img src="./assets/img/jojo.jpg" alt="Mohammad Jonah Setiawan" />
+            <p><strong>Mohammad Jonah Setiawan</strong></p>
+            <p>SMKN 1 Cibinong</p>
+            <p>
+              Instagram:
+              <a href="https://instagram.com/mojostwn" target="_blank"
+                >@mojostwn</a
+              >
+            </p>
+          </div>
+          <div class="team-member">
+            <img src="./assets/img/rafi.jpg" alt="Rafi Julian" />
+            <p><strong>Rafi Julian</strong></p>
+            <p>SMKN 1 Cibinong</p>
+            <p>
+              Instagram:
+              <a href="https://instagram.com/rjuliannnn_" target="_blank"
+                >@rjuliannnn_</a
+              >
+            </p>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="mute-toggle" id="muteToggle">
-    <img src="./assets/img/unmuteLogo.svg" alt="Unmute" id="muteIcon" />
-  </div>
+    <div class="mute-toggle" id="muteToggle">
+      <img src="./assets/img/unmuteLogo.svg" alt="Unmute" id="muteIcon" />
+    </div>
 
-  <script>
-    // Audio untuk efek klik
-    const clickSFX = new Audio('./assets/audio/click.wav');
+    <script>
+      // Audio untuk efek klik
+      const clickSFX = new Audio("./assets/audio/click.wav");
 
-    // Fungsi untuk memutar SFX klik
-    function playClickSFX() {
-      try {
-        // Reset waktu putar agar dapat diputar berulang kali
-        clickSFX.currentTime = 0;
-        clickSFX.play();
-      } catch (error) {
-        console.error("Error playing click sound effect:", error);
+      // Fungsi untuk memutar SFX klik
+      function playClickSFX() {
+        try {
+          // Reset waktu putar agar dapat diputar berulang kali
+          clickSFX.currentTime = 0;
+          clickSFX.play();
+        } catch (error) {
+          console.error("Error playing click sound effect:", error);
+        }
       }
-    }
 
-    // Mulai tampilan start screen dan pindah ke konten utama
-    const startScreen = document.getElementById("startScreen");
-    const mainContent = document.getElementById("mainContent");
-    const bgMusic = document.getElementById("bgMusic");
+      // Mulai tampilan start screen dan pindah ke konten utama
+      const startScreen = document.getElementById("startScreen");
+      const mainContent = document.getElementById("mainContent");
+      const bgMusic = document.getElementById("bgMusic");
 
-    startScreen.addEventListener("click", function () {
-      playClickSFX();
-      // Mulai mainkan audio
-      bgMusic.play();
+      startScreen.addEventListener("click", function () {
+        playClickSFX();
+        // Mulai mainkan audio
+        bgMusic.play();
 
-      // Fade out start screen
-      startScreen.style.opacity = "0";
-      startScreen.style.transition = "opacity 1s ease";
-
-      setTimeout(() => {
-        startScreen.style.display = "none";
-        mainContent.style.display = "block";
+        // Fade out start screen
+        startScreen.style.opacity = "0";
+        startScreen.style.transition = "opacity 1s ease";
 
         setTimeout(() => {
-          mainContent.style.opacity = "1";
-          muteToggle.classList.add("visible");
-        }, 50);
+          startScreen.style.display = "none";
+          mainContent.style.display = "block";
 
-        document.body.style.backgroundImage = "url('./assets/img/indexBg.png')";
-        document.body.style.backgroundSize = "cover";
-        document.body.style.backgroundPosition = "center";
+          setTimeout(() => {
+            mainContent.style.opacity = "1";
+            muteToggle.classList.add("visible");
+          }, 50);
 
-        // Mulai spawn burung hanya setelah pengguna klik start screen
-        spawnBird();
-      }, 1000);
-    });
+          document.body.style.backgroundImage =
+            "url('./assets/img/indexBg.png')";
+          document.body.style.backgroundSize = "cover";
+          document.body.style.backgroundPosition = "center";
 
-    // Popup About Us
-    const aboutButton = document.getElementById("aboutButton");
-    const aboutPopup = document.getElementById("aboutPopup");
-    const closePopup = document.getElementById("closePopup");
+          // Mulai spawn burung hanya setelah pengguna klik start screen
+          spawnBird();
+        }, 1000);
+      });
 
-    aboutButton.addEventListener("click", function (e) {
-      playClickSFX();
-      e.preventDefault();
-      aboutPopup.classList.add("active");
-      muteToggle.classList.add("disabled");
-    });
+      // Popup About Us
+      const aboutButton = document.getElementById("aboutButton");
+      const aboutPopup = document.getElementById("aboutPopup");
+      const closePopup = document.getElementById("closePopup");
 
-    closePopup.addEventListener("click", function () {
-      playClickSFX();
-      aboutPopup.classList.remove("active");
-      muteToggle.classList.remove("disabled");
-    });
+      aboutButton.addEventListener("click", function (e) {
+        playClickSFX();
+        e.preventDefault();
+        aboutPopup.classList.add("active");
+        muteToggle.classList.add("disabled");
+      });
 
-    // Tutup popup jika klik di luar area popup
-    aboutPopup.addEventListener("click", function (e) {
-      if (e.target === aboutPopup) {
+      closePopup.addEventListener("click", function () {
         playClickSFX();
         aboutPopup.classList.remove("active");
         muteToggle.classList.remove("disabled");
-      }
-    });
+      });
 
-    // Redirect ke prolog.html ketika tombol Play ditekan
-    const playButton = document.querySelector(".button.play");
-    playButton.addEventListener("click", function(e) {
-      playClickSFX();
-      e.preventDefault();
-      window.location.href = "prolog.html";
-    });
+      // Tutup popup jika klik di luar area popup
+      aboutPopup.addEventListener("click", function (e) {
+        if (e.target === aboutPopup) {
+          playClickSFX();
+          aboutPopup.classList.remove("active");
+          muteToggle.classList.remove("disabled");
+        }
+      });
 
-    const muteToggle = document.getElementById("muteToggle");
-    const muteIcon = document.getElementById("muteIcon");
-    let isMuted = false;
+      // Redirect ke prolog.html ketika tombol Play ditekan
+      const playButton = document.querySelector(".button.play");
+      playButton.addEventListener("click", function (e) {
+        playClickSFX();
+        e.preventDefault();
+        window.location.href = "prolog.html";
+      });
 
-    muteToggle.addEventListener("click", function () {
-      playClickSFX();
-      isMuted = !isMuted;
-      bgMusic.muted = isMuted;
-      muteIcon.src = isMuted ? "./assets/img/muteLogo.svg" : "./assets/img/unmuteLogo.svg";
-    });
+      const muteToggle = document.getElementById("muteToggle");
+      const muteIcon = document.getElementById("muteIcon");
+      let isMuted = false;
 
-    /* ---------------------------------------
+      muteToggle.addEventListener("click", function () {
+        playClickSFX();
+        isMuted = !isMuted;
+        bgMusic.muted = isMuted;
+        muteIcon.src = isMuted
+          ? "./assets/img/muteLogo.svg"
+          : "./assets/img/unmuteLogo.svg";
+      });
+
+      /* ---------------------------------------
        Bird spawn and animation logic
     ------------------------------------------ */
-    function spawnBird() {
-      try {
-        const bird = document.createElement("img");
-        bird.classList.add("bird");
-        // Mulai dengan frame gambar burung 1
-        bird.src = "./assets/img/burung1.png";
-        
-        // Tentukan arah terbang secara acak
-        const leftToRight = Math.random() >= 0.5;
-        // Atur posisi vertikal secara acak antara 5vh dan 80vh
-        const randomTop = Math.random() * (80 - 5) + 5;
-        bird.style.top = randomTop + "vh";
-        
-        // Acak ukuran burung antara 50px dan 80px
-        const birdSize = Math.random() * (80 - 50) + 50;
-        bird.style.width = birdSize + "px";
-        
-        // Durasi animasi antara 10 dan 20 detik
-        const duration = Math.random() * (20 - 10) + 10;
-        
-        // Gunakan properti 'left' untuk kedua arah agar konsisten
-        if (leftToRight) {
-          bird.style.left = "-150px";
-          bird.style.animation = `flyLR ${duration}s linear forwards`;
-        } else {
-          bird.style.left = "100vw";
-          // Pastikan gambar terbalik agar menghadap ke kiri
-          bird.style.animation = `flyRL ${duration}s linear forwards`;
+      function spawnBird() {
+        try {
+          const bird = document.createElement("img");
+          bird.classList.add("bird");
+          // Mulai dengan frame gambar burung 1
+          bird.src = "./assets/img/burung1.png";
+
+          // Tentukan arah terbang secara acak
+          const leftToRight = Math.random() >= 0.5;
+          // Atur posisi vertikal secara acak antara 5vh dan 80vh
+          const randomTop = Math.random() * (80 - 5) + 5;
+          bird.style.top = randomTop + "vh";
+
+          // Acak ukuran burung antara 50px dan 80px
+          const birdSize = Math.random() * (80 - 50) + 50;
+          bird.style.width = birdSize + "px";
+
+          // Durasi animasi antara 10 dan 20 detik
+          const duration = Math.random() * (20 - 10) + 10;
+
+          // Gunakan properti 'left' untuk kedua arah agar konsisten
+          if (leftToRight) {
+            bird.style.left = "-150px";
+            bird.style.animation = `flyLR ${duration}s linear forwards`;
+          } else {
+            bird.style.left = "100vw";
+            // Pastikan gambar terbalik agar menghadap ke kiri
+            bird.style.animation = `flyRL ${duration}s linear forwards`;
+          }
+
+          // Tempelkan burung ke dalam kontainer
+          const birdContainer = document.getElementById("birdContainer");
+          birdContainer.appendChild(bird);
+
+          // Animasi frame-by-frame: ganti gambar setiap 200ms antara burung1 dan burung2
+          let currentFrame = 1;
+          const frameInterval = 200; // ms
+          const birdFrameInterval = setInterval(function () {
+            currentFrame = currentFrame === 1 ? 2 : 1;
+            bird.src = `./assets/img/burung${currentFrame}.png`;
+          }, frameInterval);
+
+          // Hapus burung dan clear interval setelah animasi selesai
+          bird.addEventListener("animationend", function () {
+            clearInterval(birdFrameInterval);
+            bird.remove();
+          });
+        } catch (error) {
+          console.error("Error spawning bird:", error);
         }
-        
-        // Tempelkan burung ke dalam kontainer
-        const birdContainer = document.getElementById("birdContainer");
-        birdContainer.appendChild(bird);
-        
-        // Animasi frame-by-frame: ganti gambar setiap 200ms antara burung1 dan burung2
-        let currentFrame = 1;
-        const frameInterval = 200; // ms
-        const birdFrameInterval = setInterval(function() {
-          currentFrame = currentFrame === 1 ? 2 : 1;
-          bird.src = `./assets/img/burung${currentFrame}.png`;
-        }, frameInterval);
-        
-        // Hapus burung dan clear interval setelah animasi selesai
-        bird.addEventListener("animationend", function() {
-          clearInterval(birdFrameInterval);
-          bird.remove();
-        });
-      } catch (error) {
-        console.error("Error spawning bird:", error);
+
+        // Jadwalkan spawn burung berikutnya (delay acak antara 3 dan 7 detik)
+        const nextDelay = Math.random() * (4000 - 2000) + 2000;
+        setTimeout(spawnBird, nextDelay);
       }
-      
-      // Jadwalkan spawn burung berikutnya (delay acak antara 3 dan 7 detik)
-      const nextDelay = Math.random() * (4000 - 2000) + 2000;
-      setTimeout(spawnBird, nextDelay);
-    }
-  </script>
-</body>
+    </script>
+  </body>
 </html>
