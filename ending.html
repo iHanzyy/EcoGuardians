@@ -260,6 +260,10 @@
 </head>
 <body>
     <div class="ending-container">
+        <audio id="backgroundMusic" loop>
+            <source src="" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
         <div class="particles" id="particles"></div>
         <img id="endingImage" class="ending-image" src="/placeholder.svg" alt="Ending">
         <div class="overlay"></div>
@@ -300,6 +304,7 @@
         const endingText = document.getElementById("endingText");
         const tryAgainBtn = document.getElementById("tryAgainButton");
         const contentWrapper = document.querySelector(".content-wrapper");
+        const backgroundMusic = document.getElementById("backgroundMusic");
 
         function typeWriter(text, i = 0) {
             if (i < text.length) {
@@ -364,9 +369,34 @@
             }
         }
 
+        // Fungsi untuk memainkan musik sesuai dengan ending
+        function playBackgroundMusic() {
+            const musicPath = endingType === "good" 
+                ? "./assets/audio/goodEnding.mp3" 
+                : "./assets/audio/badEnding.wav";
+            
+            backgroundMusic.src = musicPath;
+            
+            // Memastikan volume tidak terlalu keras
+            backgroundMusic.volume = 0.5;
+            
+            // Mencoba memutar musik dengan promise
+            const playPromise = backgroundMusic.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log("Autoplay prevented:", error);
+                });
+            }
+        }
+
         window.addEventListener('load', () => {
             createParticles();
             endingImage.src = endingData.image;
+            
+            // Memutar musik saat halaman dimuat
+            playBackgroundMusic();
+            
             setTimeout(() => {
                 endingImage.classList.add('fade-in');
                 endingImage.style.transform = 'scale(1)';
@@ -382,11 +412,25 @@
             }, 500);
         });
 
+        // Menambahkan fungsi untuk menghentikan musik saat pindah halaman
+        window.addEventListener('beforeunload', () => {
+            backgroundMusic.pause();
+            backgroundMusic.currentTime = 0;
+        });
+
+        // Modifikasi event listener untuk tombol
         document.addEventListener('DOMContentLoaded', () => {
-            tryAgainBtn.addEventListener("click", () => {
-                localStorage.clear();
-                window.location.href = "index.html";
-            });
+            const buttonGroup = document.getElementById('buttonGroup');
+            
+            if (buttonGroup) {
+                buttonGroup.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('try-again-button')) {
+                        backgroundMusic.pause();
+                        localStorage.clear();
+                        window.location.href = "index.html";
+                    }
+                });
+            }
         });
 
         tryAgainBtn.addEventListener('mouseenter', () => {
