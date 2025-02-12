@@ -2768,6 +2768,7 @@
         localStorage.setItem(`${currentTool}Placed`, 'true');
         updateInventory();
         updateInteractiveButtons();
+        updateToolButtons(); // <-- Baris baru untuk memperbarui tombol secara langsung
         showActionPopup("Alat berhasil dipasang!");
         
         // Reset UI placement
@@ -2905,6 +2906,7 @@
         localStorage.setItem(`${currentTool}Placed`, 'true');
         updateInventory();
         updateInteractiveButtons();
+        updateToolButtons(); // <-- Baris baru untuk memperbarui tombol secara langsung
         showActionPopup("Alat berhasil dipasang!");
         
         // Reset UI placement
