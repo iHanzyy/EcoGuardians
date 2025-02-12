@@ -668,10 +668,7 @@
         left: -2px;
         right: -2px;
         bottom: -2px;
-        background: linear-gradient(45deg, 
-          transparent 20%, 
-          #00fff9 40%, 
-          transparent 60%);
+        background: linear-gradient(155deg, #209902 0%, #0e671a 100%);
         z-index: -1;
         animation: borderGlow 3s linear infinite;
       }
@@ -960,8 +957,8 @@
       /* Guide Modal Specific Styles */
       /* -------------------------- */
       .guide-modal .modal-container {
-        background: #f8f9fa;
-        border: 2px solid #00fff9;
+        background: #046d04;
+        border: 2px solid #00ff22;
         box-shadow: 0 0 30px rgba(0, 255, 249, 0.2);
       }
 
@@ -1008,7 +1005,7 @@
       }
 
       .quest-modal .modal-container h2 {
-        color: #bdc3c7; /* Warna teks yang lembut dan elegan */
+        color: #f3f8f9; /* Warna teks yang lembut dan elegan */
         text-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Shadow halus untuk menambah dimensi */
       }
 
@@ -1062,7 +1059,7 @@
       /* Anime Style Guide Modal */
       /* -------------------------- */
       .guide-modal .modal-container {
-        background: linear-gradient(155deg, #086efe 0%, #80dce8 100%);
+        background: linear-gradient(155deg, #209902 0%, #00ff22 100%);
         border: 2px solid #011c80;
         border-radius: 12px;
         box-shadow: 0 0 20px rgba(77, 208, 225, 0.5), 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -1086,13 +1083,14 @@
       .guide-modal .modal-container h2 {
         color: #264653;
         font-family: 'Helvetica', sans-serif;
-        font-size: 28px;
+        font-size: 35px;
         text-transform: uppercase;
         letter-spacing: 1px;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
         margin-bottom: 20px;
         position: relative;
         display: inline-block;
+        top: 20px;
         padding: 0 15px;
       }
 
@@ -1361,7 +1359,7 @@
         <h2 style="text-align: center;">ACTIVE QUEST</h2>
         <div class="mission-content">
           <!-- Update warna label dengan tone yang lebih cool dan banner quest -->
-          <div class="quest-label" style="color: #95a5a6; margin-bottom: 15px;">✦ MISSION IN PROGRESS ✦</div>
+          <div class="quest-label" style="color: #f3f8f9; margin-bottom: 15px;">✦ MISSION IN PROGRESS ✦</div>
           <!-- Misi: Buat Alat Konversi Air -->
           <div class="mission-item">
             <img
@@ -2299,7 +2297,7 @@
         cutButton.disabled = true;
         plantButton.disabled = false;
 
-        showActionPopup(`Pohon ditebang! Nature -10%, Energy -5%, Wood +${randomWood}.`);
+        showActionPopup(`Pohon berhasil ditebang! Pohon berkurang sebanyak -10% dan Energy berkurang sebanyak -5% \n Kayu didapatkan sebanyak +${randomWood}.`);
 
         // Update progress quest
         updateQuestProgress();
@@ -2333,7 +2331,7 @@
         cutButton.disabled = false;
         plantButton.disabled = true;
 
-        showActionPopup("Pohon ditanam! Nature +7%, Air -10%.");
+        showActionPopup("Pohon ditanam! Pohon meningkat sebanyak +7% dan Air berkurang sebanyak -10%.");
 
         updateQuestProgress();
       });
@@ -2373,7 +2371,7 @@
         localStorage.setItem("waterStatus", status.water);
         localStorage.setItem("energyStatus", status.energy);
 
-        showActionPopup("Konversi air berhasil! Water +8%, Energy -8%.");
+        showActionPopup("Konversi air berhasil! Air meningkat sebanyak 8% dan Energy berkurang sebanyak 7%");
 
         triggerShakeAnimation();
         updateQuestProgress();
