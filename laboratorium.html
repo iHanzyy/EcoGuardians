@@ -1187,15 +1187,17 @@
 
         // Fungsi untuk mengupdate semua status bar secara real-time
         function updateStatusBars() {
-          // Ambil nilai-nilai dari localStorage
-          const nature =
-            parseFloat(localStorage.getItem("natureStatus")) || 100;
-          const water = parseFloat(localStorage.getItem("waterStatus")) || 100;
-          const energy =
-            parseFloat(localStorage.getItem("energyStatus")) || 100;
-          const toxic = parseFloat(localStorage.getItem("toxicStatus")) || 0;
+          // Parsing nilai dan cek apakah NaN, jika ya pakai nilai default (100 untuk nature, water, energy; 0 untuk toxic)
+          const natureRaw = parseFloat(localStorage.getItem("natureStatus"));
+          const waterRaw = parseFloat(localStorage.getItem("waterStatus"));
+          const energyRaw = parseFloat(localStorage.getItem("energyStatus"));
+          const toxicRaw = parseFloat(localStorage.getItem("toxicStatus"));
 
-          // Update bar untuk Nature, Water, Energy, dan Toxic
+          const nature = isNaN(natureRaw) ? 100 : natureRaw;
+          const water = isNaN(waterRaw) ? 100 : waterRaw;
+          const energy = isNaN(energyRaw) ? 100 : energyRaw;
+          const toxic = isNaN(toxicRaw) ? 0 : toxicRaw;
+
           const natureBar = document.querySelector(".nature .status-bar-fill");
           const waterBar = document.querySelector(".water .status-bar-fill");
           const energyBar = document.querySelector(".energy .status-bar-fill");
@@ -1206,7 +1208,7 @@
           if (energyBar) energyBar.style.width = energy + "%";
           if (toxicBar) toxicBar.style.width = toxic + "%";
 
-          // Jika terdapat elemen untuk menampilkan nilai, perbarui pula text-nya
+          // Jika ada elemen nilai, perbarui pula teksnya
           const natureValue = document.querySelector(".nature .status-value");
           const waterValue = document.querySelector(".water .status-value");
           const energyValue = document.querySelector(".energy .status-value");
@@ -1429,6 +1431,27 @@
               button.disabled = false;
             }, 1000); // cooldown 1000ms (1 detik)
           });
+        });
+
+        // Tombol Keluar (menggunakan elemen <a>) dengan anti-spam click dan cek energy
+        const exitButton = document.querySelector(".exit-btn");
+        exitButton.addEventListener("click", function (e) {
+          e.preventDefault();
+          // Jika sudah diklik sebelumnya, hentikan eksekusi
+          if (exitButton.dataset.clicked === "true") return;
+          exitButton.dataset.clicked = "true";
+          document.body.classList.add("fade-out");
+          
+          // Periksa status energy sebelum redirect
+          const energyStatus = parseFloat(localStorage.getItem("energyStatus"));
+          setTimeout(function () {
+            if (!isNaN(energyStatus) && energyStatus <= 0) {
+              localStorage.setItem("endingType", "badEnergy");
+              window.location.href = "ending.html";
+            } else {
+              window.location.href = exitButton.href;
+            }
+          }, 1000);
         });
       });
     </script>

@@ -602,14 +602,21 @@
 
       // Update status dan resource secara real-time
       function updateStatusBars() {
-        const nature = parseFloat(localStorage.getItem("natureStatus")) || 100;
-        const water = parseFloat(localStorage.getItem("waterStatus")) || 100;
-        const energy = parseFloat(localStorage.getItem("energyStatus")) || 100;
-        const toxic = parseFloat(localStorage.getItem("toxicStatus")) || 0;
+        const natureRaw = parseFloat(localStorage.getItem("natureStatus"));
+        const waterRaw = parseFloat(localStorage.getItem("waterStatus"));
+        const energyRaw = parseFloat(localStorage.getItem("energyStatus"));
+        const toxicRaw = parseFloat(localStorage.getItem("toxicStatus"));
+
+        const nature = isNaN(natureRaw) ? 100 : natureRaw;
+        const water = isNaN(waterRaw) ? 100 : waterRaw;
+        const energy = isNaN(energyRaw) ? 100 : energyRaw;
+        const toxic = isNaN(toxicRaw) ? 0 : toxicRaw;
+
         const natureBar = document.querySelector(".nature .status-bar-fill");
         const waterBar = document.querySelector(".water .status-bar-fill");
         const energyBar = document.querySelector(".energy .status-bar-fill");
         const toxicBar = document.querySelector(".toxic .status-bar-fill");
+
         if (natureBar) natureBar.style.width = nature + "%";
         if (waterBar) waterBar.style.width = water + "%";
         if (energyBar) energyBar.style.width = energy + "%";
