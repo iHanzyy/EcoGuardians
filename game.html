@@ -2261,6 +2261,11 @@
       <source src="./assets/audio/step.mp3" type="audio/mpeg" />
     </audio>
 
+    <!-- Tambahkan elemen audio untuk sfx pasang setelah elemen audio lainnya -->
+    <audio id="pasangSound">
+      <source src="./assets/audio/pasang.mp3" type="audio/mpeg" />
+    </audio>
+
     <!-- Loading Screen -->
     <div id="loadingScreen">Loading...</div>
     <!-- Game Canvas -->
@@ -4050,24 +4055,15 @@
       confirmPlacement.addEventListener("click", () => {
         if (!currentTool || !targetArea) return;
 
-        // Jika alat yang dipasang adalah polusi, gunakan ukuran dari game.tools.alatPolusi
-        // Jika bukan, ambil ukuran dari targetArea secara default
-        let rect;
-        if (currentTool === "pollution") {
-          rect = {
-            left: game.tools.alatPolusi.x,
-            top: game.tools.alatPolusi.y,
-            width: game.tools.alatPolusi.width,
-            height: game.tools.alatPolusi.height,
-          };
-        } else {
-          rect = targetArea.getBoundingClientRect();
-        }
+        // Mainkan sound effect pasang
+        const pasangSound = document.getElementById("pasangSound");
+        pasangSound.currentTime = 0;
+        pasangSound.play().catch(error => console.log("Pasang sound failed to play:", error));
 
-        const toolName =
-          currentTool === "converter" ? "Konversi" : "PenghilangPolusi";
-        const toolId =
-          currentTool === "converter" ? "alatKonversi" : "alatPolusi";
+        // Dapatkan posisi dan ukuran targetArea terlebih dahulu
+        const rect = targetArea.getBoundingClientRect();
+        const toolName = currentTool === "converter" ? "Konversi" : "PenghilangPolusi";
+        const toolId = currentTool === "converter" ? "alatKonversi" : "alatPolusi";
         let toolElement = document.getElementById(toolId);
 
         if (toolElement) {
