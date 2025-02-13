@@ -3563,14 +3563,8 @@
       // --- Aksi Tebang (Cut) ---
       const cutButton = document.getElementById("cutButton");
       cutButton.addEventListener("click", () => {
-        // Cek apakah pohon bisa ditebang
-        if (
-          game.tree.isCut ||
-          status.nature < 10 ||
-          status.energy < 5 ||
-          game.player.isChopping
-        )
-          return;
+        // Ubah kondisi pengecekan - hapus pengecekan status.nature < 10
+        if (game.tree.isCut || status.energy < 5 || game.player.isChopping) return;
 
         // Mainkan sound effect tebang
         const tebangSound = document.getElementById("tebangSound");
