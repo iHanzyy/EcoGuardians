@@ -4281,8 +4281,11 @@
 
         // Tampilkan popup guide untuk pemain baru secara otomatis
         if (!localStorage.getItem("guideSeen")) {
-          guideModal.style.display = "flex"; // Gunakan flex seperti modal lainnya
+          guideModal.style.display = "flex";
           guideModal.classList.add("active");
+          // Tambahkan ini: Reset dan update navigasi saat modal pertama kali muncul
+          currentSlide = 0;
+          updateNavigationButtons(); // Panggil fungsi untuk menyembunyikan arrow kiri
         }
 
         // Event listener untuk menutup popup guide
@@ -4296,8 +4299,11 @@
 
         // Event listener untuk membuka kembali popup guide ketika tombol guide ditekan
         guideButton.addEventListener("click", function () {
-          guideModal.style.display = "flex"; // Gunakan flex seperti modal lainnya
+          guideModal.style.display = "flex";
           guideModal.classList.add("active");
+          // Tambahkan ini: Reset dan update navigasi saat tombol guide ditekan
+          currentSlide = 0;
+          updateNavigationButtons(); // Panggil fungsi untuk menyembunyikan arrow kiri
         });
       });
     </script>
