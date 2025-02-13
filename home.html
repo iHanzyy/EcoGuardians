@@ -158,7 +158,7 @@
         font-size: 1.4rem;
         font-weight: bold;
         color: #fff;
-        background-color: #3fa840; /* menggunakan warna merah polos */
+        background-color: #3fa840; 
         border: none;
         border-radius: 15px;
         text-transform: uppercase;
@@ -167,8 +167,6 @@
         overflow: hidden;
         cursor: pointer;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
-        animation: pulseGlow 2s infinite;
-        box-shadow: 0 0 15px rgba(200, 0, 100, 0.5);
         text-decoration: none; /* memastikan tidak ada underline */
       }
 
@@ -179,18 +177,11 @@
         left: -75%;
         width: 50%;
         height: 100%;
-        background: linear-gradient(
-          120deg,
-          transparent,
-          rgba(255, 255, 255, 0.4),
-          transparent
-        );
         transform: skewX(-25deg);
       }
 
       .makan-btn:hover {
         transform: scale(1.1);
-        box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
       }
 
       .makan-btn:hover::after {
